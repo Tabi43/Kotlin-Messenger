@@ -26,6 +26,11 @@ class f_register : Fragment(R.layout.f_register) {
             //TODO: Funzione per il register fragment
         }
 
+        binding.loginreturnButton.setOnClickListener {
+            val fragment = f_login()
+            val transaction = fragmentManager?.beginTransaction()
+            transaction?.replace(R.id.fragmentContainer,fragment)?.commit()
+        }
         binding.confirmButton.setOnClickListener {
             performRegistration()
         }
@@ -36,9 +41,15 @@ class f_register : Fragment(R.layout.f_register) {
     private fun performRegistration() {
         var email = binding.mailET.text.toString()
         var password = binding.passwordET.text.toString()
+        var confirm_password=binding.confirmPasswordET.text.toString()
 
         if (email.isEmpty() || password.isEmpty()) {
-            Toast.makeText(activity, "Inserisci sto testo del cazzo", Toast.LENGTH_LONG).show()
+            Toast.makeText(activity, "Please fill out the fields", Toast.LENGTH_LONG).show()
+            return
+        }
+        Log.d("Main Activity","$password :check $confirm_password" )
+        if ( password!=confirm_password) {
+            Toast.makeText(activity, "Check your password", Toast.LENGTH_LONG).show()
             return
         }
 

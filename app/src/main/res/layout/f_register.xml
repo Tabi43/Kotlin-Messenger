@@ -4,6 +4,19 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+    <Button
+        android:id="@+id/loginreturnButton"
+        android:layout_width="113dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_marginRight="5dp"
+        android:backgroundTint="#EFFFFD"
+        android:layout_gravity="left"
+        android:text="Login"
+        android:textAllCaps="false"
+        android:textColor="@color/black"
+        android:textSize="15dp" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -25,6 +38,7 @@
             android:layout_marginBottom="5dp"
             android:background="#5D8BF4"
             android:hint="Username"
+            android:inputType="text"
             android:padding="10dp"
             android:textColor="@color/white"
             android:textColorHint="@color/white"
@@ -37,6 +51,7 @@
             android:layout_height="wrap_content"
             android:background="#5D8BF4"
             android:hint="Mail"
+            android:inputType="text"
             android:padding="10dp"
             android:textColor="@color/white"
             android:textColorHint="@color/white"
@@ -51,6 +66,7 @@
             android:layout_marginTop="5dp"
             android:background="#5D8BF4"
             android:hint="Password"
+            android:inputType="textPassword"
             android:padding="10dp"
             android:textColor="@color/white"
             android:textColorHint="@color/white"
@@ -58,12 +74,13 @@
             android:textStyle="bold" />
 
         <EditText
-            android:id="@+id/confermaPasswordET"
+            android:id="@+id/confirmPasswordET"
             android:layout_width="250dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
             android:background="#5D8BF4"
             android:hint="Confirm Password"
+            android:inputType="textPassword"
             android:padding="10dp"
             android:textColor="@color/white"
             android:textColorHint="@color/white"
