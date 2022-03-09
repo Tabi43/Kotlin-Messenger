@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "1005342886966",
+    "firebase_url": "https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app",
     "project_id": "kotlin-messenger-288bc",
     "storage_bucket": "kotlin-messenger-288bc.appspot.com"
   },

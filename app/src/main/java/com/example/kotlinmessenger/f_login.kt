@@ -1,5 +1,6 @@
 package com.example.kotlinmessenger
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -30,10 +31,13 @@ class f_login : Fragment(R.layout.f_login) {
             transaction?.replace(R.id.fragmentContainer,fragment)?.commit()
         }
 
+        binding.debugButton.setOnClickListener {
+            var intent = Intent(activity, ProfileActivity::class.java)
+            startActivity(intent)
+        }
+
         return binding.root
     }
-
-
 
     private fun performLogin(){
         var email = binding.mailET.text.toString()
@@ -52,6 +56,7 @@ class f_login : Fragment(R.layout.f_login) {
                     return@addOnCompleteListener
                 }
                 //ha funzionato
+                Toast.makeText(activity,"Loggato con successo $email",Toast.LENGTH_SHORT).show()
                 //info visibili su logcat
                 Log.d("Main Activity", "Login effettuato con successo ${it.result?.user?.uid}")
 

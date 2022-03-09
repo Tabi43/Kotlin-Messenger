@@ -9,10 +9,13 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.kotlinmessenger.databinding.FRegisterBinding
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 
 
+
 class f_register : Fragment(R.layout.f_register) {
+
     lateinit var binding: FRegisterBinding
 
     override fun onCreateView(
@@ -65,7 +68,8 @@ class f_register : Fragment(R.layout.f_register) {
                 //ha funzionato
                 //info visibili su logcat
                 Log.d("Main Activity", "Utente creato con successo ${it.result?.user?.uid}")
-
+                //Dati dell'utente
+                saveUserToFirebaseDatabase()
             }
             .addOnFailureListener {
                 Toast.makeText(activity, "Failed to create user: ${it.message}", Toast.LENGTH_LONG)
@@ -76,13 +80,19 @@ class f_register : Fragment(R.layout.f_register) {
     }//fine performRegistration
 
     private fun saveUserToFirebaseDatabase() {
+        Log.d("Register Activity", "Chiamata salvataggio dati utente")
         val uid = FirebaseAuth.getInstance().uid ?: ""
-        val ref = FirebaseDatabase.getInstance().getReference("/users/$uid")
-        val user = User(uid, binding.username.text.toString())
+        val ref = FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app").getReference("/users/$uid")
+        Log.d("Register Activity", "Reference : $ref")
+        //val user = User(uid, binding.username.text.toString(), "Hello")
+        val user = mapOf(
+            "uid" to uid,
+            "username" to binding.username.text.toString(),
+            "status" to "Hello"
+        )
         ref.setValue(user)
             .addOnSuccessListener {
                 Log.d("Register Activity", "Utente salvato nel db")
-
                 /*//start activity dopo aver creato l utente
                 val intent = Intent(this, LatestMessageActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)

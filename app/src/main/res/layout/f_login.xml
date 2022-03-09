@@ -80,6 +80,16 @@
                 android:textColor="@color/black"
                 android:id="@+id/loginButton"/>
 
+            <Button
+                android:layout_width="250dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="30dp"
+                android:layout_marginTop="20dp"
+                android:backgroundTint="#EFFFFD"
+                android:text="Debug"
+                android:textColor="@color/black"
+                android:id="@+id/debugButton"/>
+
         </LinearLayout>
 
     </LinearLayout>
