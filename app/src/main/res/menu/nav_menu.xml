@@ -9,7 +9,7 @@
         android:icon="@drawable/ic_contacts"
         android:title="Contacts"/>
     <item
-        android:id="@+id/profile"
+        android:id="@+id/settings"
         android:icon="@drawable/ic_settings"
-        android:title="Settings"/>
+        android:title="Settings" />
 </menu>

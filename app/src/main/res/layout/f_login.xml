@@ -37,8 +37,8 @@
 
             <ImageView
                 android:id="@+id/imgSplash"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
                 android:src="@drawable/group_1"
                 android:layout_gravity="center"
                 android:layout_marginBottom="10dp"/>
