@@ -13,7 +13,6 @@ import androidx.fragment.app.FragmentTransaction
 import com.example.kotlinmessenger.databinding.FLoginBinding
 import com.google.firebase.auth.FirebaseAuth
 
-
 class f_login : Fragment(R.layout.f_login) {
 
     lateinit var binding : FLoginBinding
@@ -32,7 +31,7 @@ class f_login : Fragment(R.layout.f_login) {
         }
 
         binding.debugButton.setOnClickListener {
-            var intent = Intent(activity, ProfileActivity::class.java)
+            var intent = Intent(activity, DashBoard::class.java)
             startActivity(intent)
         }
 
