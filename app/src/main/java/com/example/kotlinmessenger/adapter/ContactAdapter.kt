@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import android.widget.Filter
 import android.widget.Filterable
 import androidx.recyclerview.widget.RecyclerView
+import com.example.kotlinmessenger.User
 //import com.example.kotlinmessenger.MessageActivity
 //import com.example.kotlinmessenger.Activities.UserInfoActivity
 import com.example.kotlinmessenger.UserModel
@@ -17,6 +18,7 @@ class ContactAdapter(private var appContacts: ArrayList<UserModel>) :
     RecyclerView.Adapter<ContactAdapter.ViewHolder>(), Filterable {
 
     private var allContact: ArrayList<UserModel> = appContacts
+
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val contactItemLayoutBinding =
