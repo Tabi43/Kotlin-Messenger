@@ -29,7 +29,7 @@ class f_login : Fragment(R.layout.f_login) {
             val transaction = fragmentManager?.beginTransaction()
             transaction?.replace(R.id.fragmentContainer,fragment)?.commit()
         }
-
+        autologin()
         return binding.root
     }
 
@@ -65,6 +65,16 @@ class f_login : Fragment(R.layout.f_login) {
                 Toast.makeText(this.activity,"Failed to Login: ${it.message}", Toast.LENGTH_LONG).show()
                 //info visibili su logcat
                 Log.d("Main Activity", "sei un coglione")
+            }
+    }
+
+    private fun autologin(){
+        val email= "m@gmail.com"
+        val password= "stocazzo"
+        FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
+            .addOnSuccessListener {
+                var intent = Intent(activity, DashBoard::class.java)
+                startActivity(intent)
             }
     }
 

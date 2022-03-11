@@ -14,6 +14,7 @@ import com.example.kotlinmessenger.adapter.ContactAdapter
 import com.example.kotlinmessenger.databinding.FContactsBinding
 import com.example.kotlinmessenger.permissions.AppPermission
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
 
@@ -30,62 +31,72 @@ class f_contacts : Fragment(R.layout.f_contacts) {
     lateinit var binding: FContactsBinding
 
 
-
-
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         binding = FContactsBinding.inflate(inflater, container, false)
         appPermission = AppPermission()
         firebaseAuth = FirebaseAuth.getInstance()
-        searchUser("")
         binding.contactSearchView.setOnQueryTextListener(object :
+
             SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 return false
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
-                Log.d("Ricerca","${searchUser(newText!!)}")
+                Log.d("Ricerca", "${searchUser(newText!!)}")
+                searchUser(newText)
                 return true
             }
         })
+
         return binding.root
     }
 
     private fun searchUser(key: String) {
         val uid = FirebaseAuth.getInstance().uid ?: ""
-        var result : ArrayList<UserModel> = ArrayList()
-        val ref = FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app").getReference("/users")
+        var result = ArrayList<UserModel>()
+        val ref =
+            FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
+                .getReference("/users")
         ref.get()
             .addOnFailureListener() {
-
+                Toast.makeText(activity, "Failed to search users", Toast.LENGTH_SHORT).show()
             }
             .addOnSuccessListener {
+                Log.d("Search", "GET: ${it}")
                 it.children.forEach {
                     val username = it.child("username").value.toString()
                     val status = it.child("status").value.toString()
                     val id = it.child("uid").value.toString()
-                    var img_url:String?=null
-                    FirebaseStorage.getInstance().reference.child(AppConstants.PATH+id).downloadUrl.addOnSuccessListener {
+                    FirebaseStorage.getInstance().reference.child(AppConstants.PATH + id).downloadUrl.addOnSuccessListener {
                         // Got the download URL for 'users/me/profile.png'
-                        Log.d("url ","ottenuto:${it} id:${id}")
-                        if(username.contains(key) && uid!=id){
-                            Log.d("url ","aggiunto:${img_url} id:${id}" )
-                            result.add(UserModel(username,status,it.toString(),"",id,"",""))
+                        //Log.d("url ","ottenuto:${it} id:${id}")
+                        if (username.contains(key) && uid != id) {
+                            //Log.d("url ","aggiunto:${it} id:${id}" )
+                            Log.d("url ", "aggiunto url foto: per id:${id}")
+                            result.add(UserModel(username, status, it.toString(), "", id, "", ""))
                         }
                     }.addOnFailureListener {
-                        // Handle any errors
+                        Log.d("Search ", "Errore di caricamento dell'immagine: $it")
+                        if (username.contains(key) && uid != id) {
+                            //Log.d("url ","aggiunto:${it} id:${id}" )
+                            Log.d("url ", "aggiunto url foto: per id:${id}")
+                            //result.add(UserModel(username, status, "","", "", id, ""))
+                        }
                     }
-
                 }
                 //Adapter
+                Log.d("Search", "Utenti trovati: ${result.size}")
                 binding.recyclerViewContact.apply {
                     layoutManager = LinearLayoutManager(context)
                     setHasFixedSize(true)
                     contactAdapter = ContactAdapter(result)
                     adapter = contactAdapter
                 }
-
             }
     }
 
