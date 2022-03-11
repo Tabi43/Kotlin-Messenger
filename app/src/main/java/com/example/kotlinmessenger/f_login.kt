@@ -17,6 +17,7 @@ class f_login : Fragment(R.layout.f_login) {
 
     lateinit var binding : FLoginBinding
 
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FLoginBinding.inflate(inflater, container, false)
 
@@ -30,10 +31,10 @@ class f_login : Fragment(R.layout.f_login) {
             transaction?.replace(R.id.fragmentContainer,fragment)?.commit()
         }
 
-        binding.debugButton.setOnClickListener {
+        /*binding.debugButton.setOnClickListener {
             var intent = Intent(activity, DashBoard::class.java)
             startActivity(intent)
-        }
+        }*/
 
         return binding.root
     }
@@ -58,7 +59,8 @@ class f_login : Fragment(R.layout.f_login) {
                 Toast.makeText(activity,"Loggato con successo $email",Toast.LENGTH_SHORT).show()
                 //info visibili su logcat
                 Log.d("Main Activity", "Login effettuato con successo ${it.result?.user?.uid}")
-
+                var intent = Intent(activity, DashBoard::class.java)
+                startActivity(intent)
                 //start activity dopo aver effettuato il login
                 //TODO:"Inserire la schermata home"
                 //val intent= Intent(this, ::class.java)

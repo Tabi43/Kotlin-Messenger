@@ -2,7 +2,6 @@ package com.example.kotlinmessenger
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.kotlinmessenger.databinding.ActivityDashBoardBinding
 

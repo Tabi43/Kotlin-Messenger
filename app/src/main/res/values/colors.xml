@@ -8,6 +8,9 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="colorAccent">#FFCEA3</color>
+    <color name="edittextColor">#DDDDDD</color>
+    <color name="textColor">#999DA4</color>
+    <item name="cardBackground" type="color">#f6f6f6</item>
     <!-- MY COLORS -->
     <color name="colorPrimary">#2D31FA</color>
 </resources>

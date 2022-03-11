@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <layout>
-<!--
     <data>
         <variable
             name="chatModel"
             type="com.example.kotlinmessenger.ChatModel" />
         <import type="android.graphics.drawable.Drawable" />
     </data>
--->
+
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"

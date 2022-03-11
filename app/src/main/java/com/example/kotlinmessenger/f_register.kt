@@ -1,5 +1,6 @@
 package com.example.kotlinmessenger
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -70,6 +71,7 @@ class f_register : Fragment(R.layout.f_register) {
                 Log.d("Main Activity", "Utente creato con successo ${it.result?.user?.uid}")
                 //Dati dell'utente
                 saveUserToFirebaseDatabase()
+
             }
             .addOnFailureListener {
                 Toast.makeText(activity, "Failed to create user: ${it.message}", Toast.LENGTH_LONG)
@@ -93,10 +95,14 @@ class f_register : Fragment(R.layout.f_register) {
         ref.setValue(user)
             .addOnSuccessListener {
                 Log.d("Register Activity", "Utente salvato nel db")
+                Toast.makeText(activity, "Successfully registration into db ", Toast.LENGTH_LONG)
+                    .show()
                 /*//start activity dopo aver creato l utente
                 val intent = Intent(this, LatestMessageActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
                 startActivity(intent)*/
+                var intent = Intent(activity, DashBoard::class.java)
+                startActivity(intent)
             }
             .addOnFailureListener {
                 Toast.makeText(activity, "impossibile salvare nel db", Toast.LENGTH_LONG).show()
