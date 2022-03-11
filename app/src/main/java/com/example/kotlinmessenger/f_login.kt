@@ -17,7 +17,6 @@ class f_login : Fragment(R.layout.f_login) {
 
     lateinit var binding : FLoginBinding
 
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FLoginBinding.inflate(inflater, container, false)
 
@@ -30,11 +29,6 @@ class f_login : Fragment(R.layout.f_login) {
             val transaction = fragmentManager?.beginTransaction()
             transaction?.replace(R.id.fragmentContainer,fragment)?.commit()
         }
-
-        /*binding.debugButton.setOnClickListener {
-            var intent = Intent(activity, DashBoard::class.java)
-            startActivity(intent)
-        }*/
 
         return binding.root
     }

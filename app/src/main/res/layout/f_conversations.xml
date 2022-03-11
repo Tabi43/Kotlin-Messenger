@@ -5,11 +5,6 @@
     android:layout_height="match_parent"
     tools:context=".f_conversations">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="ciao io sono i contatti..."/>
-
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewChat"
         android:layout_width="match_parent"

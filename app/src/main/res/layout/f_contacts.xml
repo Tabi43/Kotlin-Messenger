@@ -30,8 +30,8 @@
                     app:iconifiedByDefault="false"
                     app:queryHint="Search Friend" />
 
-
             </LinearLayout>
+
         </androidx.cardview.widget.CardView>
 
         <androidx.recyclerview.widget.RecyclerView

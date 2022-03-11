@@ -35,34 +35,4 @@ class DashBoard : AppCompatActivity() {
             .replace(R.id.frameLayoutWrapper, fragment).commit()
     }
 
-    /* Da aggiungere dentro onCreate
-
-
-
-        * binding=DashBinging.inflate(LayoutInflater)
-        setContetnView(binding.root)
-
-
-        binding.contacs_button.setOnClickListener {
-        replaceFragment(FragmentHome())
-        }
-
-        binding.chat_button.setOnClickListener {
-        replaceFragment(FragmentChat())
-        }
-
-        binding.settings_buttonsetOnClickListener {
-        replaceFragment(FragmentSettings())
-        }
-
-        Private fun replaceFragment(fragment: Fragment) {
-        val fragmentManager=supportFragmentManager
-        val fragmentTransaction=fragmentManager.beginTranscation()
-        fragmentTransaction.replace( R.id.fragmentContainer, fragment)
-        fragmentTransaction.commit()
-        }
-    *
-    * */
-
-
 }
