@@ -7,7 +7,7 @@ import de.hdodenhof.circleimageview.CircleImageView
 data class UserModel(
     var name: String = "",
     val status: String = "",
-    val image: String = "",
+    var image: String = "",
     var number: String = "",
     val uid: String = "",
     val online: String = "offline",

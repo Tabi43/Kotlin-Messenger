@@ -1,16 +1,20 @@
 package com.example.kotlinmessenger.adapter
 
 import android.content.Intent
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Filter
 import android.widget.Filterable
 import androidx.recyclerview.widget.RecyclerView
+import com.example.kotlinmessenger.Constants.AppConstants
 import com.example.kotlinmessenger.User
 //import com.example.kotlinmessenger.MessageActivity
 //import com.example.kotlinmessenger.Activities.UserInfoActivity
 import com.example.kotlinmessenger.UserModel
 import com.example.kotlinmessenger.databinding.ContactItemLayoutBinding
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.storage.FirebaseStorage
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -27,8 +31,18 @@ class ContactAdapter(private var appContacts: ArrayList<UserModel>) :
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val userModel = allContact[position]
-        holder.contactItemLayoutBinding.userModel = userModel
+        var userModel = allContact[position]
+        FirebaseStorage.getInstance().reference.child(AppConstants.PATH + userModel.uid).downloadUrl
+            .addOnSuccessListener {
+                userModel.image = it.toString()
+                Log.d("adapter","username: ${userModel.name} Url: ${userModel.image}")
+                holder.contactItemLayoutBinding.userModel = userModel
+            }
+            .addOnFailureListener {
+                Log.d("adapter","per: ${userModel.name} id: ${userModel.uid} è andatya in vacca perchè: $it")
+                holder.contactItemLayoutBinding.userModel = userModel
+            }
+
 
         holder.contactItemLayoutBinding.imgContact.setOnClickListener {
            // val intent = Intent(it.context, UserInfoActivity::class.java)
