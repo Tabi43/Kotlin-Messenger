@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.Filter
 import android.widget.Filterable
 import androidx.recyclerview.widget.RecyclerView
+import com.example.kotlinmessenger.Activity.MessageActivity
 import com.example.kotlinmessenger.Constants.AppConstants
 import com.example.kotlinmessenger.User
 //import com.example.kotlinmessenger.MessageActivity
@@ -50,11 +51,11 @@ class ContactAdapter(private var appContacts: ArrayList<UserModel>) :
            // it.context.startActivity(intent)
         }
 
-        holder.itemView.setOnClickListener {
-            //val intent = Intent(it.context, MessageActivity::class.java)
-           // intent.putExtra("hisId", userModel.uid)
-            //intent.putExtra("hisImage", userModel.image)
-         //   it.context.startActivity(intent)
+            holder.itemView.setOnClickListener {
+                val intent = Intent(it.context, MessageActivity::class.java)
+                intent.putExtra("hisId", userModel.uid)
+                intent.putExtra("hisImage", userModel.image)
+                it.context.startActivity(intent)
         }
 
     }

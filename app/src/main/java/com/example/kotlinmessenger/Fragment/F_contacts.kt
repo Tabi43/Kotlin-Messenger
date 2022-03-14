@@ -1,4 +1,4 @@
-package com.example.kotlinmessenger
+package com.example.kotlinmessenger.Fragment
 
 import android.os.Bundle
 import android.util.Log
@@ -9,14 +9,13 @@ import android.widget.Toast
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.kotlinmessenger.Constants.AppConstants
+import com.example.kotlinmessenger.R
+import com.example.kotlinmessenger.UserModel
 import com.example.kotlinmessenger.adapter.ContactAdapter
 import com.example.kotlinmessenger.databinding.FContactsBinding
 import com.example.kotlinmessenger.permissions.AppPermission
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.storage.FirebaseStorage
 
 
 //https://youtu.be/TCA9R2LsOcQ?t=319

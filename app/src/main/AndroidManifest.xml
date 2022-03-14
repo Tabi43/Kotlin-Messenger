@@ -13,16 +13,19 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.KotlinMessenger">
         <activity
-            android:name=".ProfileActivity"
+            android:name=".Activity.MessageActivity"
             android:exported="false" />
         <activity
-            android:name=".DashBoard"
+            android:name=".Activity.ProfileActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Activity.DashBoard"
             android:exported="false" />
         <activity
             android:name=".SplashScreen"
             android:exported="false" />
         <activity
-            android:name=".MainActivity"
+            android:name=".Activity.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

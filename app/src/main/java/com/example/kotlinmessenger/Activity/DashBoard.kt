@@ -1,8 +1,12 @@
-package com.example.kotlinmessenger
+package com.example.kotlinmessenger.Activity
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.fragment.app.Fragment
+import com.example.kotlinmessenger.Fragment.f_contacts
+import com.example.kotlinmessenger.Fragment.f_conversations
+import com.example.kotlinmessenger.Fragment.f_settings
+import com.example.kotlinmessenger.R
 import com.example.kotlinmessenger.databinding.ActivityDashBoardBinding
 
 class DashBoard : AppCompatActivity() {

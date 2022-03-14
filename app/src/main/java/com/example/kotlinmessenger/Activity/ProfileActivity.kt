@@ -1,4 +1,4 @@
-package com.example.kotlinmessenger
+package com.example.kotlinmessenger.Activity
 
 import android.Manifest
 import android.app.Activity

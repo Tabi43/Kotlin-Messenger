@@ -1,4 +1,4 @@
-package com.example.kotlinmessenger
+package com.example.kotlinmessenger.Fragment
 
 import android.content.Intent
 import android.os.Bundle
@@ -8,9 +8,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import com.example.kotlinmessenger.Activity.DashBoard
+import com.example.kotlinmessenger.R
 import com.example.kotlinmessenger.databinding.FRegisterBinding
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 
 

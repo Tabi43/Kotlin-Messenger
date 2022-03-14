@@ -1,14 +1,12 @@
-package com.example.kotlinmessenger
+package com.example.kotlinmessenger.Fragment
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.example.kotlinmessenger.adapter.ContactAdapter
+import com.example.kotlinmessenger.R
 import com.example.kotlinmessenger.databinding.FConversationsBinding
-import com.example.kotlinmessenger.permissions.AppPermission
-import com.google.firebase.auth.FirebaseAuth
 
 //https://youtu.be/TCA9R2LsOcQ?t=319
 

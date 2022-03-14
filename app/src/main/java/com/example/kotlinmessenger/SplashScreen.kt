@@ -4,6 +4,8 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
+import com.example.kotlinmessenger.Activity.DashBoard
+import com.example.kotlinmessenger.Activity.MainActivity
 import com.google.firebase.auth.FirebaseAuth
 
 class SplashScreen : AppCompatActivity() {

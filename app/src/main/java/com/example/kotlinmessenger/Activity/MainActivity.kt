@@ -1,13 +1,10 @@
-package com.example.kotlinmessenger
+package com.example.kotlinmessenger.Activity
 
-import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
-import android.widget.Toast
-import androidx.fragment.app.Fragment
+import com.example.kotlinmessenger.Fragment.f_login
+import com.example.kotlinmessenger.R
 import com.example.kotlinmessenger.databinding.ActivityMainBinding
-import com.google.firebase.auth.FirebaseAuth
 
 class MainActivity : AppCompatActivity() {
 
