@@ -1,5 +1,6 @@
 package com.example.kotlinmessenger
 
+import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -25,7 +26,9 @@ class MessageActivity : AppCompatActivity() {
     private var chatId: String? = null
     private lateinit var myId: String
     private lateinit var appUtil: AppUtil
-    private lateinit var firebaseRecyclerAdapter: FirebaseRecyclerAdapter<MessageModel, ContactAdapter.ViewHolder>
+    private var firebaseRecyclerAdapter: FirebaseRecyclerAdapter<MessageModel, ViewHolder>? = null
+    private lateinit var myImage: String
+    private lateinit var sharedPreferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         activityMessageBinding = ActivityMessageBinding.inflate(layoutInflater)
@@ -33,6 +36,11 @@ class MessageActivity : AppCompatActivity() {
         setContentView(R.layout.activity_message)
         appUtil = AppUtil()
         myId = appUtil.getUID()!!
+        sharedPreferences=getSharedPreferences("userData", MODE_PRIVATE)
+        myImage=sharedPreferences.getString("myImage","").toString()
+
+        activityMessageBinding.activity=this
+
         hisId = intent.getStringExtra("hisId")
         hisImage = intent.getStringExtra("hisImage")
 
@@ -62,6 +70,7 @@ class MessageActivity : AppCompatActivity() {
                         val member: String = ds.child("member").value.toString()
                         if (hisId == member) {
                             chatId = ds.key
+                            readMessages(chatId!!)
                             break
                         }
                     }//end for
@@ -166,7 +175,7 @@ class MessageActivity : AppCompatActivity() {
                 ) {
                     if (getItemViewType(position) == 0) {
                         holder.viewDataBinding.setVariable(BR.message, messageModel)
-                        holder.viewDataBinding.setVariable(BR.messageImage, myImage)
+                        holder.viewDataBinding.setVariable(BR.messageImage,myImage)
                     }
                     if (getItemViewType(position) == 1) {
 
@@ -193,12 +202,17 @@ class MessageActivity : AppCompatActivity() {
     class ViewHolder(var viewDataBinding: ViewDataBinding) :
         RecyclerView.ViewHolder(viewDataBinding.root)
 
+    override fun onPause(){
+        super.onPause()
+        if(firebaseRecyclerAdapter!=null){
+            firebaseRecyclerAdapter!!.stopListening()
+        }
+
+    }
+
+
+
 }
 
 
-
-
-
-
-}
 

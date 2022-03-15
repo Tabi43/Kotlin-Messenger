@@ -30,10 +30,14 @@
         <entry key="..\:/Users/Tabit/AndroidStudioProjects/KotlinMessenger/app/src/main/res/menu/bottom_nav_menu.xml" value="0.5744791666666667" />
         <entry key="..\:/Users/Tabit/AndroidStudioProjects/KotlinMessenger/app/src/main/res/menu/nav_menu.xml" value="0.5744791666666667" />
         <entry key="app/src/main/res/drawable/ic_baseline_insert_photo_24.xml" value="0.106" />
+        <entry key="app/src/main/res/drawable/left_side_background.xml" value="0.1835" />
         <entry key="app/src/main/res/drawable/message_edittext_background.xml" value="0.187" />
+        <entry key="app/src/main/res/drawable/right_side_background.xml" value="0.1835" />
         <entry key="app/src/main/res/layout/activity_dash_board.xml" value="0.12129629629629629" />
         <entry key="app/src/main/res/layout/activity_message.xml" value="0.3577550817418982" />
+        <entry key="app/src/main/res/layout/left_item_layout.xml" value="0.29907407407407405" />
         <entry key="app/src/main/res/layout/message_toolbar.xml" value="0.3346602935332794" />
+        <entry key="app/src/main/res/layout/right_item_layout.xml" value="0.29907407407407405" />
       </map>
     </option>
   </component>
