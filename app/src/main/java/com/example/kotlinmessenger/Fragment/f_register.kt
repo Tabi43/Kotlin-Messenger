@@ -8,7 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import com.example.kotlinmessenger.Activity.DashBoard
+import com.example.kotlinmessenger.DashBoard
 import com.example.kotlinmessenger.R
 import com.example.kotlinmessenger.databinding.FRegisterBinding
 import com.google.firebase.auth.FirebaseAuth

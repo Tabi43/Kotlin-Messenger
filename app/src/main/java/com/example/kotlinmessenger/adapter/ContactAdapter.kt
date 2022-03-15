@@ -7,14 +7,12 @@ import android.view.ViewGroup
 import android.widget.Filter
 import android.widget.Filterable
 import androidx.recyclerview.widget.RecyclerView
-import com.example.kotlinmessenger.Activity.MessageActivity
+import com.example.kotlinmessenger.MessageActivity
 import com.example.kotlinmessenger.Constants.AppConstants
-import com.example.kotlinmessenger.User
 //import com.example.kotlinmessenger.MessageActivity
 //import com.example.kotlinmessenger.Activities.UserInfoActivity
 import com.example.kotlinmessenger.UserModel
 import com.example.kotlinmessenger.databinding.ContactItemLayoutBinding
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.FirebaseStorage
 import java.util.*
 import kotlin.collections.ArrayList

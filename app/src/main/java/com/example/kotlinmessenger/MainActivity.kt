@@ -1,4 +1,4 @@
-package com.example.kotlinmessenger.Activity
+package com.example.kotlinmessenger
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
