@@ -40,10 +40,10 @@ class MessageActivity : AppCompatActivity() {
 
         appUtil = AppUtil()
         myId = appUtil.getUID()!!
-        sharedPreferences=getSharedPreferences("userData", MODE_PRIVATE)
-        myImage=sharedPreferences.getString("myImage","").toString()
+        sharedPreferences = getSharedPreferences("userData", MODE_PRIVATE)
+        myImage = sharedPreferences.getString("myImage", "").toString()
 
-        activityMessageBinding.activity=this
+        activityMessageBinding.activity = this
 
         hisId = intent.getStringExtra("hisId")
         hisImageUrl = intent.getStringExtra("hisImage")
@@ -57,20 +57,18 @@ class MessageActivity : AppCompatActivity() {
             }
         }
 
-        if(chatId == null) CheckChat(hisId!!)
+        if (chatId == null) CheckChat(hisId!!)
 
         FirebaseStorage.getInstance().reference.child(AppConstants.PATH + hisId).downloadUrl
             .addOnSuccessListener {
-                Log.d("Chat","HIS URL: ${it.toString()}")
-               activityMessageBinding.hisImage = it.toString()
+                Log.d("Chat", "HIS URL: ${it.toString()}")
+                activityMessageBinding.hisImage = it.toString()
             }
         FirebaseStorage.getInstance().reference.child(AppConstants.PATH + myId).downloadUrl
             .addOnSuccessListener {
-                Log.d("Chat","Our URL: ${it.toString()}")
+                Log.d("Chat", "Our URL: ${it.toString()}")
                 myImage = it.toString()
             }
-
-
     }
 
     private fun CheckChat(hisId: String) {
@@ -96,19 +94,16 @@ class MessageActivity : AppCompatActivity() {
                 .getReference("/chatlist").child(myId)
         chatId = databaseReference.push().key
         val chatListMod =
-            ChatListModel(chatId!!, message, System.currentTimeMillis().toString(), hisId!!)
+            ChatListModel(chatId!!, "Say Hi!", System.currentTimeMillis().toString(), hisId!!)
         databaseReference.child(chatId!!).setValue(chatListMod)
         databaseReference =
             FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
                 .getReference("/chatlist").child(hisId!!)
         val chatList =
-            ChatListModel(chatId!!, message, System.currentTimeMillis().toString(), myId!!)
+            ChatListModel(chatId!!, "Say Hi!", System.currentTimeMillis().toString(), myId!!)
         databaseReference.child(chatId!!).setValue(chatList)
-        databaseReference =
-            FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
-                .getReference("/chat").child(chatId!!)
-        val messageModel = MessageModel(myId, hisId!!, message, type = "text")
-        databaseReference.push().setValue(messageModel)
+        readMessages(chatId!!)
+        sendMessage(message)
     }
 
     private fun sendMessage(message: String) {
@@ -135,7 +130,6 @@ class MessageActivity : AppCompatActivity() {
                 FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
                     .getReference("/chatlist").child(hisId!!).child(chatId!!)
             databaseReference.updateChildren(Map)
-            Log.d("Chat","Sono ancora vivo")
         }//end else
     }
 
@@ -161,17 +155,13 @@ class MessageActivity : AppCompatActivity() {
                             parent,
                             false
                         )
-
                     if (viewType == 1)
-
                         viewDataBinding = LeftItemLayoutBinding.inflate(
                             LayoutInflater.from(parent.context),
                             parent,
                             false
                         )
-
                     return ViewHolder(viewDataBinding!!)
-
                 }
 
                 override fun onBindViewHolder(
@@ -191,17 +181,14 @@ class MessageActivity : AppCompatActivity() {
 
                 override fun getItemViewType(position: Int): Int {
                     val messageModel = getItem(position)
-                    return if (messageModel.senderId == myId)
-                        0
-                    else
-                        1
+                    return if (messageModel.senderId == myId) 0
+                    else 1
                 }
             }
 
         activityMessageBinding.messageRecyclerView.layoutManager = LinearLayoutManager(this)
         activityMessageBinding.messageRecyclerView.adapter = firebaseRecyclerAdapter
         firebaseRecyclerAdapter!!.startListening()
-
     }
 
     class ViewHolder(var viewDataBinding: ViewDataBinding) :
@@ -212,10 +199,7 @@ class MessageActivity : AppCompatActivity() {
         if(firebaseRecyclerAdapter!=null){
             firebaseRecyclerAdapter!!.stopListening()
         }
-
     }
-
-
 
 }
 
