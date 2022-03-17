@@ -17,9 +17,10 @@
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="5dp">
+        android:padding="5dp"
+        android:gravity="right">
 
-
+<!--
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/imgMessageImage"
             imageUrl="@{messageImage}"
@@ -29,16 +30,18 @@
             android:layout_alignParentEnd="true"
             android:layout_marginEnd="2dp"
             android:src="@drawable/ic_launcher_background" />
-
+-->
         <LinearLayout
             android:id="@+id/rightLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="5dp"
-            android:layout_toStartOf="@+id/imgMessageImage"
             android:background="@drawable/right_side_background"
             android:padding="5dp">
-
+            <!--android:layout_toStartOf="@+id/imgMessageImage"
+            android:background="@drawable/right_side_background"
+            android:padding="5dp">
+-->
             <TextView
                 android:id="@+id/txtMessage"
                 android:layout_width="wrap_content"
@@ -53,7 +56,6 @@
                 android:visibility="@{message.type.equals(`text`)?View.VISIBLE:View.GONE}" />
 
             <ImageView
-
                 imageMessage="@{message.message}"
                 android:layout_width="100dp"
                 android:layout_height="100dp"

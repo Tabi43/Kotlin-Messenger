@@ -6,10 +6,12 @@ import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.RelativeLayout
 import android.widget.Toast
 import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.kotlinmessenger.Constants.AppConstants
 import com.example.kotlinmessenger.adapter.ContactAdapter
 import com.example.kotlinmessenger.databinding.ActivityMessageBinding
 import com.example.kotlinmessenger.databinding.LeftItemLayoutBinding
@@ -17,12 +19,13 @@ import com.example.kotlinmessenger.databinding.RightItemLayoutBinding
 import com.firebase.ui.database.FirebaseRecyclerAdapter
 import com.google.firebase.database.*
 import com.firebase.ui.database.FirebaseRecyclerOptions
+import com.google.firebase.storage.FirebaseStorage
 
 class MessageActivity : AppCompatActivity() {
 
     private lateinit var activityMessageBinding: ActivityMessageBinding
     private var hisId: String? = null
-    private var hisImage: String? = null
+    private var hisImageUrl: String? = null
     private var chatId: String? = null
     private lateinit var myId: String
     private lateinit var appUtil: AppUtil
@@ -33,7 +36,8 @@ class MessageActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         activityMessageBinding = ActivityMessageBinding.inflate(layoutInflater)
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_message)
+        setContentView(activityMessageBinding.root)
+
         appUtil = AppUtil()
         myId = appUtil.getUID()!!
         sharedPreferences=getSharedPreferences("userData", MODE_PRIVATE)
@@ -42,7 +46,7 @@ class MessageActivity : AppCompatActivity() {
         activityMessageBinding.activity=this
 
         hisId = intent.getStringExtra("hisId")
-        hisImage = intent.getStringExtra("hisImage")
+        hisImageUrl = intent.getStringExtra("hisImage")
 
         activityMessageBinding.btnSend.setOnClickListener {
             val message: String = activityMessageBinding.msgText.text.toString()
@@ -53,36 +57,36 @@ class MessageActivity : AppCompatActivity() {
             }
         }
 
-        if (chatId != null) CheckChat(hisId!!)
+        if(chatId == null) CheckChat(hisId!!)
+
+        FirebaseStorage.getInstance().reference.child(AppConstants.PATH + hisId).downloadUrl
+            .addOnSuccessListener {
+                Log.d("Chat","HIS URL: ${it.toString()}")
+               activityMessageBinding.hisImage = it.toString()
+            }
+        FirebaseStorage.getInstance().reference.child(AppConstants.PATH + myId).downloadUrl
+            .addOnSuccessListener {
+                Log.d("Chat","Our URL: ${it.toString()}")
+                myImage = it.toString()
+            }
 
 
     }
 
     private fun CheckChat(hisId: String) {
+        Log.d("Chat", "Check chat id: $hisId")
         val databaseReference =
             FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
-                .getReference("/messages").child(myId)
-        val query = databaseReference.orderByChild("members").equalTo(hisId)
-        query.addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                if (snapshot.exists()) {
-                    for (ds in snapshot.children) {
-                        val member: String = ds.child("member").value.toString()
-                        if (hisId == member) {
-                            chatId = ds.key
-                            readMessages(chatId!!)
-                            break
-                        }
-                    }//end for
-
+                .getReference("/chatlist").child(myId)
+        databaseReference.get().addOnSuccessListener {
+            it.children.forEach {
+                if (it.child("member").value == hisId) {
+                    Log.d("Chat", "Chat ID rilevato: ${it.key}")
+                    chatId = it.key
+                    readMessages(chatId!!)
                 }
             }
-
-            override fun onCancelled(error: DatabaseError) {
-                TODO("Not yet implemented")
-            }
-        })
-
+        }
     }
 
     private fun CreateChat(message: String) {
@@ -108,6 +112,7 @@ class MessageActivity : AppCompatActivity() {
     }
 
     private fun sendMessage(message: String) {
+        activityMessageBinding.msgText.text = null
         Log.d("Message", "Send : $message")
         if (chatId == null) {
             Log.d("Message", "ID NULL")
@@ -121,7 +126,7 @@ class MessageActivity : AppCompatActivity() {
             databaseReference.push().setValue(messageModel)
             val Map: MutableMap<String, Any> = HashMap()
             Map["Last Message"] = message
-            Map["Date"] = System.currentTimeMillis().toShort()
+            Map["Date"] = System.currentTimeMillis().toShort().toInt()
             databaseReference =
                 FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
                     .getReference("/chatlist").child(myId).child(chatId!!)
@@ -130,12 +135,13 @@ class MessageActivity : AppCompatActivity() {
                 FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
                     .getReference("/chatlist").child(hisId!!).child(chatId!!)
             databaseReference.updateChildren(Map)
+            Log.d("Chat","Sono ancora vivo")
         }//end else
     }
 
     private fun readMessages(chatId: String) {
-
-        val query = FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app").getReference("Chat").child(chatId)
+        Log.d("Message", "Read  chat id: $chatId")
+        val query = FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app").getReference("chat").child(chatId)
 
         val firebaseRecyclerOptions = FirebaseRecyclerOptions.Builder<MessageModel>()
             .setLifecycleOwner(this)
@@ -175,12 +181,11 @@ class MessageActivity : AppCompatActivity() {
                 ) {
                     if (getItemViewType(position) == 0) {
                         holder.viewDataBinding.setVariable(BR.message, messageModel)
-                        holder.viewDataBinding.setVariable(BR.messageImage,myImage)
+                        //holder.viewDataBinding.setVariable(BR.messageImage,myImage)
                     }
                     if (getItemViewType(position) == 1) {
-
                         holder.viewDataBinding.setVariable(BR.message, messageModel)
-                        holder.viewDataBinding.setVariable(BR.messageImage, hisImage)
+                       // holder.viewDataBinding.setVariable(BR.messageImage, hisImageUrl)
                     }
                 }
 

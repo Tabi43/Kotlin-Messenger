@@ -38,7 +38,7 @@ class ProfileActivity : AppCompatActivity() {
     private var storageReference: StorageReference? = null
 
     private lateinit var binding: ActivityProfileBinding
-    private lateinit var sharedPreferences: SharedPreferences
+    //private lateinit var sharedPreferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         binding = ActivityProfileBinding.inflate(layoutInflater)
@@ -48,7 +48,7 @@ class ProfileActivity : AppCompatActivity() {
         firebaseAuth = FirebaseAuth.getInstance()
         databaseReference = FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app").getReference("Users")
         storageReference = FirebaseStorage.getInstance().reference
-        sharedPreferences = this.getSharedPreferences("userData", Context.MODE_PRIVATE)
+        //sharedPreferences = this.getSharedPreferences("userData", Context.MODE_PRIVATE)
 
         binding.btnDataDone.setOnClickListener {
             if(checkData()){
@@ -179,9 +179,8 @@ class ProfileActivity : AppCompatActivity() {
                             val intent = Intent(this, LatestMessageActivity::class.java)
                             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
                             startActivity(intent)*/
-                            val editor=sharedPreferences.edit()
-                            editor.putString("myImage",imageUrl).apply()
-
+                            /*val editor=sharedPreferences.edit()
+                            editor.putString("myImage",imageUrl).apply()*/
                         }
                         .addOnFailureListener {
                             Toast.makeText(this, "impossibile salvare nel db", Toast.LENGTH_LONG).show()

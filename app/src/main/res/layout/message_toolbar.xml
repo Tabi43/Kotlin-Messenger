@@ -47,18 +47,22 @@
                 <de.hdodenhof.circleimageview.CircleImageView
                     android:id="@+id/msgImage"
                     imageUrl="@{hisImage}"
-                    android:layout_width="35dp"
-                    android:layout_height="35dp"
-                    android:layout_margin="10dp"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_marginTop="2.5dp"
+                    android:layout_marginBottom="2.5dp"
                     android:src="@drawable/ic_launcher_background" />
 
                 <ImageView
                     android:id="@+id/msgOnlineStatus"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginLeft="25dp"
+                    android:layout_marginTop="30dp"
+                    android:scaleX="0.5"
+                    android:scaleY="0.5"
                     android:src="@{online.equals(`online`)? @drawable/ic_online:@drawable/ic_offline}"
-                    app:layout_anchor="@id/msgImage"
-                    app:layout_anchorGravity="end|center" />
+                    app:layout_anchor="@id/msgImage" />
 
             </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

@@ -1,5 +1,6 @@
 package com.example.kotlinmessenger
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -24,14 +25,19 @@ class DashBoard : AppCompatActivity() {
 
         replaceFragment(chatListF)
 
+        var intent = Intent(this, ProfileActivity::class.java)
+
+
         binding.bottomNavigation.setOnItemSelectedListener {
             when(it.itemId){
                 R.id.chat -> replaceFragment(chatListF)
                 R.id.contacts -> replaceFragment(contactsF)
-                R.id.settings -> replaceFragment(settingsF)
+                R.id.settings -> startActivity(intent)
             }
             return@setOnItemSelectedListener true
         }
+
+
     }
 
     private fun replaceFragment(fragment: Fragment) {
