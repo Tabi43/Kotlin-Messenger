@@ -77,7 +77,7 @@ class f_contacts : Fragment(R.layout.f_contacts) {
                     if (username.contains(key,true) && uid != id) {
                         //Log.d("url ","aggiunto:${it} id:${id}" )
                         Log.d("url ", "aggiunto url foto: per id:${id}")
-                        result.add(UserModel(username, status, "","", id, "", ""))
+                        result.add(UserModel(username, status, "",id, "",""))
                         Log.d("Contatti","(S)Dimension $result")
                     }
                 }
@@ -107,7 +107,7 @@ class f_contacts : Fragment(R.layout.f_contacts) {
                     if (uid != id) {
                         //Log.d("url ","aggiunto:${it} id:${id}" )
                         Log.d("url ", "aggiunto url foto: per id:${id}")
-                        result.add(UserModel(username, status, "","", id, "", ""))
+                        result.add(UserModel(username, status, "",id, "",""))
                         Log.d("Contatti","(S)Dimension $result")
                     }
                 }

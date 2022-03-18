@@ -60,7 +60,7 @@ class AppUtil {
     fun updateOnlineStatus(status: String) {
 
         val databaseReference =
-            FirebaseDatabase.getInstance().getReference("Users").child(getUID()!!)
+            FirebaseDatabase.getInstance().getReference("users").child(getUID()!!)
         val map = HashMap<String, Any>()
         map["online"] = status
         databaseReference.updateChildren(map)

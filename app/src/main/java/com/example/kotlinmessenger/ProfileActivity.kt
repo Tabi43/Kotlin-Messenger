@@ -113,7 +113,7 @@ class ProfileActivity : AppCompatActivity() {
                 .addOnSuccessListener {
                     Toast.makeText(this,"Data Fetched",Toast.LENGTH_SHORT).show()
                     val status = it.child("status").value
-                    val username = it.child("username").value
+                    val username = it.child("name").value
                     binding.usernameET.setText(username.toString())
                     binding.userStatusET.setText(status.toString())
                     //Caricamento e visualizzazione dell'immagine da Firebase
@@ -139,12 +139,9 @@ class ProfileActivity : AppCompatActivity() {
     private fun uploadData(name: String, status: String) {
         val uid = FirebaseAuth.getInstance().uid ?: ""
         val ref = FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app").getReference("/users/$uid")
-        val map = mapOf(
-            "status" to status,
-            "uid" to firebaseAuth!!.uid,
-            "username" to name,
-        )
-        ref.setValue(map)
+        val user =
+            UserModel(name,status,"",uid,"online","false")
+        ref.setValue(user)
             .addOnSuccessListener {
                 Log.d("Register Activity", "Utente salvato nel db")
                 /*//start activity dopo aver creato l utente
@@ -168,12 +165,9 @@ class ProfileActivity : AppCompatActivity() {
                     imageUrl = uri.result.toString()
                     val uid = FirebaseAuth.getInstance().uid ?: ""
                     val ref = FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app").getReference("/users/$uid")
-                    val map = mapOf(
-                        "status" to status,
-                        "uid" to firebaseAuth!!.uid,
-                        "username" to name,
-                    )
-                    ref.setValue(map)
+                    val user =
+                        UserModel(name,status,"",uid,"online","false")
+                    ref.setValue(user)
                         .addOnSuccessListener {
                             Log.d("Register Activity", "Utente salvato nel db")
                             /*//start activity dopo aver creato l utente

@@ -8,7 +8,6 @@ data class UserModel(
     var name: String = "",
     val status: String = "",
     var image: String = "",
-    var number: String = "",
     val uid: String = "",
     val online: String = "offline",
     val typing: String = "false"

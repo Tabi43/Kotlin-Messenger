@@ -18,6 +18,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
 import java.io.File
+import com.example.kotlinmessenger.UserModel
 
 
 class f_register : Fragment(R.layout.f_register) {
@@ -75,7 +76,7 @@ class f_register : Fragment(R.layout.f_register) {
                 //info visibili su logcat
                 Log.d("Main Activity", "Utente creato con successo ${it.result?.user?.uid}")
                 //Dati dell'utente
-                saveUserToFirebaseDatabase()
+                saveUserToFirebaseDatabase2()
             }
             .addOnFailureListener {
                 Toast.makeText(activity, "Failed to create user: ${it.message}", Toast.LENGTH_LONG)
@@ -101,6 +102,36 @@ class f_register : Fragment(R.layout.f_register) {
                 Log.d("Register Activity", "Utente salvato nel db")
                 Toast.makeText(activity, "Successfully registration into db ", Toast.LENGTH_LONG)
                     .show()
+
+                /*//start activity dopo aver creato l utente
+                val intent = Intent(this, LatestMessageActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
+                startActivity(intent)*/
+                setDefaultAvatar(uid)
+                var intent = Intent(activity, DashBoard::class.java)
+                startActivity(intent)
+            }
+            .addOnFailureListener {
+                Toast.makeText(activity, "impossibile salvare nel db", Toast.LENGTH_LONG).show()
+                Log.d("Register Activity", "Utente NON salvato nel db")
+            }
+    }
+    private fun saveUserToFirebaseDatabase2() {
+        Log.d("Register Activity", "Chiamata salvataggio dati utente")
+        val uid = FirebaseAuth.getInstance().uid ?: ""
+        val ref = FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app").getReference("/users")
+        Log.d("Register Activity", "Reference : $ref")
+        //val user = User(uid, binding.username.text.toString(), "Hello")
+        val user =
+            UserModel(binding.username.text.toString(), "Hello","",uid,"online","flase")
+        ref.child(uid).setValue(user)
+            .addOnSuccessListener {
+                Log.d("Register Activity", "Utente salvato nel db")
+                Toast.makeText(activity, "Successfully registration into db ", Toast.LENGTH_LONG)
+                    .show()
+                /* val chatList =
+                     ChatListModel(chatId!!, "Say Hi!", System.currentTimeMillis().toString(), myId!!)
+                 databaseReference.child(chatId!!).setValue(chatList)*/
                 /*//start activity dopo aver creato l utente
                 val intent = Intent(this, LatestMessageActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)

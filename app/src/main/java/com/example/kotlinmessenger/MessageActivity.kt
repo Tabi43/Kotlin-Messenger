@@ -1,10 +1,11 @@
-package com.example.kotlinmessenger
+package com.example. kotlinmessenger
 
 import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.RelativeLayout
 import android.widget.Toast
@@ -69,6 +70,7 @@ class MessageActivity : AppCompatActivity() {
                 Log.d("Chat", "Our URL: ${it.toString()}")
                 myImage = it.toString()
             }
+        checkOnlineStatus()
     }
 
     private fun CheckChat(hisId: String) {
@@ -104,6 +106,7 @@ class MessageActivity : AppCompatActivity() {
         databaseReference.child(chatId!!).setValue(chatList)
         readMessages(chatId!!)
         sendMessage(message)
+
     }
 
     private fun sendMessage(message: String) {
@@ -189,6 +192,7 @@ class MessageActivity : AppCompatActivity() {
         activityMessageBinding.messageRecyclerView.layoutManager = LinearLayoutManager(this)
         activityMessageBinding.messageRecyclerView.adapter = firebaseRecyclerAdapter
         firebaseRecyclerAdapter!!.startListening()
+
     }
 
     class ViewHolder(var viewDataBinding: ViewDataBinding) :
@@ -200,6 +204,34 @@ class MessageActivity : AppCompatActivity() {
             firebaseRecyclerAdapter!!.stopListening()
         }
     }
+    override fun onResume() {
+        super.onResume()
+        appUtil.updateOnlineStatus("online")
+    }
+
+   private fun checkOnlineStatus() {
+       Log.d("string","ho chiamato la funzione checkOnlineStatus()")
+
+        val databaseReference = FirebaseDatabase.getInstance().getReference("users").child(hisId!!)
+        databaseReference.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (snapshot.exists()) {
+                    val userModel = snapshot.getValue(UserModel::class.java)
+                    activityMessageBinding.online = userModel!!.online
+                    Log.d("chat","stato interlocutore: ${activityMessageBinding.online}")
+
+
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                TODO("Not yet implemented")
+            }
+        })
+   }
+
+
+
 
 }
 
