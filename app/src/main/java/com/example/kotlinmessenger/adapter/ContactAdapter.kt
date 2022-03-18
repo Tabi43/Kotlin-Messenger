@@ -42,7 +42,6 @@ class ContactAdapter(private var appContacts: ArrayList<UserModel>) :
                 holder.contactItemLayoutBinding.userModel = userModel
             }
 
-
         holder.contactItemLayoutBinding.imgContact.setOnClickListener {
            // val intent = Intent(it.context, UserInfoActivity::class.java)
             //intent.putExtra("userId", userModel.uid)

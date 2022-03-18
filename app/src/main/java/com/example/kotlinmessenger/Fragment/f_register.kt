@@ -1,19 +1,23 @@
 package com.example.kotlinmessenger.Fragment
 
 import android.content.Intent
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
+import com.example.kotlinmessenger.Constants.AppConstants
 import com.example.kotlinmessenger.DashBoard
 import com.example.kotlinmessenger.R
 import com.example.kotlinmessenger.databinding.FRegisterBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
-
+import com.google.firebase.storage.FirebaseStorage
+import java.io.File
 
 
 class f_register : Fragment(R.layout.f_register) {
@@ -72,7 +76,6 @@ class f_register : Fragment(R.layout.f_register) {
                 Log.d("Main Activity", "Utente creato con successo ${it.result?.user?.uid}")
                 //Dati dell'utente
                 saveUserToFirebaseDatabase()
-
             }
             .addOnFailureListener {
                 Toast.makeText(activity, "Failed to create user: ${it.message}", Toast.LENGTH_LONG)
@@ -102,12 +105,30 @@ class f_register : Fragment(R.layout.f_register) {
                 val intent = Intent(this, LatestMessageActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
                 startActivity(intent)*/
+                setDefaultAvatar(uid)
                 var intent = Intent(activity, DashBoard::class.java)
                 startActivity(intent)
             }
             .addOnFailureListener {
                 Toast.makeText(activity, "impossibile salvare nel db", Toast.LENGTH_LONG).show()
                 Log.d("Register Activity", "Utente NON salvato nel db")
+            }
+    }
+
+    private fun setDefaultAvatar(uid: String){
+        val storageReference = FirebaseStorage.getInstance().reference
+        val storageRef = FirebaseStorage.getInstance().reference.child(AppConstants.PATH + "default-avatar")
+        val localFile = File.createTempFile("tempImage","jpeg")
+        storageRef.getFile(localFile)
+            .addOnSuccessListener {
+                val url = localFile.toUri()
+                storageReference!!.child(AppConstants.PATH + uid).putFile(url!!)
+                    .addOnSuccessListener {
+                        Toast.makeText(activity,"Default avatar loaded and saved", Toast.LENGTH_SHORT).show()
+                    }
+            }
+            .addOnFailureListener {
+                Toast.makeText(activity,"Image loading failed", Toast.LENGTH_SHORT).show()
             }
     }
 }

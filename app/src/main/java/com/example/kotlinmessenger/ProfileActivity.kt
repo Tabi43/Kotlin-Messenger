@@ -57,6 +57,7 @@ class ProfileActivity : AppCompatActivity() {
                     uploadData(username,status)
                 }else{
                     uploadData(username,status,selectedPhotoUri!!)
+                    //uploadImageToFireDataBase(selectedPhotoUri!!)
                 }
             }
         }
@@ -189,6 +190,13 @@ class ProfileActivity : AppCompatActivity() {
                     //startActivity(Intent(this, DashBoard::class.java))
                     //finish()
                 }
+            }
+    }
+
+    private fun uploadImageToFireDataBase( image: Uri){
+        storageReference!!.child(AppConstants.PATH + "default-avatar").putFile(image)
+            .addOnSuccessListener {
+                Toast.makeText(this,"File uploaded",Toast.LENGTH_SHORT).show()
             }
     }
 
