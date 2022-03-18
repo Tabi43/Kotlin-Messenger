@@ -5,15 +5,17 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
-import android.view.View
+import com.android.volley.Response
 import android.view.ViewGroup
-import android.widget.RelativeLayout
 import android.widget.Toast
 import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.android.volley.toolbox.JsonObjectRequest
 import com.example.kotlinmessenger.Constants.AppConstants
 import com.example.kotlinmessenger.adapter.ContactAdapter
+import com.android.volley.toolbox.Volley
+import com.android.volley.DefaultRetryPolicy
 import com.example.kotlinmessenger.databinding.ActivityMessageBinding
 import com.example.kotlinmessenger.databinding.LeftItemLayoutBinding
 import com.example.kotlinmessenger.databinding.RightItemLayoutBinding
@@ -21,6 +23,7 @@ import com.firebase.ui.database.FirebaseRecyclerAdapter
 import com.google.firebase.database.*
 import com.firebase.ui.database.FirebaseRecyclerOptions
 import com.google.firebase.storage.FirebaseStorage
+import org.json.JSONObject
 
 class MessageActivity : AppCompatActivity() {
 
@@ -32,6 +35,7 @@ class MessageActivity : AppCompatActivity() {
     private lateinit var appUtil: AppUtil
     private var firebaseRecyclerAdapter: FirebaseRecyclerAdapter<MessageModel, ViewHolder>? = null
     private lateinit var myImage: String
+    private var myName: String? = null
     private lateinit var sharedPreferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,7 +47,6 @@ class MessageActivity : AppCompatActivity() {
         myId = appUtil.getUID()!!
         sharedPreferences = getSharedPreferences("userData", MODE_PRIVATE)
         myImage = sharedPreferences.getString("myImage", "").toString()
-
         activityMessageBinding.activity = this
 
         hisId = intent.getStringExtra("hisId")
@@ -71,7 +74,15 @@ class MessageActivity : AppCompatActivity() {
                 myImage = it.toString()
             }
         checkOnlineStatus()
+        getMyname()
     }
+     private fun getMyname() {
+         val databaseReference =
+             FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
+                 .getReference("/users").child(myId).get().addOnSuccessListener {
+                     myName=it.value.toString()
+                 }
+     }
 
     private fun CheckChat(hisId: String) {
         Log.d("Chat", "Check chat id: $hisId")
@@ -203,6 +214,7 @@ class MessageActivity : AppCompatActivity() {
         if(firebaseRecyclerAdapter!=null){
             firebaseRecyclerAdapter!!.stopListening()
         }
+        appUtil.updateOnlineStatus("offline")
     }
     override fun onResume() {
         super.onResume()
@@ -229,6 +241,73 @@ class MessageActivity : AppCompatActivity() {
             }
         })
    }
+    private fun getToken(message: String) {
+        val databaseReference = FirebaseDatabase.getInstance().getReference("Users").child(hisId!!)
+        databaseReference.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (snapshot.exists()) {
+                    val token = snapshot.child("token").value.toString()
+
+                    val to = JSONObject()
+                    val data = JSONObject()
+
+                    data.put("hisId", myId)
+                    data.put("hisImage", myImage)
+                    data.put("title", myName)
+                    data.put("message", message)
+                    data.put("chatId", chatId)
+
+                    to.put("to", token)
+                    to.put("data", data)
+                    sendNotification(to)
+
+
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                TODO("Not yet implemented")
+            }
+        })
+    }
+    private fun sendNotification(to: JSONObject) {
+
+        val request: JsonObjectRequest = object : JsonObjectRequest(
+            Method.POST,
+            AppConstants.NOTIFICATION_URL,
+            to,
+            Response.Listener { response: JSONObject ->
+
+                Log.d("TAG", "onResponse: $response")
+            },
+            Response.ErrorListener {
+
+                Log.d("TAG", "onError: $it")
+            }) {
+            override fun getHeaders(): MutableMap<String, String> {
+                val map: MutableMap<String, String> = HashMap()
+
+                map["Authorization"] = "key=" + AppConstants.SERVER_KEY
+                map["Content-type"] = "application/json"
+                return map
+            }
+
+            override fun getBodyContentType(): String {
+                return "application/json"
+            }
+        }
+
+        val requestQueue = Volley.newRequestQueue(this)
+        request.retryPolicy = DefaultRetryPolicy(
+            30000,
+            DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+            DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
+        )
+
+        requestQueue.add(request)
+
+    }
+
 
 
 

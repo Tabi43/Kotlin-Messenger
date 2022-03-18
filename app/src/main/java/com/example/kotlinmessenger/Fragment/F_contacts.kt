@@ -26,8 +26,6 @@ class f_contacts : Fragment(R.layout.f_contacts) {
     //var dimension : Int = 0
 
     private lateinit var appPermission: AppPermission
-    private lateinit var contacts: ArrayList<UserModel>
-    private lateinit var appContacts: ArrayList<UserModel>
     private var contactAdapter: ContactAdapter? = null
     private lateinit var firebaseAuth: FirebaseAuth
     lateinit var binding: FContactsBinding
@@ -68,10 +66,9 @@ class f_contacts : Fragment(R.layout.f_contacts) {
                 Toast.makeText(activity, "Failed to search users", Toast.LENGTH_SHORT).show()
             }
             .addOnSuccessListener {
-                //dimension = it.childrenCount.toInt() - 1
                 Log.d("Search", "GET: ${it}")
                 it.children.forEach {
-                    val username = it.child("username").value.toString()
+                    val username = it.child("name").value.toString()
                     val status = it.child("status").value.toString()
                     val id = it.child("uid").value.toString()
                     if (username.contains(key,true) && uid != id) {
@@ -101,7 +98,7 @@ class f_contacts : Fragment(R.layout.f_contacts) {
                 //dimension = it.childrenCount.toInt() - 1
                 Log.d("Search", "GET: ${it}")
                 it.children.forEach {
-                    val username = it.child("username").value.toString()
+                    val username = it.child("name").value.toString()
                     val status = it.child("status").value.toString()
                     val id = it.child("uid").value.toString()
                     if (uid != id) {
