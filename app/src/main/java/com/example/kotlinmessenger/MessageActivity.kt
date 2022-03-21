@@ -1,6 +1,7 @@
 package com.example. kotlinmessenger
 
 import android.content.SharedPreferences
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -8,6 +9,7 @@ import android.view.LayoutInflater
 import com.android.volley.Response
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -24,6 +26,7 @@ import com.google.firebase.database.*
 import com.firebase.ui.database.FirebaseRecyclerOptions
 import com.google.firebase.storage.FirebaseStorage
 import org.json.JSONObject
+import com.google.firebase.messaging.RemoteMessage
 
 class MessageActivity : AppCompatActivity() {
 
@@ -61,7 +64,6 @@ class MessageActivity : AppCompatActivity() {
                 gettoken(message)
             }
         }
-
         if (chatId == null) CheckChat(hisId!!)
 
         FirebaseStorage.getInstance().reference.child(AppConstants.PATH + hisId).downloadUrl
@@ -129,6 +131,7 @@ class MessageActivity : AppCompatActivity() {
             CreateChat(message)
         } else {
             Log.d("Message", "SEND OK")
+
             var databaseReference =
                 FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
                     .getReference("/chat").child(chatId!!)
@@ -145,7 +148,7 @@ class MessageActivity : AppCompatActivity() {
                 FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
                     .getReference("/chatlist").child(hisId!!).child(chatId!!)
             databaseReference.updateChildren(Map)
-        }//end else
+        } //end else
     }
 
     private fun readMessages(chatId: String) {
@@ -225,7 +228,7 @@ class MessageActivity : AppCompatActivity() {
    private fun checkOnlineStatus() {
        Log.d("string","ho chiamato la funzione checkOnlineStatus()")
 
-        val databaseReference = FirebaseDatabase.getInstance().getReference("users").child(hisId!!)
+        val databaseReference = FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app").getReference("users").child(hisId!!)
         databaseReference.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (snapshot.exists()) {
@@ -243,7 +246,7 @@ class MessageActivity : AppCompatActivity() {
         })
    }
     private fun gettoken(message: String) {
-        val databaseReference = FirebaseDatabase.getInstance().getReference("users").child(hisId!!)
+        val databaseReference = FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app").getReference("users").child(hisId!!)
         databaseReference.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (snapshot.exists()) {

@@ -7,6 +7,7 @@ import android.app.PendingIntent
 import android.content.Intent
 import android.media.RingtoneManager
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.content.res.ResourcesCompat
@@ -19,7 +20,7 @@ import kotlin.collections.HashMap
 
 
 class FirebaseNotificationsr:FirebaseMessagingService() {
-    private val Apputil=AppUtil()
+    private val apputil=AppUtil()
     override fun onNewToken(token: String) {
         super.onNewToken(token)
         updateToken(token)
@@ -44,14 +45,16 @@ class FirebaseNotificationsr:FirebaseMessagingService() {
         }
 
     }
-    private fun updateToken(token:String) {
-        val databaseReference = FirebaseDatabase.getInstance().getReference("users").child(Apputil.getUID()!!)
+    fun updateToken(token:String) {
+        val databaseReference = FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app").getReference("users").child(apputil.getUID()!!)
         val map:MutableMap<String, Any> = HashMap()
         map["token"]=token
         databaseReference.updateChildren(map)
+        Log.d("token:", "$token")
 
     }
-    private fun createnormalnotification(title:String, message:String, hisId:String, hisImage:String, chatId:String) {
+    fun createnormalnotification(title:String, message:String, hisId:String, hisImage:String, chatId:String) {
+        Log.d("string","ho chiamato la funzione createnormalnotification()")
         val uri=RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
         val builder=NotificationCompat.Builder(this, AppConstants.CHANNEL_ID)
         builder.setContentTitle(title)
@@ -72,7 +75,7 @@ class FirebaseNotificationsr:FirebaseMessagingService() {
         manager.notify(Random().nextInt(85-65), builder.build())
     }
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun createOreonotification(title:String, message:String, hisId:String, hisImage:String, chatId:String) {
+    fun createOreonotification(title:String, message:String, hisId:String, hisImage:String, chatId:String) {
         val channel = NotificationChannel(
             AppConstants.CHANNEL_ID,
             "Message",
