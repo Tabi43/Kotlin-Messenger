@@ -58,6 +58,7 @@ class MessageActivity : AppCompatActivity() {
                 Toast.makeText(this, "Enter Message", Toast.LENGTH_SHORT).show()
             } else {
                 sendMessage(message)
+                gettoken(message)
             }
         }
 
@@ -241,8 +242,8 @@ class MessageActivity : AppCompatActivity() {
             }
         })
    }
-    private fun getToken(message: String) {
-        val databaseReference = FirebaseDatabase.getInstance().getReference("Users").child(hisId!!)
+    private fun gettoken(message: String) {
+        val databaseReference = FirebaseDatabase.getInstance().getReference("users").child(hisId!!)
         databaseReference.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (snapshot.exists()) {

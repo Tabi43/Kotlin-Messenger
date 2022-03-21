@@ -123,7 +123,7 @@ class f_register : Fragment(R.layout.f_register) {
         Log.d("Register Activity", "Reference : $ref")
         //val user = User(uid, binding.username.text.toString(), "Hello")
         val user =
-            UserModel(binding.username.text.toString(), "Hello","",uid,"online","flase")
+            UserModel(binding.username.text.toString(), "Hello","",uid,"online","false")
         ref.child(uid).setValue(user)
             .addOnSuccessListener {
                 Log.d("Register Activity", "Utente salvato nel db")
