@@ -17,12 +17,14 @@ import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import java.util.*
 import kotlin.collections.HashMap
+import com.example.kotlinmessenger.UserModel
 
 
 class FirebaseNotificationsr:FirebaseMessagingService() {
     private val apputil=AppUtil()
     override fun onNewToken(token: String) {
         super.onNewToken(token)
+        Log.d("token:", "IL TOKEN GENERATO è $token")
         updateToken(token)
     }
 
@@ -50,7 +52,7 @@ class FirebaseNotificationsr:FirebaseMessagingService() {
         val map:MutableMap<String, Any> = HashMap()
         map["token"]=token
         databaseReference.updateChildren(map)
-        Log.d("token:", "$token")
+
 
     }
     fun createnormalnotification(title:String, message:String, hisId:String, hisImage:String, chatId:String) {

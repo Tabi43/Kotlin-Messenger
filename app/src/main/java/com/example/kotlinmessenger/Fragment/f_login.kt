@@ -69,8 +69,8 @@ class f_login : Fragment(R.layout.f_login) {
     }
 
     private fun autologin(){
-        val email= "m@gmail.com"
-        val password= "stocazzo"
+        val email= "prova@gmail.com"
+        val password= "123456"
         FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
             .addOnSuccessListener {
                 var intent = Intent(activity, DashBoard::class.java)

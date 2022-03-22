@@ -12,7 +12,8 @@ data class UserModel(
     val online: String = "offline",
     val typing: String = "false"
 
-) {
+
+    ) {
 
     companion object {
 
