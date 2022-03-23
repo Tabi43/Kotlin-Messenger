@@ -29,7 +29,7 @@ class f_login : Fragment(R.layout.f_login) {
             val transaction = fragmentManager?.beginTransaction()
             transaction?.replace(R.id.fragmentContainer,fragment)?.commit()
         }
-        autologin()
+        //autologin()
         return binding.root
     }
 
@@ -68,7 +68,7 @@ class f_login : Fragment(R.layout.f_login) {
             }
     }
 
-    private fun autologin(){
+    /*private fun autologin(){
         val email= "prova@gmail.com"
         val password= "123456"
         FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
@@ -76,6 +76,6 @@ class f_login : Fragment(R.layout.f_login) {
                 var intent = Intent(activity, DashBoard::class.java)
                 startActivity(intent)
             }
-    }
+    }*/
 
 }

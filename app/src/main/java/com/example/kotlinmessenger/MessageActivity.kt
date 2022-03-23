@@ -1,5 +1,6 @@
 package com.example. kotlinmessenger
 
+import android.annotation.SuppressLint
 import android.content.SharedPreferences
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
@@ -246,15 +247,12 @@ class MessageActivity : AppCompatActivity() {
         })
    }
     private fun gettoken(message: String) {
-        val databaseReference = FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app").getReference("users").child(hisId!!)
-        Log.d("token:", "ID messaggio è $databaseReference")
-        databaseReference.addListenerForSingleValueEvent(object : ValueEventListener {
+        val databaseReference = FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app").getReference("users").child(hisId!!).child("token")
+        .addListenerForSingleValueEvent(object : ValueEventListener {
 
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (snapshot.exists()) {
-                    val token = FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app").getReference("users").child(hisId!!).child("token").get().toString()
-
-                    Log.d("token:", "gettoken è $token")
+                    val token =snapshot.getValue().toString()
 
                     val to = JSONObject()
                     val data = JSONObject()
@@ -278,8 +276,9 @@ class MessageActivity : AppCompatActivity() {
             }
         })
     }
+    @SuppressLint("LongLogTag")
     private fun sendNotification(to: JSONObject) {
-
+        Log.d("token passato in sendNotification()","$to")
         val request: JsonObjectRequest = object : JsonObjectRequest(
             Method.POST,
             AppConstants.NOTIFICATION_URL,
