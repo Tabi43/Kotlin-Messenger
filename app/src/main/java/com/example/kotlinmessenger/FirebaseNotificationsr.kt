@@ -31,7 +31,7 @@ class FirebaseNotificationsr:FirebaseMessagingService() {
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)
         if (remoteMessage.data.isNotEmpty()) {
-
+            Log.d("funzione:","chiamata onMessageReceived")
             val map: Map<String, String> = remoteMessage.data
 
             val title = map["title"]

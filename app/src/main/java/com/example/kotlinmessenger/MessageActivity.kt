@@ -27,7 +27,7 @@ import com.google.firebase.database.*
 import com.firebase.ui.database.FirebaseRecyclerOptions
 import com.google.firebase.storage.FirebaseStorage
 import org.json.JSONObject
-import com.google.firebase.messaging.RemoteMessage
+
 
 class MessageActivity : AppCompatActivity() {
 
@@ -51,7 +51,7 @@ class MessageActivity : AppCompatActivity() {
         myId = appUtil.getUID()!!
         sharedPreferences = getSharedPreferences("userData", MODE_PRIVATE)
         myImage = sharedPreferences.getString("myImage", "").toString()
-        activityMessageBinding.activity = this
+        activityMessageBinding.activity=this
 
         hisId = intent.getStringExtra("hisId")
         hisImageUrl = intent.getStringExtra("hisImage")
