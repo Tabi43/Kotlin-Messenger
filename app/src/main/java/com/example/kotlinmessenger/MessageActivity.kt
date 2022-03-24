@@ -80,12 +80,21 @@ class MessageActivity : AppCompatActivity() {
         checkOnlineStatus()
         getMyname()
     }
-     private fun getMyname() {
+     private fun getMyname(){
          val databaseReference =
              FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
-                 .getReference("/users").child(myId).get().addOnSuccessListener {
-                     myName=it.value.toString()
-                 }
+                 .getReference("users").child(myId).child("name").addListenerForSingleValueEvent(object : ValueEventListener {
+                     override fun onDataChange(snapshot: DataSnapshot) {
+                         if (snapshot.exists()) {
+                             myName = snapshot.getValue().toString()
+                             Log.d("il nome è:", "$myName")
+                         }
+                     }
+                     override fun onCancelled(error: DatabaseError) {
+                         TODO("Not yet implemented")
+                     }
+                 })
+
      }
 
     private fun CheckChat(hisId: String) {
@@ -256,7 +265,6 @@ class MessageActivity : AppCompatActivity() {
 
                     val to = JSONObject()
                     val data = JSONObject()
-
                     data.put("hisId", myId)
                     data.put("hisImage", myImage)
                     data.put("title", myName)

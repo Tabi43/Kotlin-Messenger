@@ -20,7 +20,16 @@
         <deviceKey>
           <Key>
             <type value="VIRTUAL_DEVICE_PATH" />
-            <value value="$USER_HOME$/.android/avd/Nexus_6_API_30.avd" />
+            <value value="$USER_HOME$/.android/avd/Galaxy_Nexus_API_30.avd" />
+          </Key>
+        </deviceKey>
+      </Target>
+      <Target>
+        <type value="RUNNING_DEVICE_TARGET" />
+        <deviceKey>
+          <Key>
+            <type value="VIRTUAL_DEVICE_PATH" />
+            <value value="$USER_HOME$/.android/avd/Nexus_S_API_30.avd" />
           </Key>
         </deviceKey>
       </Target>
@@ -31,7 +40,7 @@
         <deviceKey>
           <Key>
             <type value="VIRTUAL_DEVICE_PATH" />
-            <value value="$USER_HOME$/.android/avd/Nexus_6_API_30.avd" />
+            <value value="$USER_HOME$/.android/avd/Galaxy_Nexus_API_30.avd" />
           </Key>
         </deviceKey>
       </Target>
