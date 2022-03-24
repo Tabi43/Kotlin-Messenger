@@ -1,10 +1,9 @@
 package com.example.kotlinmessenger
 
-import android.content.Context
+
 import android.Manifest
 import android.app.Activity
 import android.content.Intent
-import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
 import android.net.Uri
@@ -17,6 +16,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.kotlinmessenger.Constants.AppConstants
+import com.example.kotlinmessenger.Fragment.f_login
 import com.example.kotlinmessenger.databinding.ActivityProfileBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
@@ -36,7 +36,8 @@ class ProfileActivity : AppCompatActivity() {
     private var databaseReference: DatabaseReference? = null
     private var firebaseAuth: FirebaseAuth? = null
     private var storageReference: StorageReference? = null
-
+    private lateinit var myId: String
+    private lateinit var appUtil: AppUtil
     private lateinit var binding: ActivityProfileBinding
     //private lateinit var sharedPreferences: SharedPreferences
 
@@ -44,7 +45,8 @@ class ProfileActivity : AppCompatActivity() {
         binding = ActivityProfileBinding.inflate(layoutInflater)
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-
+        appUtil= AppUtil()
+        myId = appUtil.getUID()!!
         firebaseAuth = FirebaseAuth.getInstance()
         databaseReference = FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app").getReference("Users")
         storageReference = FirebaseStorage.getInstance().reference
@@ -60,6 +62,13 @@ class ProfileActivity : AppCompatActivity() {
                     //uploadImageToFireDataBase(selectedPhotoUri!!)
                 }
             }
+        }
+        binding.buttonlogout.setOnClickListener{
+            val databaseReference =
+                FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
+                    .getReference("users").child(myId).child("token").removeValue()
+            Log.d("token", "token rimosso $databaseReference")
+            startActivity(Intent(this, MainActivity::class.java))
         }
 
         binding.imgPickImage.setOnClickListener {

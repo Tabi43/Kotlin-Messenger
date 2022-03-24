@@ -32,6 +32,14 @@
             app:layout_anchorGravity="end|center"
             app:tint="@color/colorAccent" />
 
+        <Button
+            android:id="@+id/buttonlogout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="2dp"
+            android:layout_gravity="right"
+            android:text="Logout" />
+
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
     <LinearLayout

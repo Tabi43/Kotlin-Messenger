@@ -22,18 +22,18 @@ class DashBoard : AppCompatActivity() {
         setContentView(binding.root)
 
 
-        val chatListF = f_conversations()
+        val conversationsF = f_conversations()
         val contactsF = f_contacts()
         val settingsF = f_settings()
 
-        replaceFragment(chatListF)
+        replaceFragment(conversationsF)
 
         var intent = Intent(this, ProfileActivity::class.java)
 
 
         binding.bottomNavigation.setOnItemSelectedListener {
             when(it.itemId){
-                R.id.chat -> replaceFragment(chatListF)
+                R.id.chat -> replaceFragment(conversationsF)
                 R.id.contacts -> replaceFragment(contactsF)
                 R.id.settings -> startActivity(intent)
             }

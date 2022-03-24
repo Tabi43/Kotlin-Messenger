@@ -3,7 +3,6 @@ package com.example.kotlinmessenger
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.example.kotlinmessenger.Fragment.f_login
-import com.example.kotlinmessenger.R
 import com.example.kotlinmessenger.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {

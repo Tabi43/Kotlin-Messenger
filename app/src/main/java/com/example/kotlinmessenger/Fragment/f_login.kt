@@ -8,14 +8,18 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import com.example.kotlinmessenger.AppUtil
 import com.example.kotlinmessenger.DashBoard
 import com.example.kotlinmessenger.R
 import com.example.kotlinmessenger.databinding.FLoginBinding
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.messaging.FirebaseMessaging
 
 class f_login : Fragment(R.layout.f_login) {
 
     lateinit var binding : FLoginBinding
+    private lateinit var appUtil: AppUtil
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FLoginBinding.inflate(inflater, container, false)
@@ -23,7 +27,7 @@ class f_login : Fragment(R.layout.f_login) {
         binding.loginButton.setOnClickListener {
             performLogin()
         }
-
+        appUtil=AppUtil()
         binding.signUpButton.setOnClickListener {
             val fragment = f_register()
             val transaction = fragmentManager?.beginTransaction()
@@ -48,6 +52,19 @@ class f_login : Fragment(R.layout.f_login) {
             .addOnCompleteListener{
                 if(!it.isSuccessful){
                     return@addOnCompleteListener
+                }
+                FirebaseMessaging.getInstance().token.addOnSuccessListener { result ->
+                    if (result != null) {
+                        val token = result
+                        val databaseReference =
+                            FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
+                                .getReference("users")
+                                .child(appUtil.getUID()!!)
+                        Log.d("token", "IL TOKEN è $token")
+                        val map: MutableMap<String, Any> = HashMap()
+                        map["token"] = token!!
+                        databaseReference.updateChildren(map)
+                    }
                 }
                 //ha funzionato
                 Toast.makeText(activity,"Loggato con successo $email",Toast.LENGTH_SHORT).show()

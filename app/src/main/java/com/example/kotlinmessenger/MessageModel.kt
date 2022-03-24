@@ -17,7 +17,7 @@ class MessageModel constructor(
 
         @JvmStatic
         @BindingAdapter("imageMessage")
-        public fun loadImage(imageView: ImageView, image: String?) {
+        fun loadImage(imageView: ImageView, image: String?) {
             if (image != null) {
                 Glide.with(imageView.context).load(image).into(imageView)
             }

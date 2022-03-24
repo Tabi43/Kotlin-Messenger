@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
+import com.example.kotlinmessenger.AppUtil
 import com.example.kotlinmessenger.Constants.AppConstants
 import com.example.kotlinmessenger.DashBoard
 import com.example.kotlinmessenger.R
@@ -19,11 +20,13 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
 import java.io.File
 import com.example.kotlinmessenger.UserModel
+import com.google.firebase.messaging.FirebaseMessaging
 
 
 class f_register : Fragment(R.layout.f_register) {
 
     lateinit var binding: FRegisterBinding
+    private lateinit var appUtil: AppUtil
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -35,7 +38,7 @@ class f_register : Fragment(R.layout.f_register) {
         binding.confirmButton.setOnClickListener {
             //TODO: Funzione per il register fragment
         }
-
+        appUtil=AppUtil()
         binding.loginreturnButton.setOnClickListener {
             val fragment = f_login()
             val transaction = fragmentManager?.beginTransaction()
@@ -76,6 +79,7 @@ class f_register : Fragment(R.layout.f_register) {
                 //info visibili su logcat
                 Log.d("Main Activity", "Utente creato con successo ${it.result?.user?.uid}")
                 //Dati dell'utente
+
                 saveUserToFirebaseDatabase2()
             }
             .addOnFailureListener {
@@ -107,6 +111,7 @@ class f_register : Fragment(R.layout.f_register) {
                 val intent = Intent(this, LatestMessageActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
                 startActivity(intent)*/
+
                 setDefaultAvatar(uid)
                 var intent = Intent(activity, DashBoard::class.java)
                 startActivity(intent)
@@ -136,7 +141,21 @@ class f_register : Fragment(R.layout.f_register) {
                 val intent = Intent(this, LatestMessageActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
                 startActivity(intent)*/
+
                 setDefaultAvatar(uid)
+                FirebaseMessaging.getInstance().token.addOnSuccessListener { result ->
+                    if (result != null) {
+                        val token = result
+                        val databaseReference =
+                            FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
+                                .getReference("users")
+                                .child(appUtil.getUID()!!)
+                        Log.d("token", "IL TOKEN è $token")
+                        val map: MutableMap<String, Any> = HashMap()
+                        map["token"] = token!!
+                        databaseReference.updateChildren(map)
+                    }
+                }
                 var intent = Intent(activity, DashBoard::class.java)
                 startActivity(intent)
             }

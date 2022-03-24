@@ -42,7 +42,7 @@ class FirebaseNotificationsr:FirebaseMessagingService() {
 
             if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O)
                 createOreonotification(title!!, message!!, hisId!!, hisImage!!, chatId!!)
-             createnormalnotification(title!!, message!!, hisId!!, hisImage!!, chatId!!)
+            else createnormalnotification(title!!, message!!, hisId!!, hisImage!!, chatId!!)
 
         }
 
