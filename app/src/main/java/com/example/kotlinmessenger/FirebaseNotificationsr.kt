@@ -42,7 +42,7 @@ class FirebaseNotificationsr:FirebaseMessagingService() {
 
             if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O)
                 createOreonotification(title!!, message!!, hisId!!, hisImage!!, chatId!!)
-            else createnormalnotification(title!!, message!!, hisId!!, hisImage!!, chatId!!)
+             createnormalnotification(title!!, message!!, hisId!!, hisImage!!, chatId!!)
 
         }
 
@@ -55,6 +55,7 @@ class FirebaseNotificationsr:FirebaseMessagingService() {
 
 
     }
+
     fun createnormalnotification(title:String, message:String, hisId:String, hisImage:String, chatId:String) {
         Log.d("string","ho chiamato la funzione createnormalnotification()")
         val uri=RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
@@ -71,7 +72,7 @@ class FirebaseNotificationsr:FirebaseMessagingService() {
         intent.putExtra("hisImage", hisImage)
         intent.putExtra("chatId", chatId)
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-        val pendingIntent=PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_ONE_SHOT)
+        val pendingIntent=PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
         builder.setContentIntent(pendingIntent)
         val manager=getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         manager.notify(Random().nextInt(85-65), builder.build())
@@ -97,7 +98,7 @@ class FirebaseNotificationsr:FirebaseMessagingService() {
         intent.putExtra("chatId", chatId)
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
 
-        val pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_ONE_SHOT)
+        val pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
         val notification = Notification.Builder(this, AppConstants.CHANNEL_ID)
             .setContentTitle(title)
             .setContentText(message)

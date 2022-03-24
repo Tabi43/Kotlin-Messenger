@@ -44,7 +44,7 @@ class SplashScreen : AppCompatActivity() {
 
                 }
 
-                startActivity(Intent(this, DashBoard::class.java))
+                startActivity(Intent(this, MainActivity::class.java))
                 finish()
             }
         }, 3000)
