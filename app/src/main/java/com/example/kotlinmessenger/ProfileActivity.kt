@@ -32,14 +32,12 @@ class ProfileActivity : AppCompatActivity() {
     private lateinit var imageUrl: String
 
     private var selectedPhotoUri: Uri? = null
-
     private var databaseReference: DatabaseReference? = null
     private var firebaseAuth: FirebaseAuth? = null
     private var storageReference: StorageReference? = null
     private lateinit var myId: String
     private lateinit var appUtil: AppUtil
     private lateinit var binding: ActivityProfileBinding
-    //private lateinit var sharedPreferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         binding = ActivityProfileBinding.inflate(layoutInflater)
@@ -50,11 +48,10 @@ class ProfileActivity : AppCompatActivity() {
         firebaseAuth = FirebaseAuth.getInstance()
         databaseReference = FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app").getReference("Users")
         storageReference = FirebaseStorage.getInstance().reference
-        //sharedPreferences = this.getSharedPreferences("userData", Context.MODE_PRIVATE)
 
         binding.btnDataDone.setOnClickListener {
             if(checkData()){
-                //uploadData(username,status,selectedPhotoUri!!)
+
                 if(selectedPhotoUri == null){
                     uploadData(username,status)
                 }else{
@@ -68,6 +65,7 @@ class ProfileActivity : AppCompatActivity() {
                 FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
                     .getReference("users").child(myId).child("token").removeValue()
             Log.d("token", "token rimosso $databaseReference")
+            firebaseAuth!!.signOut()
             startActivity(Intent(this, MainActivity::class.java))
         }
 

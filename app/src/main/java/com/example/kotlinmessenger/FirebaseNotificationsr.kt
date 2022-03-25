@@ -18,16 +18,19 @@ import com.google.firebase.messaging.RemoteMessage
 import java.util.*
 import kotlin.collections.HashMap
 import com.example.kotlinmessenger.UserModel
+import com.google.firebase.storage.FirebaseStorage
 
 
 class FirebaseNotificationsr:FirebaseMessagingService() {
     private val apputil=AppUtil()
+
     override fun onNewToken(token: String) {
         super.onNewToken(token)
         Log.d("token:", "IL TOKEN GENERATO è $token")
         updateToken(token)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)
         if (remoteMessage.data.isNotEmpty()) {
@@ -41,8 +44,8 @@ class FirebaseNotificationsr:FirebaseMessagingService() {
             val chatId = map["chatId"]
 
             if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O)
-                createOreonotification(title!!, message!!, hisId!!, hisImage!!, chatId!!)
-            else createnormalnotification(title!!, message!!, hisId!!, hisImage!!, chatId!!)
+                createnormalnotification(title!!, message!!, hisId!!, hisImage!!, chatId!!)
+            else createOreonotification(title!!, message!!, hisId!!, hisImage!!, chatId!!)
 
         }
 
@@ -58,6 +61,7 @@ class FirebaseNotificationsr:FirebaseMessagingService() {
 
     fun createnormalnotification(title:String, message:String, hisId:String, hisImage:String, chatId:String) {
         Log.d("string","ho chiamato la funzione createnormalnotification()")
+
         val uri=RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
         val builder=NotificationCompat.Builder(this, AppConstants.CHANNEL_ID)
         builder.setContentTitle(title)

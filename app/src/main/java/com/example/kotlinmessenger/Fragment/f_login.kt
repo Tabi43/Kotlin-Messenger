@@ -13,6 +13,7 @@ import com.example.kotlinmessenger.DashBoard
 import com.example.kotlinmessenger.R
 import com.example.kotlinmessenger.databinding.FLoginBinding
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.messaging.FirebaseMessaging
 
@@ -46,6 +47,8 @@ class f_login : Fragment(R.layout.f_login) {
             return
         }
 
+
+
         Log.d("Login_activity","Login with email $email and password $password")
         FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
 
@@ -68,20 +71,15 @@ class f_login : Fragment(R.layout.f_login) {
                 }
                 //ha funzionato
                 Toast.makeText(activity,"Loggato con successo $email",Toast.LENGTH_SHORT).show()
-                //info visibili su logcat
-                Log.d("Main Activity", "Login effettuato con successo ${it.result?.user?.uid}")
-                var intent = Intent(activity, DashBoard::class.java)
-                startActivity(intent)
-                //start activity dopo aver effettuato il login
-                //TODO:"Inserire la schermata home"
+
+                    var intent = Intent(activity, DashBoard::class.java)
+                    startActivity(intent)
                 //val intent= Intent(this, ::class.java)
                 //intent.flags= Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
                 //startActivity(intent)
             }
             .addOnFailureListener {
                 Toast.makeText(this.activity,"Failed to Login: ${it.message}", Toast.LENGTH_LONG).show()
-                //info visibili su logcat
-                Log.d("Main Activity", "sei un coglione")
             }
     }
 

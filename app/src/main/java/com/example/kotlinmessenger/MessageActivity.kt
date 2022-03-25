@@ -19,6 +19,10 @@ import com.example.kotlinmessenger.Constants.AppConstants
 import com.example.kotlinmessenger.adapter.ContactAdapter
 import com.android.volley.toolbox.Volley
 import com.android.volley.DefaultRetryPolicy
+import com.example.kotlinmessenger.AppUtil
+import com.example.kotlinmessenger.ChatListModel
+import com.example.kotlinmessenger.MessageModel
+import com.example.kotlinmessenger.UserModel
 import com.example.kotlinmessenger.databinding.ActivityMessageBinding
 import com.example.kotlinmessenger.databinding.LeftItemLayoutBinding
 import com.example.kotlinmessenger.databinding.RightItemLayoutBinding

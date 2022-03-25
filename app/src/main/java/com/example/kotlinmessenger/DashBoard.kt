@@ -6,9 +6,6 @@ import android.os.Bundle
 import androidx.fragment.app.Fragment
 import com.example.kotlinmessenger.Fragment.f_contacts
 import com.example.kotlinmessenger.Fragment.f_conversations
-import com.example.kotlinmessenger.Fragment.f_settings
-import com.example.kotlinmessenger.AppUtil
-import com.example.kotlinmessenger.R
 import com.example.kotlinmessenger.databinding.ActivityDashBoardBinding
 
 class DashBoard : AppCompatActivity() {
@@ -24,7 +21,8 @@ class DashBoard : AppCompatActivity() {
 
         val conversationsF = f_conversations()
         val contactsF = f_contacts()
-        val settingsF = f_settings()
+
+
 
         replaceFragment(conversationsF)
 
