@@ -19,6 +19,10 @@ import com.example.kotlinmessenger.Constants.AppConstants
 import com.example.kotlinmessenger.adapter.ContactAdapter
 import com.android.volley.toolbox.Volley
 import com.android.volley.DefaultRetryPolicy
+import com.example.kotlinmessenger.AppUtil
+import com.example.kotlinmessenger.ChatListModel
+import com.example.kotlinmessenger.MessageModel
+import com.example.kotlinmessenger.UserModel
 import com.example.kotlinmessenger.databinding.ActivityMessageBinding
 import com.example.kotlinmessenger.databinding.LeftItemLayoutBinding
 import com.example.kotlinmessenger.databinding.RightItemLayoutBinding
@@ -27,7 +31,6 @@ import com.google.firebase.database.*
 import com.firebase.ui.database.FirebaseRecyclerOptions
 import com.google.firebase.storage.FirebaseStorage
 import org.json.JSONObject
-
 
 class MessageActivity : AppCompatActivity() {
 
@@ -65,6 +68,7 @@ class MessageActivity : AppCompatActivity() {
                 gettoken(message)
             }
         }
+
         if (chatId == null) CheckChat(hisId!!)
 
         FirebaseStorage.getInstance().reference.child(AppConstants.PATH + hisId).downloadUrl
@@ -80,6 +84,7 @@ class MessageActivity : AppCompatActivity() {
         checkOnlineStatus()
         getMyname()
     }
+
      private fun getMyname(){
          val databaseReference =
              FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
@@ -91,7 +96,7 @@ class MessageActivity : AppCompatActivity() {
                          }
                      }
                      override fun onCancelled(error: DatabaseError) {
-                         TODO("Not yet implemented")
+
                      }
                  })
 
@@ -148,7 +153,7 @@ class MessageActivity : AppCompatActivity() {
             val messageModel = MessageModel(myId, hisId!!, message, type = "text")
             databaseReference.push().setValue(messageModel)
             val Map: MutableMap<String, Any> = HashMap()
-            Map["Last Message"] = message
+            Map["lastMessage"] = message
             Map["Date"] = System.currentTimeMillis().toShort().toInt()
             databaseReference =
                 FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
@@ -245,16 +250,16 @@ class MessageActivity : AppCompatActivity() {
                     val userModel = snapshot.getValue(UserModel::class.java)
                     activityMessageBinding.online = userModel!!.online
                     Log.d("chat","stato interlocutore: ${activityMessageBinding.online}")
-
-
                 }
             }
 
             override fun onCancelled(error: DatabaseError) {
-                TODO("Not yet implemented")
+
             }
+
         })
    }
+
     private fun gettoken(message: String) {
         val databaseReference = FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app").getReference("users").child(hisId!!).child("token")
         .addListenerForSingleValueEvent(object : ValueEventListener {
@@ -275,12 +280,10 @@ class MessageActivity : AppCompatActivity() {
                     to.put("data", data)
                     sendNotification(to)
 
-
                 }
             }
-
             override fun onCancelled(error: DatabaseError) {
-                TODO("Not yet implemented")
+
             }
         })
     }
@@ -292,11 +295,9 @@ class MessageActivity : AppCompatActivity() {
             AppConstants.NOTIFICATION_URL,
             to,
             Response.Listener { response: JSONObject ->
-
                 Log.d("TAG", "onResponse: $response")
             },
             Response.ErrorListener {
-
                 Log.d("TAG", "onError: $it")
             }) {
             override fun getHeaders(): MutableMap<String, String> {
@@ -322,10 +323,6 @@ class MessageActivity : AppCompatActivity() {
         requestQueue.add(request)
 
     }
-
-
-
-
 
 }
 

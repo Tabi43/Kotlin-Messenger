@@ -9,8 +9,6 @@ import android.widget.Filterable
 import androidx.recyclerview.widget.RecyclerView
 import com.example.kotlinmessenger.MessageActivity
 import com.example.kotlinmessenger.Constants.AppConstants
-//import com.example.kotlinmessenger.MessageActivity
-//import com.example.kotlinmessenger.Activities.UserInfoActivity
 import com.example.kotlinmessenger.UserModel
 import com.example.kotlinmessenger.databinding.ContactItemLayoutBinding
 import com.google.firebase.storage.FirebaseStorage

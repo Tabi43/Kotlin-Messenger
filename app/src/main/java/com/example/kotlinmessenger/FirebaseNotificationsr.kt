@@ -18,16 +18,19 @@ import com.google.firebase.messaging.RemoteMessage
 import java.util.*
 import kotlin.collections.HashMap
 import com.example.kotlinmessenger.UserModel
+import com.google.firebase.storage.FirebaseStorage
 
 
 class FirebaseNotificationsr:FirebaseMessagingService() {
     private val apputil=AppUtil()
+
     override fun onNewToken(token: String) {
         super.onNewToken(token)
         Log.d("token:", "IL TOKEN GENERATO è $token")
         updateToken(token)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)
         if (remoteMessage.data.isNotEmpty()) {
@@ -41,23 +44,21 @@ class FirebaseNotificationsr:FirebaseMessagingService() {
             val chatId = map["chatId"]
 
             if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O)
-                createOreonotification(title!!, message!!, hisId!!, hisImage!!, chatId!!)
-            else createnormalnotification(title!!, message!!, hisId!!, hisImage!!, chatId!!)
-
+                createnormalnotification(title!!, message!!, hisId!!, hisImage!!, chatId!!)
+            else createOreonotification(title!!, message!!, hisId!!, hisImage!!, chatId!!)
         }
-
     }
+
     fun updateToken(token:String) {
         val databaseReference = FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app").getReference("users").child(apputil.getUID()!!)
         val map:MutableMap<String, Any> = HashMap()
         map["token"]=token
         databaseReference.updateChildren(map)
-
-
     }
 
     fun createnormalnotification(title:String, message:String, hisId:String, hisImage:String, chatId:String) {
         Log.d("string","ho chiamato la funzione createnormalnotification()")
+
         val uri=RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
         val builder=NotificationCompat.Builder(this, AppConstants.CHANNEL_ID)
         builder.setContentTitle(title)
@@ -77,6 +78,7 @@ class FirebaseNotificationsr:FirebaseMessagingService() {
         val manager=getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         manager.notify(Random().nextInt(85-65), builder.build())
     }
+
     @RequiresApi(Build.VERSION_CODES.O)
     fun createOreonotification(title:String, message:String, hisId:String, hisImage:String, chatId:String) {
         val channel = NotificationChannel(

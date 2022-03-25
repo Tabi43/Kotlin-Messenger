@@ -2,8 +2,10 @@ package com.example.kotlinmessenger
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.Toast
 import com.example.kotlinmessenger.Fragment.f_login
 import com.example.kotlinmessenger.databinding.ActivityMainBinding
+import com.google.firebase.auth.FirebaseAuth
 
 class MainActivity : AppCompatActivity() {
 
@@ -13,15 +15,10 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-
-        val fragmentManager = supportFragmentManager
-        /*
-        val fragmentTransaction = fragmentManager.beginTransaction()
-        fragmentTransaction.replace(R.id.fragmentContainer, f_login)
-        fragmentTransaction.commit()*/
+        var firebaseAuth = FirebaseAuth.getInstance()
 
         supportFragmentManager.beginTransaction()
-            .add(R.id.fragmentContainer, f_login())
+            .replace(R.id.fragmentContainer, f_login())
             .commit()
     }
 

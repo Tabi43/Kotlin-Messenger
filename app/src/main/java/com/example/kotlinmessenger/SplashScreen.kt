@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.util.Log
+import android.widget.Toast
 import com.google.android.gms.auth.GoogleAuthUtil.getToken
 import com.google.android.gms.auth.zzd.getToken
 import com.google.firebase.auth.FirebaseAuth
@@ -20,7 +21,6 @@ class SplashScreen : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash_screen)
-        Log.d("token","PARTITA")
         firebaseAuth = FirebaseAuth.getInstance()
         appUtil = AppUtil()
 
@@ -29,11 +29,10 @@ class SplashScreen : AppCompatActivity() {
                 startActivity(Intent(this, MainActivity::class.java))
                 finish()
             } else {
-
                 startActivity(Intent(this, DashBoard::class.java))
                 finish()
             }
-        }, 3000)
+        }, 1000)
 
     }
 
