@@ -2,6 +2,7 @@ package com.example.kotlinmessenger.Fragment
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,6 +21,7 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.example.kotlinmessenger.R
+import com.example.kotlinmessenger.adapter.ChatAdapter
 import com.example.kotlinmessenger.adapter.ContactAdapter
 import com.google.firebase.auth.FirebaseAuth
 
@@ -29,12 +31,13 @@ class f_conversations : Fragment(R.layout.f_conversations) {
 
     private lateinit var binding: FConversationsBinding
     private lateinit var firebaseAuth: FirebaseAuth
-    private var chatAdapter: ContactAdapter? = null
+    private var chatAdapter: ChatAdapter? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FConversationsBinding.inflate(inflater, container, false)
 
         firebaseAuth = FirebaseAuth.getInstance()
+        getAllActiveChat()
 
         return binding.root
     }
@@ -53,7 +56,8 @@ class f_conversations : Fragment(R.layout.f_conversations) {
                             val lastMessage = it.child("Last Message").value.toString()
                             val date = it.child("date").value.toString()
                             val chatID = it.child("chatId").value.toString()
-                            chats.add(ChatModel(chatID,"",lastMessage,"",date,""))
+                            val hisId = it.child("member").value.toString()
+                            chats.add(ChatModel(chatID,"",lastMessage,"",date,hisId,""))
                         }
                     }
                 }
@@ -61,15 +65,12 @@ class f_conversations : Fragment(R.layout.f_conversations) {
             }
     }
 
-
-    class ViewHolder(val chatItemLayoutBinding: ChatItemLayoutBinding) :
-        RecyclerView.ViewHolder(chatItemLayoutBinding.root)
-
     private fun updateRecycleView(collection: ArrayList<ChatModel>) {
         binding.recyclerViewChat.apply{
             layoutManager = LinearLayoutManager(context)
             setHasFixedSize(true)
-
+            chatAdapter = ChatAdapter(collection)
+            adapter = chatAdapter
         }
 
     }

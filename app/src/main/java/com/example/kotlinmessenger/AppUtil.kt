@@ -2,6 +2,7 @@ package com.example.kotlinmessenger
 
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
+import android.util.Log
 
 class AppUtil {
 
@@ -31,6 +32,7 @@ class AppUtil {
         }
 
         val diff = now - time
+        Log.d("DATE","Ora: ${now} time: $time diff: $diff")
 
         return when {
             diff < MINUTE_MILLIS -> {
@@ -58,7 +60,6 @@ class AppUtil {
     }
 
     fun updateOnlineStatus(status: String) {
-
         val databaseReference =
             FirebaseDatabase.getInstance().getReference("users").child(getUID()!!)
         val map = HashMap<String, Any>()
