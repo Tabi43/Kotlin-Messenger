@@ -26,6 +26,7 @@
             android:value="true"/>
         <activity
             android:name=".MessageActivity"
+            android:windowSoftInputMode="adjustResize"
             android:exported="false" />
         <activity
             android:name=".ProfileActivity"

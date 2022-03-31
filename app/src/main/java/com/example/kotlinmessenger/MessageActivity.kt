@@ -68,7 +68,6 @@ class MessageActivity : AppCompatActivity() {
                 gettoken(message)
             }
         }
-
         if (chatId == null) CheckChat(hisId!!)
 
         FirebaseStorage.getInstance().reference.child(AppConstants.PATH + hisId).downloadUrl
@@ -83,6 +82,13 @@ class MessageActivity : AppCompatActivity() {
             }
         checkOnlineStatus()
         getMyname()
+        /*activityMessageBinding.msgText.setOnClickListener {
+            var position=activityMessageBinding.messageRecyclerView.adapter?.itemCount!!.toInt()
+            Log.d("postion", "è ${position}")
+            activityMessageBinding.messageRecyclerView.smoothScrollToPosition(position)
+        }*/
+        /*var position=activityMessageBinding.messageRecyclerView.adapter?.itemCount!!.toInt()
+        activityMessageBinding.messageRecyclerView.smoothScrollToPosition(position)*/
     }
 
      private fun getMyname(){
@@ -197,6 +203,7 @@ class MessageActivity : AppCompatActivity() {
                     return ViewHolder(viewDataBinding!!)
                 }
 
+
                 override fun onBindViewHolder(
                     holder: ViewHolder,
                     position: Int,
@@ -209,7 +216,9 @@ class MessageActivity : AppCompatActivity() {
                     if (getItemViewType(position) == 1) {
                         holder.viewDataBinding.setVariable(BR.message, messageModel)
                        // holder.viewDataBinding.setVariable(BR.messageImage, hisImageUrl)
+
                     }
+
                 }
 
                 override fun getItemViewType(position: Int): Int {
