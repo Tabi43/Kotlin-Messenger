@@ -8,7 +8,6 @@ class MessageModel constructor(
     var senderId: String = "",
     var receiverId: String = "",
     var message: String = "",
-    //var data:String = system.currentMIll.toString()
     var date: String = "",
     var type: String = ""
 

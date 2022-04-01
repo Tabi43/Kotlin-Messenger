@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<layout>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
 
@@ -13,8 +14,7 @@
 
     </data>
 
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp">
@@ -72,13 +72,14 @@
 
                     <TextView
                         android:id="@+id/txtChatDate"
-                        android:layout_width="0dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight=".5"
                         android:gravity="center"
                         android:text="@{chatModel.date ,default=Nothing}"
                         android:textColor="@color/textColor"
                         android:textSize="13dp"
+                        android:layout_marginRight="0dp"
                         android:textStyle="bold" />
 
                 </LinearLayout>
