@@ -54,7 +54,7 @@
         <entry key="app/src/main/res/layout/chat_item_layout.xml" value="0.22447916666666667" />
         <entry key="app/src/main/res/layout/contact_item_layout.xml" value="0.1" />
         <entry key="app/src/main/res/layout/f_contacts.xml" value="0.1" />
-        <entry key="app/src/main/res/layout/f_conversations.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/f_conversations.xml" value="0.25" />
         <entry key="app/src/main/res/layout/f_login.xml" value="0.3515625" />
         <entry key="app/src/main/res/layout/fragment_prova.xml" value="0.38189682157913063" />
         <entry key="app/src/main/res/layout/left_item_layout.xml" value="0.29907407407407405" />

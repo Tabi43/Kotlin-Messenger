@@ -42,6 +42,7 @@ class MessageActivity : AppCompatActivity() {
     private var myName: String? = null
     private lateinit var sharedPreferences: SharedPreferences
     private val TAG = "Message Activity"
+    private var existChat:Boolean=false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         activityMessageBinding = ActivityMessageBinding.inflate(layoutInflater)
@@ -77,7 +78,19 @@ class MessageActivity : AppCompatActivity() {
                 activityMessageBinding.messageRecyclerView.adapter?.itemCount?.let{activityMessageBinding.messageRecyclerView.smoothScrollToPosition(it)}
             }
         })
+        activityMessageBinding.messageToolbar.trashChat.setOnClickListener {
+            if (existChat) {
+                startActivity(Intent(this, DashBoard::class.java))
+                val databaseReference =
+                    FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
+                        .getReference("chatlist").child(myId!!).child(chatId!!).removeValue()
+                val databaseref =
+                    FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
+                        .getReference("chat").child(chatId!!).removeValue()
+                finish()
+            }
 
+        }
         if (chatId == null) CheckChat(hisId!!)
 
         checkOnlineStatus()
@@ -179,8 +192,9 @@ class MessageActivity : AppCompatActivity() {
                 override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
 
                     var viewDataBinding: ViewDataBinding? = null
-
-                    if (viewType == 0)
+                    if(itemCount>0) existChat=true
+                    else existChat=false
+                        if (viewType == 0)
                         viewDataBinding = RightItemLayoutBinding.inflate(
                             LayoutInflater.from(parent.context),
                             parent,

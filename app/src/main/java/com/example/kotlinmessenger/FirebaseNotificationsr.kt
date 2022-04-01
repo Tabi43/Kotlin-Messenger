@@ -42,10 +42,10 @@ class FirebaseNotificationsr:FirebaseMessagingService() {
             val hisId = map["hisId"]
             val hisImage = map["hisImage"]
             val chatId = map["chatId"]
-
+            Log.d("VALORI:", "sono:${hisId}")
             if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O)
-                createnormalnotification(title!!, message!!, hisId!!, hisImage!!, chatId!!)
-            else createOreonotification(title!!, message!!, hisId!!, hisImage!!, chatId!!)
+                createOreonotification(title!!, message!!, hisId!!, chatId!!)
+            else createnormalnotification(title!!, message!!, hisId!!, chatId!!)
         }
     }
 
@@ -56,9 +56,7 @@ class FirebaseNotificationsr:FirebaseMessagingService() {
         databaseReference.updateChildren(map)
     }
 
-    fun createnormalnotification(title:String, message:String, hisId:String, hisImage:String, chatId:String) {
-        Log.d("string","ho chiamato la funzione createnormalnotification()")
-
+    fun createnormalnotification(title:String, message:String, hisId:String, chatId:String) {
         val uri=RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
         val builder=NotificationCompat.Builder(this, AppConstants.CHANNEL_ID)
         builder.setContentTitle(title)
@@ -70,7 +68,6 @@ class FirebaseNotificationsr:FirebaseMessagingService() {
             .setSound(uri)
         val intent=Intent(this,MessageActivity::class.java)
         intent.putExtra("hisId", hisId)
-        intent.putExtra("hisImage", hisImage)
         intent.putExtra("chatId", chatId)
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
         val pendingIntent=PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
@@ -80,7 +77,7 @@ class FirebaseNotificationsr:FirebaseMessagingService() {
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun createOreonotification(title:String, message:String, hisId:String, hisImage:String, chatId:String) {
+    fun createOreonotification(title:String, message:String, hisId:String, chatId:String) {
         val channel = NotificationChannel(
             AppConstants.CHANNEL_ID,
             "Message",
@@ -94,9 +91,8 @@ class FirebaseNotificationsr:FirebaseMessagingService() {
         manager.createNotificationChannel(channel)
 
         val intent = Intent(this, MessageActivity::class.java)
-
+        Log.d("VALORI:", "sono:${hisId}")
         intent.putExtra("hisId", hisId)
-        intent.putExtra("hisImage", hisImage)
         intent.putExtra("chatId", chatId)
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
 
