@@ -80,8 +80,8 @@
                 android:layout_marginTop="15dp"
                 android:layout_marginRight="348dp"
                 android:layout_marginBottom="348dp"
-                android:scaleX="1.2"
-                android:scaleY="1.2"
+                android:scaleX="1"
+                android:scaleY="1"
                 android:src="@drawable/ic_trash"
                 app:tint="@color/white" />
 

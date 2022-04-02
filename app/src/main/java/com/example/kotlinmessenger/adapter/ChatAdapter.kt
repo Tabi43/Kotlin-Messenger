@@ -20,6 +20,8 @@ import com.google.firebase.storage.FirebaseStorage
 class ChatAdapter(private val chatList: ArrayList<ChatModel>) :
         RecyclerView.Adapter<ChatAdapter.ViewHolder>() {
 
+    private val TAG = "CHAT ADAPTER"
+
     class ViewHolder(val chatItemLayoutBinding: ChatItemLayoutBinding):
             RecyclerView.ViewHolder(chatItemLayoutBinding.root) {}
 
@@ -42,6 +44,18 @@ class ChatAdapter(private val chatList: ArrayList<ChatModel>) :
                         Log.d("CHAT ADAPETR","Load data user or changed")
                         chatModel.name = snapshot.child("name").getValue().toString()
                         chatModel.online = snapshot.child("online").getValue().toString()
+                        chatModel.image = snapshot.child("image").getValue().toString()
+                        if (chatModel.image!!.isEmpty()) {
+                            FirebaseStorage.getInstance().reference.child(AppConstants.PATH + chatModel.hisID.toString()).downloadUrl
+                                .addOnSuccessListener {
+                                    chatModel.image = it.toString()
+                                    Log.d(TAG, "Url image loaded successfully")
+                                    holder.chatItemLayoutBinding.chatModel = chatModel
+                                }
+                                .addOnFailureListener {
+                                    Log.d(TAG, "Failed to load url image -> $it")
+                                }
+                        }
                         holder.chatItemLayoutBinding.chatModel = chatModel
                     }
                     override fun onCancelled(error: DatabaseError) {
@@ -59,18 +73,10 @@ class ChatAdapter(private val chatList: ArrayList<ChatModel>) :
                 chatModel.date = util.getTimeAgo(raw.toLong())
                 holder.chatItemLayoutBinding.chatModel = chatModel
             }
-
             override fun onCancelled(error: DatabaseError) {
 
             }
         })
-
-
-        FirebaseStorage.getInstance().reference.child(AppConstants.PATH + chatModel.hisID).downloadUrl
-            .addOnSuccessListener {
-                chatModel.image = it.toString()
-                holder.chatItemLayoutBinding.chatModel = chatModel
-            }
 
         holder.chatItemLayoutBinding.container.setOnClickListener{
             val intent = Intent(it.context, MessageActivity::class.java)
@@ -78,6 +84,7 @@ class ChatAdapter(private val chatList: ArrayList<ChatModel>) :
             intent.putExtra("hisImage", chatModel.image)
             it.context.startActivity(intent)
         }
+
         holder.chatItemLayoutBinding.chatModel = chatModel
     }
 

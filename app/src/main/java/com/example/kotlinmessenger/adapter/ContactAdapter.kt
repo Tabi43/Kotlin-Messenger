@@ -12,14 +12,13 @@ import com.example.kotlinmessenger.Constants.AppConstants
 import com.example.kotlinmessenger.UserModel
 import com.example.kotlinmessenger.databinding.ContactItemLayoutBinding
 import com.google.firebase.storage.FirebaseStorage
-import java.util.*
 import kotlin.collections.ArrayList
 
 class ContactAdapter(private var appContacts: ArrayList<UserModel>) :
     RecyclerView.Adapter<ContactAdapter.ViewHolder>(), Filterable {
 
     private var allContact: ArrayList<UserModel> = appContacts
-
+    private val TAG = "CONTACT ADAPTER"
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val contactItemLayoutBinding =
@@ -28,31 +27,26 @@ class ContactAdapter(private var appContacts: ArrayList<UserModel>) :
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        var userModel = allContact[position]
-        FirebaseStorage.getInstance().reference.child(AppConstants.PATH + userModel.uid).downloadUrl
-            .addOnSuccessListener {
-                userModel.image = it.toString()
-                Log.d("adapter","username: ${userModel.name} Url: ${userModel.image}")
-                holder.contactItemLayoutBinding.userModel = userModel
-            }
-            .addOnFailureListener {
-                Log.d("adapter","per: ${userModel.name} id: ${userModel.uid} è andatya in vacca perchè: $it")
-                holder.contactItemLayoutBinding.userModel = userModel
-            }
+        val userModel = allContact[position]
+        if (userModel.image.isEmpty()) {
+            FirebaseStorage.getInstance().reference.child(AppConstants.PATH + userModel.uid).downloadUrl
+                .addOnSuccessListener {
+                    userModel.image = it.toString()
+                    Log.d(TAG, "Url image loaded successfully")
+                    holder.contactItemLayoutBinding.userModel = userModel
+                }
+                .addOnFailureListener {
+                    Log.d(TAG, "Failed to load url image -> $it")
+                    holder.contactItemLayoutBinding.userModel = userModel
+                }
+        }else holder.contactItemLayoutBinding.userModel = userModel
 
-        holder.contactItemLayoutBinding.imgContact.setOnClickListener {
-           // val intent = Intent(it.context, UserInfoActivity::class.java)
-            //intent.putExtra("userId", userModel.uid)
-           // it.context.startActivity(intent)
+        holder.itemView.setOnClickListener {
+            val intent = Intent(it.context, MessageActivity::class.java)
+            intent.putExtra("hisId", userModel.uid)
+            intent.putExtra("hisImage", userModel.image)
+            it.context.startActivity(intent)
         }
-
-            holder.itemView.setOnClickListener {
-                val intent = Intent(it.context, MessageActivity::class.java)
-                intent.putExtra("hisId", userModel.uid)
-                intent.putExtra("hisImage", userModel.image)
-                it.context.startActivity(intent)
-        }
-
     }
 
     override fun getItemCount(): Int {
@@ -63,8 +57,9 @@ class ContactAdapter(private var appContacts: ArrayList<UserModel>) :
         RecyclerView.ViewHolder(contactItemLayoutBinding.root) {
     }
 
-    override fun getFilter(): Filter {
-        return object : Filter() {
+    override fun getFilter(): Filter? {
+        return null
+    /* return object : Filter() {
             override fun performFiltering(constraint: CharSequence?): FilterResults {
                 val searchContent = constraint.toString()
                 if (searchContent.isEmpty())
@@ -90,9 +85,8 @@ class ContactAdapter(private var appContacts: ArrayList<UserModel>) :
             override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
                 allContact = results?.values as ArrayList<UserModel>
                 notifyDataSetChanged()
-
             }
-        }
+        }*/
     }
 
 }

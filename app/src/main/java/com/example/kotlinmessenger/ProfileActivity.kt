@@ -38,6 +38,8 @@ class ProfileActivity : AppCompatActivity() {
     private lateinit var myId: String
     private lateinit var appUtil: AppUtil
     private lateinit var binding: ActivityProfileBinding
+    private var myToken = ""
+    private val TAG = "PROFILE ACTIVITY"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         binding = ActivityProfileBinding.inflate(layoutInflater)
@@ -51,12 +53,10 @@ class ProfileActivity : AppCompatActivity() {
 
         binding.btnDataDone.setOnClickListener {
             if(checkData()){
-
                 if(selectedPhotoUri == null){
                     uploadData(username,status)
                 }else{
                     uploadData(username,status,selectedPhotoUri!!)
-                    //uploadImageToFireDataBase(selectedPhotoUri!!)
                 }
             }
         }
@@ -64,7 +64,7 @@ class ProfileActivity : AppCompatActivity() {
             val databaseReference =
                 FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
                     .getReference("users").child(myId).child("token").removeValue()
-            Log.d("token", "token rimosso $databaseReference")
+            Log.d(TAG, "token removed")
             firebaseAuth!!.signOut()
             startActivity(Intent(this, MainActivity::class.java))
             finish()
@@ -82,19 +82,13 @@ class ProfileActivity : AppCompatActivity() {
     private val getAction= registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
             result ->
         if(result.resultCode==Activity.RESULT_OK && result.data!=null){
-            Log.d("RegisterActivity","Photo was selected")
+            Log.d(TAG,"Photo selected")
             selectedPhotoUri= result.data?.data//location di dove l immagine è stata memorizzata
             //caricamento immagine sulla pagina di login
             val bitmap= MediaStore.Images.Media.getBitmap(contentResolver,selectedPhotoUri)
-            //val bitmapDrawable=BitmapDrawable(bitmap)
-            //buttonSelectPhoto.setBackgroundDrawable(bitmapDrawable)
             binding.imgUser.setImageBitmap(bitmap)
         }
     }
-
-    /*
-    * buttonSelectPhoto.setOnClickListener {
-    * */
 
     private fun checkData(): Boolean {
         username = binding.usernameET.text.toString().trim()
@@ -119,7 +113,7 @@ class ProfileActivity : AppCompatActivity() {
                     Toast.makeText(this,"Fetching error: $it",Toast.LENGTH_SHORT).show()
                 }
                 .addOnSuccessListener {
-                    Toast.makeText(this,"Data Fetched",Toast.LENGTH_SHORT).show()
+                    myToken = it.child("token").value.toString()
                     val status = it.child("status").value
                     val username = it.child("name").value
                     binding.usernameET.setText(username.toString())
@@ -147,19 +141,25 @@ class ProfileActivity : AppCompatActivity() {
     private fun uploadData(name: String, status: String) {
         val uid = FirebaseAuth.getInstance().uid ?: ""
         val ref = FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app").getReference("/users/$uid")
-        val user =
-            UserModel(name,status,"",uid,"online","false")
+        val user = UserModel(name,status,"",uid,"online","false")
         ref.setValue(user)
             .addOnSuccessListener {
-                Log.d("Register Activity", "Utente salvato nel db")
-                /*//start activity dopo aver creato l utente
-                val intent = Intent(this, LatestMessageActivity::class.java)
-                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
-                startActivity(intent)*/
+                bindUrlToUSer(uid)
+                Toast.makeText(this,"Successfully updated",Toast.LENGTH_SHORT).show()
+                Log.d(TAG, "User successfully updated")
+                startActivity(Intent(this, DashBoard::class.java))
+                finish()
             }
             .addOnFailureListener {
                 Toast.makeText(this, "impossibile salvare nel db", Toast.LENGTH_LONG).show()
-                Log.d("Register Activity", "Utente NON salvato nel db")
+                Log.d(TAG, "Save Error -> $it")
+            }
+        ref.child("token").setValue(myToken)
+            .addOnFailureListener {
+                Log.d(TAG,"Token manteined")
+            }
+            .addOnSuccessListener {
+                Log.d(TAG,"Token lost")
             }
     }
 
@@ -167,30 +167,31 @@ class ProfileActivity : AppCompatActivity() {
     private fun uploadData(name: String, status: String, image: Uri) = kotlin.run {
         storageReference!!.child(AppConstants.PATH + firebaseAuth!!.uid).putFile(image)
             .addOnSuccessListener {
-                Log.d("Profile Activity","Aggiornamento dei date dell'account")
+                Log.d(TAG,"Updateing user...")
                 val task = it.storage.downloadUrl
                 task.addOnCompleteListener { uri ->
                     imageUrl = uri.result.toString()
                     val uid = FirebaseAuth.getInstance().uid ?: ""
                     val ref = FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app").getReference("/users/$uid")
-                    val user =
-                        UserModel(name,status,"",uid,"online","false")
+                    val user = UserModel(name,status,imageUrl,uid,"online","false")
                     ref.setValue(user)
                         .addOnSuccessListener {
-                            Log.d("Register Activity", "Utente salvato nel db")
-                            /*//start activity dopo aver creato l utente
-                            val intent = Intent(this, LatestMessageActivity::class.java)
-                            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
-                            startActivity(intent)*/
-                            /*val editor=sharedPreferences.edit()
-                            editor.putString("myImage",imageUrl).apply()*/
+                            Log.d(TAG, "User sevaed correctly")
+                            Toast.makeText(this,"Successfully updated",Toast.LENGTH_SHORT).show()
                         }
                         .addOnFailureListener {
-                            Toast.makeText(this, "impossibile salvare nel db", Toast.LENGTH_LONG).show()
-                            Log.d("Register Activity", "Utente NON salvato nel db")
+                            Toast.makeText(this, "Error! Save not possible", Toast.LENGTH_LONG).show()
+                            Log.d(TAG, "Utente NON salvato nel db")
                         }
-                    //startActivity(Intent(this, DashBoard::class.java))
-                    //finish()
+                    ref.child("token").setValue(myToken)
+                        .addOnFailureListener {
+                              Log.d(TAG,"Token manteined")
+                        }
+                        .addOnSuccessListener {
+                            Log.d(TAG,"Token lost")
+                        }
+                    startActivity(Intent(this, DashBoard::class.java))
+                    finish()
                 }
             }
     }
@@ -229,6 +230,23 @@ class ProfileActivity : AppCompatActivity() {
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED)
                 else Toast.makeText(this, "Storage permission denied", Toast.LENGTH_SHORT).show()
         }
+    }
+
+    private fun bindUrlToUSer(uid: String) {
+        FirebaseStorage.getInstance().reference.child(AppConstants.PATH + uid).downloadUrl
+            .addOnSuccessListener {
+                FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
+                    .getReference("/users").child(uid).child("image").setValue(it.toString())
+                    .addOnSuccessListener {
+                        Log.d(TAG,"Url image correctly bind to userDB")
+                    }
+                    .addOnFailureListener {
+                        Log.d(TAG,"Error to bind url image -> $it")
+                    }
+            }
+            .addOnFailureListener {
+                Log.d(TAG,"Error to bind url image -> $it")
+            }
     }
 
 }

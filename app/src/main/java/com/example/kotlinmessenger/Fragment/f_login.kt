@@ -9,68 +9,92 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.kotlinmessenger.AppUtil
+import com.example.kotlinmessenger.Constants.AppConstants
 import com.example.kotlinmessenger.DashBoard
 import com.example.kotlinmessenger.R
 import com.example.kotlinmessenger.databinding.FLoginBinding
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.messaging.FirebaseMessaging
+import com.google.firebase.storage.FirebaseStorage
 
 class f_login : Fragment(R.layout.f_login) {
 
-    lateinit var binding : FLoginBinding
+    lateinit var binding: FLoginBinding
     private lateinit var appUtil: AppUtil
+    private val TAG = "LOGIN FRAGMENT"
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         binding = FLoginBinding.inflate(inflater, container, false)
         binding.loginButton.setOnClickListener {
             performLogin()
         }
-        appUtil=AppUtil()
+        appUtil = AppUtil()
         binding.signUpButton.setOnClickListener {
             val fragment = f_register()
             val transaction = fragmentManager?.beginTransaction()
-            transaction?.replace(R.id.fragmentContainer,fragment)?.commit()
+            transaction?.replace(R.id.fragmentContainer, fragment)?.commit()
         }
         return binding.root
     }
 
-    private fun performLogin(){
-        var email = binding.mailET.text.toString()
-        var password= binding.passwordET.text.toString()
+    private fun performLogin() {
+        val email = binding.mailET.text.toString()
+        val password = binding.passwordET.text.toString()
 
-        if(email.isEmpty() || password.isEmpty()){
-            Toast.makeText(activity,"Email or Password fields are required", Toast.LENGTH_LONG).show()
+        if (email.isEmpty() || password.isEmpty()) {
+            Toast.makeText(activity, "Email or Password fields are required", Toast.LENGTH_LONG)
+                .show()
             return
         }
-
-        Log.d("Login_activity","Login with email $email and password $password")
+        Log.d(TAG, "Login with email $email and password $password")
         FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
-            .addOnCompleteListener{
-                if(!it.isSuccessful){
-                    return@addOnCompleteListener
-                }
+            .addOnCompleteListener {
+                if (!it.isSuccessful) return@addOnCompleteListener
                 FirebaseMessaging.getInstance().token.addOnSuccessListener { result ->
                     if (result != null) {
                         val token = result
                         val databaseReference =
                             FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
-                                .getReference("users")
-                                .child(appUtil.getUID()!!)
-                        Log.d("token", "IL TOKEN è $token")
-                        val map: MutableMap<String, Any> = HashMap()
-                        map["token"] = token!!
-                        databaseReference.updateChildren(map)
+                                .getReference("users").child(appUtil.getUID()!!).child("token")
+                                .setValue(token)
+                                .addOnSuccessListener {
+                                    Log.d(TAG, "Token successfully assigned -> $token")
+                                    startActivity(Intent(activity, DashBoard::class.java))
+                                }
+                                .addOnFailureListener {
+                                    Log.d(TAG, "Error token not assigned -> $it")
+                                }
                     }
                 }
-                Toast.makeText(activity,"Loggato con successo $email",Toast.LENGTH_SHORT).show()
-
-                    var intent = Intent(activity, DashBoard::class.java)
-                    startActivity(intent)
+                bindUrlToUSer(FirebaseAuth.getInstance().uid!!)
+                Toast.makeText(activity, "Loggato con successo $email", Toast.LENGTH_SHORT).show()
+                startActivity(Intent(activity, DashBoard::class.java))
             }
             .addOnFailureListener {
-                Toast.makeText(this.activity,"Failed to Login: ${it.message}", Toast.LENGTH_LONG).show()
+                Toast.makeText(this.activity, "Failed to Login: ${it.message}", Toast.LENGTH_LONG)
+                    .show()
+            }
+    }
+
+    private fun bindUrlToUSer(uid: String) {
+        FirebaseStorage.getInstance().reference.child(AppConstants.PATH + uid).downloadUrl
+            .addOnSuccessListener {
+                FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
+                    .getReference("/users").child(uid).child("image").setValue(it.toString())
+                    .addOnSuccessListener {
+                        Log.d(TAG, "Url image correctly bind to userDB")
+                    }
+                    .addOnFailureListener {
+                        Log.d(TAG, "Error to bind url image -> $it")
+                    }
+            }
+            .addOnFailureListener {
+                Log.d(TAG, "Error to bind url image -> $it")
             }
     }
 }
