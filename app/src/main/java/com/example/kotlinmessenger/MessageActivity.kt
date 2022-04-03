@@ -1,36 +1,50 @@
 package com.example.kotlinmessenger
 
+import android.app.Activity
 import android.content.Intent
 import android.content.SharedPreferences
-import android.nfc.Tag
-import androidx.appcompat.app.AppCompatActivity
+import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.provider.MediaStore
 import android.util.Log
+import android.view.Gravity.apply
 import android.view.LayoutInflater
 import android.view.View
-import com.android.volley.Response
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.GravityCompat.apply
+import androidx.core.widget.doOnTextChanged
 import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.android.volley.toolbox.JsonObjectRequest
-import com.example.kotlinmessenger.Constants.AppConstants
-import com.android.volley.toolbox.Volley
 import com.android.volley.DefaultRetryPolicy
-import com.example.kotlinmessenger.AppUtil
-import com.example.kotlinmessenger.ChatListModel
+import com.android.volley.Response
+import com.android.volley.toolbox.JsonObjectRequest
+import com.android.volley.toolbox.Volley
+import com.example.kotlinmessenger.Constants.AppConstants
 import com.example.kotlinmessenger.MessageModel
 import com.example.kotlinmessenger.UserModel
+import com.example.kotlinmessenger.adapter.MessageAdapter
 import com.example.kotlinmessenger.databinding.ActivityMessageBinding
 import com.example.kotlinmessenger.databinding.LeftItemLayoutBinding
 import com.example.kotlinmessenger.databinding.RightItemLayoutBinding
 import com.firebase.ui.database.FirebaseRecyclerAdapter
-import com.google.firebase.database.*
 import com.firebase.ui.database.FirebaseRecyclerOptions
+import com.google.firebase.database.*
+import io.ak1.pix.helpers.PixEventCallback
+import io.ak1.pix.helpers.pixFragment
+import io.ak1.pix.models.Flash
+import io.ak1.pix.models.Mode
+import io.ak1.pix.models.Options
+import io.ak1.pix.models.Ratio
+
 import org.json.JSONObject
-import java.util.logging.Handler
-import android.os.Handler as Handler1
+import java.util.logging.Handler as Handler1
+
 
 class MessageActivity : AppCompatActivity() {
 
@@ -45,6 +59,19 @@ class MessageActivity : AppCompatActivity() {
     private lateinit var sharedPreferences: SharedPreferences
     private val TAG = "MESSAGE ACTIVITY"
     private var existChat: Boolean = false
+    private var messageList = ArrayList<MessageModel>()
+    private var messageAdapter: MessageAdapter? = null
+    private var isTyping = false
+    private var t : Long = 0
+    private var deadLine : Long = 500
+    private var debugTime : Long = 0
+    private var box = 0
+
+    //Local variable for handling imnages
+    private var imagesUri = ArrayList<Uri>()
+    private val PICK_IMAGES_CODE = 0
+    private val position = 0
+    private var isWriting = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         activityMessageBinding = ActivityMessageBinding.inflate(layoutInflater)
@@ -65,14 +92,62 @@ class MessageActivity : AppCompatActivity() {
             if (message.isEmpty()) {
                 Toast.makeText(this, "Enter Message", Toast.LENGTH_SHORT).show()
             } else {
+                setNoWriting()
                 sendMessage(message)
                 gettoken(message)
             }
         }
 
+        activityMessageBinding.btnDataSend.setOnClickListener {
+            pickImageIntent()
+        }
+
         activityMessageBinding.messageToolbar.msgBack.setOnClickListener {
             startActivity(Intent(this, DashBoard::class.java))
             finish()
+        }
+
+        activityMessageBinding.msgText.doOnTextChanged { text, start, before, count ->
+            val TIME_FACTOR : Long = 300
+            if(!isTyping){
+                Log.d(TAG,"Is typing")
+                t = System.currentTimeMillis()
+                debugTime = t
+                isTyping = true
+                setWriting()
+                Handler(Looper.getMainLooper()).postDelayed(
+                    {
+                        // This method will be executed once the timer is over
+                        if(System.currentTimeMillis() > t){
+                            Log.d(TAG,"No more typing (2)")
+                            setNoWriting()
+                            isTyping = false
+                        }else{
+                            Log.d(TAG,"difference from stop: ${t-System.currentTimeMillis()}")
+                        }
+                    },
+                    TIME_FACTOR // value in milliseconds
+                )
+            }else{
+                Handler(Looper.getMainLooper()).postDelayed(
+                    {
+                        // This method will be executed once the timer is over
+                        if(System.currentTimeMillis() > t){
+                            if(isTyping){
+                                Log.d(TAG,"No more typing (1) difference ${t-debugTime-deadLine}")
+                                setNoWriting()
+                                isTyping = false
+                            }
+                        }else{
+                            //Log.d(TAG,"difference: ${t-System.currentTimeMillis()}")
+                        }
+                    },
+                    deadLine // value in milliseconds
+                )
+            }
+            t+=TIME_FACTOR
+            deadLine+=(TIME_FACTOR)
+            Log.d(TAG,"difference: ${t-System.currentTimeMillis()}")
         }
 
         activityMessageBinding.msgText.addOnLayoutChangeListener(object :
@@ -97,7 +172,7 @@ class MessageActivity : AppCompatActivity() {
         })
         activityMessageBinding.messageToolbar.trashChat.setOnClickListener {
             startActivity(Intent(this, DashBoard::class.java))
-            if (existChat) {
+            if (messageList.size > 0) {
                 val databaseReference =
                     FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
                         .getReference("chatlist").child(myId!!).child(chatId!!).removeValue()
@@ -111,7 +186,6 @@ class MessageActivity : AppCompatActivity() {
 
         checkOnlineStatus()
         getMyname()
-
     }
 
     private fun getMyname() {
@@ -143,7 +217,8 @@ class MessageActivity : AppCompatActivity() {
                 if (it.child("member").value == hisId) {
                     Log.d(TAG, "Chat ID rilevato: ${it.key}")
                     chatId = it.key
-                    readMessages(chatId!!)
+                    //readMessages(chatId!!)
+                    sperimentalReadMessages(chatId!!)
                 }
             }
         }
@@ -199,7 +274,7 @@ class MessageActivity : AppCompatActivity() {
             FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
                 .getReference("chatlist").child(hisId!!).child(chatId!!).child("chatid").get()
                 .addOnSuccessListener {
-                    if(it.exists()){
+                    if (it.exists()) {
                         Map["lastMessage"] = message
                         Map["date"] = System.currentTimeMillis()
                         databaseReference =
@@ -210,7 +285,7 @@ class MessageActivity : AppCompatActivity() {
                             FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
                                 .getReference("/chatlist").child(hisId!!).child(chatId!!)
                         databaseReference.updateChildren(Map)
-                    }else{
+                    } else {
                         Map["lastMessage"] = message
                         Map["date"] = System.currentTimeMillis()
                         Map["chatId"] = chatId!!
@@ -258,8 +333,7 @@ class MessageActivity : AppCompatActivity() {
                 override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
 
                     var viewDataBinding: ViewDataBinding? = null
-                    if (itemCount > 0) existChat = true
-                    else existChat = false
+                    existChat = itemCount > 0
                     if (viewType == 0)
                         viewDataBinding = RightItemLayoutBinding.inflate(
                             LayoutInflater.from(parent.context),
@@ -308,6 +382,62 @@ class MessageActivity : AppCompatActivity() {
 
     }
 
+    private fun sperimentalReadMessages(chatId: String) {
+        //Prima fase caricamento chats
+        FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
+            .getReference("chat").child(chatId).get()
+            .addOnSuccessListener {
+                it.children.forEach {
+                    val senderId = it.child("senderId").value.toString()
+                    val reciverId = it.child("reciverId").value.toString()
+                    val message = it.child("message").value.toString()
+                    val date = it.child("date").value.toString()
+                    val type = it.child("type").value.toString()
+                    messageList.add(MessageModel(senderId, reciverId, message, date, type))
+                }
+                activityMessageBinding.messageRecyclerView.apply {
+                    layoutManager = LinearLayoutManager(context)
+                    setHasFixedSize(true)
+                    messageAdapter = MessageAdapter(messageList)
+                    adapter = messageAdapter
+                    activityMessageBinding.messageRecyclerView.smoothScrollToPosition(messageList.size)
+                    syncNewMessages(chatId)
+                    writingListener()
+                }
+            }
+            .addOnFailureListener {
+                    Log.d(TAG,"Error loading existing messages -> $it")
+            }
+    }
+
+    private fun syncNewMessages(chatId: String){
+        val query =
+            FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
+                .getReference("chat").child(chatId)
+        query.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if(snapshot.childrenCount > messageList.size){
+                    Log.d(TAG,"New message found")
+                    val lastMessageChildren = snapshot.children.last()
+                    val senderId = lastMessageChildren.child("senderId").value.toString()
+                    val reciverId = lastMessageChildren.child("reciverId").value.toString()
+                    val message = lastMessageChildren.child("message").value.toString()
+                    val date = lastMessageChildren.child("date").value.toString()
+                    val type = lastMessageChildren.child("type").value.toString()
+                    messageList.add(MessageModel(senderId, reciverId, message, date, type))
+                    activityMessageBinding.messageRecyclerView.adapter!!.notifyDataSetChanged()
+                    activityMessageBinding.messageRecyclerView.smoothScrollToPosition(messageList.size)
+                }else{
+                    Log.d(TAG,"No new message found children: ${snapshot.childrenCount} array: ${messageList.size}")
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+
+            }
+        })
+    }
+
     class ViewHolder(var viewDataBinding: ViewDataBinding) :
         RecyclerView.ViewHolder(viewDataBinding.root)
 
@@ -342,6 +472,46 @@ class MessageActivity : AppCompatActivity() {
             }
 
         })
+    }
+
+    private fun writingListener() {
+        val databaseReference =
+            FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
+                .getReference("users").child(hisId!!)
+        databaseReference.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                Log.d(TAG, "Him typing: ${snapshot.child("typing").value}")
+                if(snapshot.child("typing").value == "true" && !isWriting){
+                    messageList.add(MessageModel(hisId!!,myId,"...",System.currentTimeMillis().toString(),"IS_WRITING"))
+                    box = messageList.size-1
+                    isWriting = true
+                    activityMessageBinding.messageRecyclerView.smoothScrollToPosition(messageList.size)
+                }
+                if(snapshot.child("typing").value == "false" && isWriting){
+                    messageList.removeAt(box)
+                    isWriting = false
+                    activityMessageBinding.messageRecyclerView.smoothScrollToPosition(messageList.size)
+                }
+                activityMessageBinding.messageRecyclerView.adapter!!.notifyDataSetChanged()
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+
+            }
+
+        })
+    }
+
+    private fun setWriting() {
+        val databaseReference =
+            FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
+                .getReference("users").child(myId).child("typing").setValue("true")
+    }
+
+    private fun setNoWriting() {
+        val databaseReference =
+            FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
+                .getReference("users").child(myId).child("typing").setValue("false")
     }
 
     private fun gettoken(message: String) {
@@ -410,7 +580,28 @@ class MessageActivity : AppCompatActivity() {
 
     }
 
+    private val getAction =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK && result.data != null) {
+                Log.d(TAG, "Photo selected: ${result.data!!.data}")
+            }
+        }
+
+    private fun pickImageIntent() {
+        val intent = Intent()
+        intent.type = "image/*"
+        //intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+        intent.setAction(Intent.ACTION_GET_CONTENT)
+        getAction.launch(intent)
+    }
+
+
 }
+
+
+
+
+
 
 
 

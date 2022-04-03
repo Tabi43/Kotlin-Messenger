@@ -79,6 +79,10 @@ dependencies {
 
     // FirebaseUI for Cloud Storage
     implementation 'com.firebaseui:firebase-ui-storage:8.0.0'
+
+    implementation  'io.ak1.pix:piximagepicker:1.6.3'
+
+    implementation "androidx.core:core-ktx:1.7.0"
 }
 apply plugin: 'com.google.gms.google-services'
 
