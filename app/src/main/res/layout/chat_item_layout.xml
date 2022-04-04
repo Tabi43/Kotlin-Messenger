@@ -56,7 +56,6 @@
                     android:layout_alignParentStart="true"
                     android:layout_marginStart="0dp"
                     android:layout_marginEnd="0dp"
-                    android:layout_toStartOf="@+id/imgContact"
                     android:orientation="horizontal">
 
                     <TextView
@@ -64,7 +63,6 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
-                        android:layout_marginBottom="14dp"
                         android:text="@{chatModel.lastMessage,default=Nothing}"
                         android:textColor="@color/textColor"
                         android:textSize="13dp"
@@ -76,8 +74,7 @@
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
                         android:layout_marginTop="5dp"
-                        android:layout_marginRight="5dp"
-                        android:layout_marginBottom="14dp"
+                        android:layout_marginRight="40dp"
                         android:gravity="center"
                         android:text="@{chatModel.date ,default=Nothing}"
                         android:textColor="@color/textColor"

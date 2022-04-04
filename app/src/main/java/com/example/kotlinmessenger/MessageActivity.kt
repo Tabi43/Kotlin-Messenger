@@ -225,7 +225,6 @@ class MessageActivity : AppCompatActivity() {
                 if (it.child("member").value == hisId) {
                     Log.d(TAG, "Chat ID rilevato: ${it.key}")
                     chatId = it.key
-                    //readMessages(chatId!!)
                     sperimentalReadMessages(chatId!!)
                 }
             }
@@ -255,7 +254,7 @@ class MessageActivity : AppCompatActivity() {
         val chatList =
             ChatListModel(chatId!!, "Say Hi!", System.currentTimeMillis().toString(), myId!!)
         databaseReference.child(chatId!!).setValue(chatList)
-        readMessages(chatId!!)
+        sperimentalReadMessages(chatId!!)
         sendMessage(message)
     }
 
@@ -322,72 +321,6 @@ class MessageActivity : AppCompatActivity() {
                     databaseReference.updateChildren(Map)
                 }
         } //end else
-    }
-
-    private fun readMessages(chatId: String) {
-        Log.d(TAG, "Read  chat id: $chatId")
-        val query =
-            FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
-                .getReference("chat").child(chatId)
-
-        val firebaseRecyclerOptions = FirebaseRecyclerOptions.Builder<MessageModel>()
-            .setLifecycleOwner(this)
-            .setQuery(query, MessageModel::class.java)
-            .build()
-        query.keepSynced(true)
-
-        firebaseRecyclerAdapter =
-            object : FirebaseRecyclerAdapter<MessageModel, ViewHolder>(firebaseRecyclerOptions) {
-                override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-
-                    var viewDataBinding: ViewDataBinding? = null
-                    existChat = itemCount > 0
-                    if (viewType == 0)
-                        viewDataBinding = RightItemLayoutBinding.inflate(
-                            LayoutInflater.from(parent.context),
-                            parent,
-                            false
-                        )
-                    if (viewType == 1)
-                        viewDataBinding = LeftItemLayoutBinding.inflate(
-                            LayoutInflater.from(parent.context),
-                            parent,
-                            false
-                        )
-                    return ViewHolder(viewDataBinding!!)
-                }
-
-                override fun onDataChanged() {
-                    activityMessageBinding.messageRecyclerView.smoothScrollToPosition(itemCount)
-                    super.onDataChanged()
-                }
-
-                override fun onBindViewHolder(
-                    holder: ViewHolder,
-                    position: Int,
-                    messageModel: MessageModel
-                ) {
-                    if (getItemViewType(position) == 0) {
-                        holder.viewDataBinding.setVariable(BR.message, messageModel)
-                        //holder.viewDataBinding.setVariable(BR.messageImage,myImage)
-                    }
-                    if (getItemViewType(position) == 1) {
-                        holder.viewDataBinding.setVariable(BR.message, messageModel)
-                        // holder.viewDataBinding.setVariable(BR.messageImage, hisImageUrl)
-                    }
-                }
-
-                override fun getItemViewType(position: Int): Int {
-                    val messageModel = getItem(position)
-                    return if (messageModel.senderId == myId) 0
-                    else 1
-                }
-            }
-
-        activityMessageBinding.messageRecyclerView.layoutManager = LinearLayoutManager(this)
-        activityMessageBinding.messageRecyclerView.adapter = firebaseRecyclerAdapter
-        firebaseRecyclerAdapter!!.startListening()
-
     }
 
     private fun sperimentalReadMessages(chatId: String) {
@@ -629,7 +562,7 @@ class MessageActivity : AppCompatActivity() {
     private fun pickImageIntent() {
         val intent = Intent()
         intent.type = "image/*"
-        //intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
         intent.setAction(Intent.ACTION_GET_CONTENT)
         getAction.launch(intent)
     }

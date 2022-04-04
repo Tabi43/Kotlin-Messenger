@@ -1,6 +1,7 @@
 package com.example.kotlinmessenger
 
 import android.content.Intent
+import android.nfc.Tag
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
@@ -26,6 +27,7 @@ class SplashScreen : AppCompatActivity() {
         setContentView(R.layout.activity_splash_screen)
         firebaseAuth = FirebaseAuth.getInstance()
         appUtil = AppUtil()
+        Log.d(TAG, "${firebaseAuth!!.currentUser}")
 
         Handler().postDelayed({
             if (firebaseAuth!!.currentUser == null) {
