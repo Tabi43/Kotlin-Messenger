@@ -70,21 +70,6 @@
 
             </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
-            <ImageView
-                android:id="@+id/trashChat"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_marginStart="348dp"
-                android:layout_marginLeft="348dp"
-                android:layout_marginTop="15dp"
-                android:layout_marginRight="348dp"
-                android:layout_marginBottom="348dp"
-                android:scaleX="1"
-                android:scaleY="1"
-                android:src="@drawable/ic_trash"
-                app:tint="@color/white" />
-
 
         </RelativeLayout>
 

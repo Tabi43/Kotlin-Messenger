@@ -2,7 +2,6 @@ package com.example.kotlinmessenger.Fragment
 
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,9 +14,6 @@ import com.google.firebase.database.FirebaseDatabase
 import com.example.kotlinmessenger.R
 import com.example.kotlinmessenger.adapter.ChatAdapter
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.ValueEventListener
 
 
 class f_conversations : Fragment(R.layout.f_conversations) {
@@ -73,7 +69,7 @@ class f_conversations : Fragment(R.layout.f_conversations) {
         binding.recyclerViewChat.apply {
             layoutManager = LinearLayoutManager(context)
             setHasFixedSize(true)
-            chatAdapter = ChatAdapter(collection)
+            chatAdapter = ChatAdapter(collection,binding.noChatTV)
             adapter = chatAdapter
         }
 

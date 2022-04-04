@@ -62,16 +62,18 @@ class MessageActivity : AppCompatActivity() {
     private var messageList = ArrayList<MessageModel>()
     private var messageAdapter: MessageAdapter? = null
     private var isTyping = false
-    private var t : Long = 0
-    private var deadLine : Long = 500
-    private var debugTime : Long = 0
+    private var t: Long = 0
+    private var deadLine: Long = 500
+    private var debugTime: Long = 0
     private var box = 0
+    private var isWriting = false
+    private var isOnline = false
 
     //Local variable for handling imnages
     private var imagesUri = ArrayList<Uri>()
     private val PICK_IMAGES_CODE = 0
     private val position = 0
-    private var isWriting = false
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         activityMessageBinding = ActivityMessageBinding.inflate(layoutInflater)
@@ -108,9 +110,9 @@ class MessageActivity : AppCompatActivity() {
         }
 
         activityMessageBinding.msgText.doOnTextChanged { text, start, before, count ->
-            val TIME_FACTOR : Long = 300
-            if(!isTyping){
-                Log.d(TAG,"Is typing")
+            val TIME_FACTOR: Long = 350
+            if (!isTyping) {
+                Log.d(TAG, "Is typing")
                 t = System.currentTimeMillis()
                 debugTime = t
                 isTyping = true
@@ -118,36 +120,40 @@ class MessageActivity : AppCompatActivity() {
                 Handler(Looper.getMainLooper()).postDelayed(
                     {
                         // This method will be executed once the timer is over
-                        if(System.currentTimeMillis() > t){
-                            Log.d(TAG,"No more typing (2)")
+                        if (System.currentTimeMillis() > t) {
+                            Log.d(TAG, "No more typing (2)")
                             setNoWriting()
                             isTyping = false
-                        }else{
-                            Log.d(TAG,"difference from stop: ${t-System.currentTimeMillis()}")
+                        } else {
+                            Log.d(TAG, "difference from stop: ${t - System.currentTimeMillis()}")
                         }
                     },
                     TIME_FACTOR // value in milliseconds
                 )
-            }else{
+            } else {
                 Handler(Looper.getMainLooper()).postDelayed(
                     {
                         // This method will be executed once the timer is over
-                        if(System.currentTimeMillis() > t){
-                            if(isTyping){
-                                Log.d(TAG,"No more typing (1) difference ${t-debugTime-deadLine}")
+                        if (System.currentTimeMillis() > t) {
+                            if (isTyping) {
+                                Log.d(
+                                    TAG,
+                                    "No more typing (1) difference ${t - debugTime - deadLine}"
+                                )
                                 setNoWriting()
                                 isTyping = false
+                                deadLine = 500
                             }
-                        }else{
+                        } else {
                             //Log.d(TAG,"difference: ${t-System.currentTimeMillis()}")
                         }
                     },
                     deadLine // value in milliseconds
                 )
             }
-            t+=TIME_FACTOR
-            deadLine+=(TIME_FACTOR)
-            Log.d(TAG,"difference: ${t-System.currentTimeMillis()}")
+            t += TIME_FACTOR
+            deadLine += (TIME_FACTOR)
+            Log.d(TAG, "difference: ${t - System.currentTimeMillis()}")
         }
 
         activityMessageBinding.msgText.addOnLayoutChangeListener(object :
@@ -170,22 +176,24 @@ class MessageActivity : AppCompatActivity() {
                 }
             }
         })
-        activityMessageBinding.messageToolbar.trashChat.setOnClickListener {
-            startActivity(Intent(this, DashBoard::class.java))
-            if (messageList.size > 0) {
-                val databaseReference =
-                    FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
-                        .getReference("chatlist").child(myId!!).child(chatId!!).removeValue()
-                val databaseref =
-                    FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
-                        .getReference("chat").child(chatId!!).removeValue()
-            }
-        }
+
 
         if (chatId == null) CheckChat(hisId!!)
 
         checkOnlineStatus()
         getMyname()
+    }
+
+    private fun deleteChat(){
+        startActivity(Intent(this, DashBoard::class.java))
+        if (messageList.size > 0) {
+            val databaseReference =
+                FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
+                    .getReference("chatlist").child(myId!!).child(chatId!!).removeValue()
+            val databaseref =
+                FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
+                    .getReference("chat").child(chatId!!).removeValue()
+        }
     }
 
     private fun getMyname() {
@@ -406,18 +414,19 @@ class MessageActivity : AppCompatActivity() {
                 }
             }
             .addOnFailureListener {
-                    Log.d(TAG,"Error loading existing messages -> $it")
+                Log.d(TAG, "Error loading existing messages -> $it")
             }
     }
 
-    private fun syncNewMessages(chatId: String){
+    private fun syncNewMessages(chatId: String) {
         val query =
             FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
                 .getReference("chat").child(chatId)
         query.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                if(snapshot.childrenCount > messageList.size){
-                    Log.d(TAG,"New message found")
+                if (snapshot.childrenCount > messageList.size) {
+                    Log.d(TAG, "New message found")
+                    if(isWriting) removeIsWritingBox()
                     val lastMessageChildren = snapshot.children.last()
                     val senderId = lastMessageChildren.child("senderId").value.toString()
                     val reciverId = lastMessageChildren.child("reciverId").value.toString()
@@ -427,8 +436,11 @@ class MessageActivity : AppCompatActivity() {
                     messageList.add(MessageModel(senderId, reciverId, message, date, type))
                     activityMessageBinding.messageRecyclerView.adapter!!.notifyDataSetChanged()
                     activityMessageBinding.messageRecyclerView.smoothScrollToPosition(messageList.size)
-                }else{
-                    Log.d(TAG,"No new message found children: ${snapshot.childrenCount} array: ${messageList.size}")
+                } else {
+                    Log.d(
+                        TAG,
+                        "No new message found children: ${snapshot.childrenCount} array: ${messageList.size}"
+                    )
                 }
             }
 
@@ -442,16 +454,16 @@ class MessageActivity : AppCompatActivity() {
         RecyclerView.ViewHolder(viewDataBinding.root)
 
     override fun onPause() {
-        super.onPause()
         if (firebaseRecyclerAdapter != null) {
             firebaseRecyclerAdapter!!.stopListening()
         }
         appUtil.updateOnlineStatus("offline")
+        super.onPause()
     }
 
     override fun onResume() {
-        super.onResume()
         appUtil.updateOnlineStatus("online")
+        super.onResume()
     }
 
     private fun checkOnlineStatus() {
@@ -461,9 +473,18 @@ class MessageActivity : AppCompatActivity() {
         databaseReference.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (snapshot.exists()) {
-                    val userModel = snapshot.getValue(UserModel::class.java)
-                    activityMessageBinding.online = userModel!!.online
-                    Log.d(TAG, "stato interlocutore: ${activityMessageBinding.online}")
+                    if (!isOnline && snapshot.child("online").value == "online") {
+                        val userModel = snapshot.getValue(UserModel::class.java)
+                        activityMessageBinding.online = userModel!!.online
+                        Log.d(TAG, "stato interlocutore: ${activityMessageBinding.online}")
+                        isOnline = true
+                    }
+                    if (isOnline && snapshot.child("online").value == "offline") {
+                        val userModel = snapshot.getValue(UserModel::class.java)
+                        activityMessageBinding.online = userModel!!.online
+                        Log.d(TAG, "stato interlocutore: ${activityMessageBinding.online}")
+                        isOnline = false
+                    }
                 }
             }
 
@@ -481,18 +502,27 @@ class MessageActivity : AppCompatActivity() {
         databaseReference.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 Log.d(TAG, "Him typing: ${snapshot.child("typing").value}")
-                if(snapshot.child("typing").value == "true" && !isWriting){
-                    messageList.add(MessageModel(hisId!!,myId,"...",System.currentTimeMillis().toString(),"IS_WRITING"))
-                    box = messageList.size-1
+                if (snapshot.child("typing").value == "true" && !isWriting) {
+                    messageList.add(
+                        MessageModel(
+                            hisId!!,
+                            myId,
+                            "...",
+                            System.currentTimeMillis().toString(),
+                            "IS_WRITING"
+                        )
+                    )
+                    box = messageList.size - 1
                     isWriting = true
+                    activityMessageBinding.messageRecyclerView.adapter!!.notifyDataSetChanged()
                     activityMessageBinding.messageRecyclerView.smoothScrollToPosition(messageList.size)
                 }
-                if(snapshot.child("typing").value == "false" && isWriting){
+                if (snapshot.child("typing").value == "false" && isWriting) {
                     messageList.removeAt(box)
                     isWriting = false
+                    activityMessageBinding.messageRecyclerView.adapter!!.notifyDataSetChanged()
                     activityMessageBinding.messageRecyclerView.smoothScrollToPosition(messageList.size)
                 }
-                activityMessageBinding.messageRecyclerView.adapter!!.notifyDataSetChanged()
             }
 
             override fun onCancelled(error: DatabaseError) {
@@ -500,6 +530,15 @@ class MessageActivity : AppCompatActivity() {
             }
 
         })
+    }
+
+    private fun removeIsWritingBox() {
+        if (isWriting) {
+            messageList.removeAt(box)
+            isWriting = false
+            activityMessageBinding.messageRecyclerView.adapter!!.notifyDataSetChanged()
+            activityMessageBinding.messageRecyclerView.smoothScrollToPosition(messageList.size)
+        }
     }
 
     private fun setWriting() {
@@ -595,7 +634,11 @@ class MessageActivity : AppCompatActivity() {
         getAction.launch(intent)
     }
 
-
+    override fun onDestroy() {
+        setNoWriting()
+        appUtil.updateOnlineStatus("offline")
+        super.onDestroy()
+    }
 }
 
 
