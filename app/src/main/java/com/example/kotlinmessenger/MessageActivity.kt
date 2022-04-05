@@ -558,7 +558,7 @@ class MessageActivity : AppCompatActivity() {
 
         super.onActivityResult(requestCode, resultCode, data)
 
-        if (resultCode == Activity.RESULT_OK && ) {
+        if (resultCode == Activity.RESULT_OK ) {
             imagesUri= data?.getData() as Nothing?
 
 
@@ -568,9 +568,9 @@ class MessageActivity : AppCompatActivity() {
                 Toast.makeText(this, "Called", Toast.LENGTH_SHORT).show()
 
                 val intent = Intent(this, SendmediaService::class.java)
-                intent.putExtra("hisID", hisId)
+                /*intent.putExtra("hisID", hisId)
                 intent.putExtra("chatID", chatId)
-                intent.putStringArrayListExtra("media", returnValue)
+                intent.putStringArrayListExtra("media", returnValue)*/
 
                 if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O)
                     startForegroundService(intent)
