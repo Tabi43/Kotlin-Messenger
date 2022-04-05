@@ -83,6 +83,7 @@ dependencies {
     implementation  'io.ak1.pix:piximagepicker:1.6.3'
 
     implementation "androidx.core:core-ktx:1.7.0"
+    implementation 'com.iceteck.silicompressorr:silicompressor:2.2.3'
 }
 apply plugin: 'com.google.gms.google-services'
 

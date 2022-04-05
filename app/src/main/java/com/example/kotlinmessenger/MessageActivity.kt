@@ -3,20 +3,17 @@ package com.example.kotlinmessenger
 import android.app.Activity
 import android.content.Intent
 import android.content.SharedPreferences
-import android.net.Uri
+import android.content.pm.PackageManager
+import android.graphics.BitmapFactory
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.provider.MediaStore
 import android.util.Log
-import android.view.Gravity.apply
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.GravityCompat.apply
 import androidx.core.widget.doOnTextChanged
 import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -26,24 +23,13 @@ import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import com.example.kotlinmessenger.Constants.AppConstants
-import com.example.kotlinmessenger.MessageModel
 import com.example.kotlinmessenger.UserModel
 import com.example.kotlinmessenger.adapter.MessageAdapter
 import com.example.kotlinmessenger.databinding.ActivityMessageBinding
-import com.example.kotlinmessenger.databinding.LeftItemLayoutBinding
-import com.example.kotlinmessenger.databinding.RightItemLayoutBinding
 import com.firebase.ui.database.FirebaseRecyclerAdapter
-import com.firebase.ui.database.FirebaseRecyclerOptions
 import com.google.firebase.database.*
-import io.ak1.pix.helpers.PixEventCallback
-import io.ak1.pix.helpers.pixFragment
-import io.ak1.pix.models.Flash
-import io.ak1.pix.models.Mode
-import io.ak1.pix.models.Options
-import io.ak1.pix.models.Ratio
-
 import org.json.JSONObject
-import java.util.logging.Handler as Handler1
+import java.io.InputStream
 
 
 class MessageActivity : AppCompatActivity() {
@@ -68,9 +54,11 @@ class MessageActivity : AppCompatActivity() {
     private var box = 0
     private var isWriting = false
     private var isOnline = false
+    private var READ_EXTERNAL_STORAGE_REQUEST_CODE=1001
 
-    //Local variable for handling imnages
-    private var imagesUri = ArrayList<Uri>()
+
+    //Local variable for handling images
+    private var imagesUri=null
     private val PICK_IMAGES_CODE = 0
     private val position = 0
 
@@ -562,10 +550,62 @@ class MessageActivity : AppCompatActivity() {
     private fun pickImageIntent() {
         val intent = Intent()
         intent.type = "image/*"
-        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+        //intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
         intent.setAction(Intent.ACTION_GET_CONTENT)
         getAction.launch(intent)
     }
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (resultCode == Activity.RESULT_OK && ) {
+            imagesUri= data?.getData() as Nothing?
+
+
+            if (chatId == null)
+                Toast.makeText(this, "Please send text message first", Toast.LENGTH_SHORT).show()
+            else {
+                Toast.makeText(this, "Called", Toast.LENGTH_SHORT).show()
+
+                val intent = Intent(this, SendmediaService::class.java)
+                intent.putExtra("hisID", hisId)
+                intent.putExtra("chatID", chatId)
+                intent.putStringArrayListExtra("media", returnValue)
+
+                if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O)
+                    startForegroundService(intent)
+                else
+                    startService(intent)
+            }
+
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        when (requestCode) {
+
+            READ_EXTERNAL_STORAGE_REQUEST_CODE-> {
+
+
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    pickImageIntent()
+                } else {
+                    Toast.makeText(
+                        this@MessageActivity,
+                        "Approve permissions to open Pix ImagePicker",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+                return
+            }
+        }
+    }
+
 
     override fun onDestroy() {
         setNoWriting()
