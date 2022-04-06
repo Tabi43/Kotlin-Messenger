@@ -57,7 +57,6 @@ class f_conversations : Fragment(R.layout.f_conversations) {
             .addOnFailureListener {
                 Toast.makeText(activity,"Query for active chats failed!",Toast.LENGTH_SHORT).show()
             }
-
     }
 
     private fun updateRecycleView(collection: ArrayList<ChatModel>) {

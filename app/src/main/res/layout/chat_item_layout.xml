@@ -11,7 +11,6 @@
 
         <import type="android.graphics.drawable.Drawable" />
 
-
     </data>
 
     <RelativeLayout
@@ -44,6 +43,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentStart="true"
                     android:layout_marginTop="14dp"
+                    android:layout_marginStart="5dp"
                     android:text="@{chatModel.name, default=Nothing}"
                     android:textColor="@color/colorPrimary"
                     android:textSize="15dp"
@@ -65,6 +65,7 @@
                         android:layout_marginTop="4dp"
                         android:text="@{chatModel.lastMessage,default=Nothing}"
                         android:textColor="@color/textColor"
+                        android:layout_marginStart="5dp"
                         android:textSize="13dp"
                         android:textStyle="bold" />
 
@@ -74,6 +75,7 @@
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
                         android:layout_marginTop="5dp"
+                        android:layout_marginEnd="5dp"
                         android:layout_marginRight="40dp"
                         android:gravity="center"
                         android:text="@{chatModel.date ,default=Nothing}"

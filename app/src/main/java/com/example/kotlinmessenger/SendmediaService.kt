@@ -9,16 +9,22 @@ import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.os.IBinder
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
+import androidx.core.net.toUri
 import com.example.kotlinmessenger.MessageModel
 import com.example.kotlinmessenger.R
 import com.example.kotlinmessenger.AppUtil
+import com.example.kotlinmessenger.Constants.AppConstants
 import com.google.android.gms.tasks.Task
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
-import com.iceteck.silicompressorr.SiliCompressor
+import id.zelory.compressor.Compressor
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.io.File
+import kotlin.jvm.internal.Intrinsics
 
 class SendmediaService : Service() {
 
@@ -30,6 +36,7 @@ class SendmediaService : Service() {
     private var hisID: String? = null
     private val appUtil = AppUtil()
     private var images: ArrayList<String>? = null
+    private val TAG = "SEND MEDIA SERVICE"
 
 
     override fun onBind(intent: Intent?): IBinder? {
@@ -44,20 +51,19 @@ class SendmediaService : Service() {
         images = intent.getStringArrayListExtra("media")
         MAX_PROGRESS = images!!.size
 
-
-
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O)
             createChannel()
 
         startForeground(100, getNotification().build())
 
         for (a in images!!.indices) {
-
-            val fileName = compressImage(images!![a])
-            uploadImage(fileName!!)
-
-            builder.setProgress(MAX_PROGRESS, a + 1, false)
-            manager.notify(600, builder.build())
+            GlobalScope.launch {
+                //val fileName = compressImage(images!![a])
+                //uploadImage(fileName!!)
+                uploadImage(images!![a])
+                builder.setProgress(MAX_PROGRESS, a + 1, false)
+                manager.notify(600, builder.build())
+            }
         }
 
         builder.setContentTitle("Sending Complete")
@@ -98,25 +104,36 @@ class SendmediaService : Service() {
         manager.createNotificationChannel(channel)
     }
 
-    private fun compressImage(fileName: String): String? {
-        val file =
-            File(Environment.getExternalStorageDirectory().absoluteFile, "Chat Me/Media/Sent/")
-
-        if (!file.exists())
-            file.mkdirs()
-        return SiliCompressor.with(this).compress(fileName, file, false)
+    private suspend fun compressImage(fileName: String): String? {
+        /*val file =
+            File(Environment.getExternalStorageDirectory().absoluteFile, "Chat Me/Media/Sent/")*/
+        val file = File(fileName)
+        Log.d(TAG,"GABIBBO")
+        var compressedImageFile = Compressor.compress(this, file)
+        Log.d(TAG,"MADONNA _> ${compressedImageFile.toUri()}")
+        return compressedImageFile.toUri().toString()
     }
 
     private fun uploadImage(fileName: String) {
 
-        val storageReference = FirebaseStorage.getInstance()
-            .getReference(chatID + "/Media/Images/" + appUtil.getUID() + "/" + System.currentTimeMillis())
+        //val storageReference = FirebaseStorage.getInstance()
+        //    .getReference(chatID + "/Media/Images/" + appUtil.getUID() + "/" + System.currentTimeMillis())
+        Log.d(TAG,"uploading image")
+        val pathDB = "/$chatID/"
+        val ref = FirebaseStorage.getInstance().reference.child(pathDB+System.currentTimeMillis())
 
-        val uri = Uri.fromFile(File(fileName))
+        val file = File(fileName)
 
-        storageReference.putFile(uri).addOnSuccessListener { taskSnapshot ->
+
+        Log.d(TAG,"ref: $ref")
+
+        ref.putFile(file.toUri()).addOnFailureListener { Log.d(TAG,"error: $it") }
+
+       /* ref.putFile(uri).addOnSuccessListener { taskSnapshot ->
             val task = taskSnapshot.storage.downloadUrl
             task.addOnCompleteListener { uri: Task<Uri> ->
+
+
                 if (uri.isSuccessful) {
 
                     val path = uri.result.toString()
@@ -135,5 +152,8 @@ class SendmediaService : Service() {
                 }
             }
         }
+            .addOnFailureListener{
+                Log.d(TAG,"Error non uploaded image message -> $it")
+            }*/
     }
 }

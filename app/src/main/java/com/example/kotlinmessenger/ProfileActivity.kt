@@ -165,6 +165,8 @@ class ProfileActivity : AppCompatActivity() {
 
     //Modifica nome, stato e foto
     private fun uploadData(name: String, status: String, image: Uri) = kotlin.run {
+        Log.d(TAG,"URI: $image")
+        Log.d(TAG,"PAth: ${storageReference!!.child(AppConstants.PATH + firebaseAuth!!.uid)}")
         storageReference!!.child(AppConstants.PATH + firebaseAuth!!.uid).putFile(image)
             .addOnSuccessListener {
                 Log.d(TAG,"Updateing user...")

@@ -40,6 +40,7 @@ class ChatAdapter(private val chatList: ArrayList<ChatModel>,private val noChatT
         val uid = FirebaseAuth.getInstance().uid ?: ""
         val chatModel = chatList[position]
         val rawDate = chatModel.date
+        var last_message = chatModel.lastMessage
         chatModel.date = util.getTimeAgo(rawDate!!.toLong())
         val databaseReference = FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
             .getReference("users")
@@ -62,6 +63,11 @@ class ChatAdapter(private val chatList: ArrayList<ChatModel>,private val noChatT
                                     .addOnFailureListener {
                                         Log.d(TAG, "Failed to load url image -> $it")
                                     }
+                            }
+                            if(snapshot.child("typing").getValue() == "true"){
+                                chatModel.lastMessage = "is typing..."
+                            }else{
+                                chatModel.lastMessage = last_message
                             }
                             holder.chatItemLayoutBinding.chatModel = chatModel
                         }
@@ -93,6 +99,7 @@ class ChatAdapter(private val chatList: ArrayList<ChatModel>,private val noChatT
             val intent = Intent(it.context, MessageActivity::class.java)
             intent.putExtra("hisId", chatModel.hisID)
             intent.putExtra("hisImage", chatModel.image)
+            intent.putExtra("hisUsername",chatModel.name)
             it.context.startActivity(intent)
         }
 

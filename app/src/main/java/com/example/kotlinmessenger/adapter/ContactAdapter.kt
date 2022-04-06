@@ -46,6 +46,7 @@ class ContactAdapter(private var appContacts: ArrayList<UserModel>) :
             val intent = Intent(it.context, MessageActivity::class.java)
             intent.putExtra("hisId", userModel.uid)
             intent.putExtra("hisImage", userModel.image)
+            intent.putExtra("hisUsername",userModel.name)
             it.context.startActivity(intent)
         }
     }

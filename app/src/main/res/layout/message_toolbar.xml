@@ -14,8 +14,11 @@
 
         <variable
             name="online"
-            type="String" />
+            type="String"/>
 
+        <variable
+            name="username"
+            type="String"/>
 
     </data>
 
@@ -38,12 +41,10 @@
                 android:src="@drawable/ic_back"
                 app:tint="@color/colorAccent" />
 
-
-
             <androidx.coordinatorlayout.widget.CoordinatorLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerInParent="true">
+                android:layout_toRightOf="@id/msgBack">
 
                 <de.hdodenhof.circleimageview.CircleImageView
                     android:id="@+id/msgImage"
@@ -52,7 +53,7 @@
                     android:layout_height="50dp"
                     android:layout_marginTop="2.5dp"
                     android:layout_marginBottom="2.5dp"
-                    android:src="@drawable/ic_launcher_background" />
+                    android:src="@drawable/ic_launcher_background"/>
 
                 <ImageView
                     android:id="@+id/msgOnlineStatus"
@@ -66,10 +67,18 @@
                     android:src="@{online.equals(`online`)? @drawable/ic_online:@drawable/ic_offline}"
                     app:layout_anchor="@id/msgImage" />
 
-
-
             </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
+            <TextView
+                android:id="@+id/usernameTV"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="80dp"
+                android:text="@{username,default=Username}"
+                android:textSize="15dp"
+                android:textStyle="bold"
+                android:textColor="@color/white"/>
 
         </RelativeLayout>
 
