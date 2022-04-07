@@ -14,6 +14,9 @@ import com.google.firebase.database.FirebaseDatabase
 import com.example.kotlinmessenger.R
 import com.example.kotlinmessenger.adapter.ChatAdapter
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ValueEventListener
 
 
 class f_conversations : Fragment(R.layout.f_conversations) {
@@ -21,6 +24,7 @@ class f_conversations : Fragment(R.layout.f_conversations) {
     private lateinit var binding: FConversationsBinding
     private lateinit var firebaseAuth: FirebaseAuth
     private var chatAdapter: ChatAdapter? = null
+    private var activeChats = ArrayList<ChatModel>()
 
     private val TAG = "CONVERSATION FRAGMENT"
 
@@ -50,13 +54,39 @@ class f_conversations : Fragment(R.layout.f_conversations) {
                     val date = it.child("date").value.toString()
                     val chatID = it.child("chatId").value.toString()
                     val hisId = it.child("member").value.toString()
-                    chats.add(ChatModel(chatID,"",lastMessage,"",date,hisId,""))
+                    activeChats.add(ChatModel(chatID,"",lastMessage,"",date,hisId,""))
                 }
-                updateRecycleView(chats)
+                updateRecycleView(activeChats)
+                syncNewChats()
             }
             .addOnFailureListener {
                 Toast.makeText(activity,"Query for active chats failed!",Toast.LENGTH_SHORT).show()
             }
+    }
+
+    private fun syncNewChats(){
+        val uid = FirebaseAuth.getInstance().uid ?: ""
+        FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
+            .getReference("/chatlist").child(uid).addValueEventListener(object: ValueEventListener{
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    if(activeChats.size < snapshot.childrenCount){
+                        //New chat created
+                            if(activeChats.size == 0) binding.noChatTV.visibility = View.INVISIBLE
+                        snapshot.children.last().let {
+                            val lastMessage = it.child("lastMessage").value.toString()
+                            val date = it.child("date").value.toString()
+                            val chatID = it.child("chatId").value.toString()
+                            val hisId = it.child("member").value.toString()
+                            activeChats.add(ChatModel(chatID,"",lastMessage,"",date,hisId,""))
+                            binding.recyclerViewChat.adapter!!.notifyItemInserted(activeChats.size-1)
+                        }
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+
+                }
+            })
     }
 
     private fun updateRecycleView(collection: ArrayList<ChatModel>) {

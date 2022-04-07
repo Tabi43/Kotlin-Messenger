@@ -76,6 +76,11 @@ class ProfileActivity : AppCompatActivity() {
             intent.type="image/*"
             getAction.launch(intent)
         }
+
+        binding.Back.setOnClickListener {
+            startActivity(Intent(this, DashBoard::class.java))
+        }
+
         loadData()
     }
 

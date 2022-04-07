@@ -58,7 +58,6 @@ class MessageActivity : AppCompatActivity() {
     private var myName: String? = null
     private lateinit var sharedPreferences: SharedPreferences
     private val TAG = "MESSAGE ACTIVITY"
-    private var existChat: Boolean = false
     private var messageList = ArrayList<MessageModel>()
     private var messageAdapter: MessageAdapter? = null
     private var isTyping = false
@@ -70,12 +69,6 @@ class MessageActivity : AppCompatActivity() {
     private var isOnline = false
     private var READ_EXTERNAL_STORAGE_REQUEST_CODE = 1001
     private var imageUris = ArrayList<String>()
-
-
-    //Local variable for handling images
-    private val PICK_IMAGES_CODE = 0
-    private val position = 0
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         activityMessageBinding = ActivityMessageBinding.inflate(layoutInflater)
@@ -100,7 +93,7 @@ class MessageActivity : AppCompatActivity() {
             } else {
                 setNoWriting()
                 sendMessage(message)
-                gettoken(message)
+                gettokenForNotification(message)
             }
         }
 
@@ -238,7 +231,7 @@ class MessageActivity : AppCompatActivity() {
                 .getReference("/chatlist").child(myId)
         chatId = databaseReference.push().key
         val chatListMod =
-            ChatListModel(chatId!!, "Say Hi!", System.currentTimeMillis().toString(), hisId!!)
+            ChatListModel(chatId!!, message, System.currentTimeMillis().toString(), hisId!!)
         databaseReference.child(chatId!!).setValue(chatListMod)
         databaseReference =
             FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
@@ -334,8 +327,9 @@ class MessageActivity : AppCompatActivity() {
                     messageAdapter = MessageAdapter(messageList)
                     adapter = messageAdapter
                     activityMessageBinding.messageRecyclerView.smoothScrollToPosition(messageList.size)
-
                 }
+                syncNewMessages(chatId)
+                writingListener()
             }
             .addOnFailureListener {
                 Log.d(TAG, "Error loading existing messages -> $it")
@@ -470,45 +464,52 @@ class MessageActivity : AppCompatActivity() {
     }
 
     private fun setWriting() {
-        val databaseReference =
             FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
                 .getReference("users").child(myId).child("typing").setValue("true")
     }
 
     private fun setNoWriting() {
-        val databaseReference =
             FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
                 .getReference("users").child(myId).child("typing").setValue("false")
     }
 
-    private fun gettoken(message: String) {
-        val databaseReference =
+    private fun gettokenForNotification(message: String) {
+        /*val databaseReference =
             FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
                 .getReference("users").child(hisId!!).child("token")
                 .addListenerForSingleValueEvent(object : ValueEventListener {
-
                     override fun onDataChange(snapshot: DataSnapshot) {
                         if (snapshot.exists()) {
                             val token = snapshot.getValue().toString()
-
                             val to = JSONObject()
                             val data = JSONObject()
                             data.put("hisId", myId)
                             data.put("title", myName)
                             data.put("message", message)
                             data.put("chatId", chatId)
-
                             to.put("to", token)
                             to.put("data", data)
                             sendNotification(to)
-
                         }
                     }
-
                     override fun onCancelled(error: DatabaseError) {
-
                     }
-                })
+                })*/ //INDOVINA? Non mi piaceva...
+            FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app").getReference("users")
+            .child(hisId!!).child("token").get()
+            .addOnSuccessListener {
+                val token = it.value.toString()
+                val to = JSONObject()
+                val data = JSONObject()
+                data.put("hisId", myId)
+                data.put("title", myName)
+                data.put("message", message)
+                data.put("chatId", chatId)
+                to.put("to", token)
+                to.put("data", data)
+
+                sendNotification(to)
+            }
     }
 
     private fun sendNotification(to: JSONObject) {
@@ -518,10 +519,10 @@ class MessageActivity : AppCompatActivity() {
             AppConstants.NOTIFICATION_URL,
             to,
             Response.Listener { response: JSONObject ->
-                Log.d("TAG", "onResponse: $response")
+                Log.d(TAG, "onResponse: $response")
             },
             Response.ErrorListener {
-                Log.d("TAG", "onError: $it")
+                Log.d(TAG, "onError: $it")
             }) {
             override fun getHeaders(): MutableMap<String, String> {
                 val map: MutableMap<String, String> = HashMap()
@@ -565,8 +566,11 @@ class MessageActivity : AppCompatActivity() {
                 }
 
                 val intent = Intent(this, SendmediaService::class.java)
+                Toast.makeText(this,"il nome: $myName",Toast.LENGTH_SHORT).show()
                 intent.putExtra("hisID", hisId)
                 intent.putExtra("chatID", chatId)
+                intent.putExtra("myName",myName)
+                intent.putExtra("myID",myId)
                 intent.putStringArrayListExtra("media", imageUris)
 
                 if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O)

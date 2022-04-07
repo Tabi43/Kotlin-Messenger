@@ -5,33 +5,29 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
 import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
-import android.os.Environment
 import android.os.IBinder
-import android.provider.MediaStore
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
-import androidx.core.net.toFile
 import androidx.core.net.toUri
-import androidx.lifecycle.lifecycleScope
+import com.android.volley.DefaultRetryPolicy
+import com.android.volley.Response
+import com.android.volley.toolbox.JsonObjectRequest
+import com.android.volley.toolbox.Volley
+import com.bumptech.glide.util.Util
+import com.example.kotlinmessenger.Constants.AppConstants
 import com.google.android.gms.tasks.Task
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
 import id.zelory.compressor.Compressor
-import id.zelory.compressor.constraint.default
-import id.zelory.compressor.constraint.destination
-import id.zelory.compressor.constraint.format
-import id.zelory.compressor.constraint.quality
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import org.json.JSONObject
 import java.io.File
-import java.io.FileNotFoundException
-import java.io.InputStream
 
+//Library for compress image: https://github.com/zetbaitsu/Compressor
 
 class SendmediaService : Service() {
 
@@ -40,12 +36,11 @@ class SendmediaService : Service() {
     private lateinit var manager: NotificationManager
     private var chatID: String? = null
     private var hisID: String? = null
+    private var myID: String? = null
+    private var myName: String? = null
     private val appUtil = AppUtil()
     private var images: ArrayList<String>? = null
     private val TAG = "SEND MEDIA SERVICE"
-    private val type :String? = null
-    private val message :String? = null
-
 
     override fun onBind(intent: Intent?): IBinder? {
         return null
@@ -53,9 +48,14 @@ class SendmediaService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 
-        hisID = intent!!.getStringExtra("hisID")
-        chatID = intent.getStringExtra("chatID")
-        images = intent.getStringArrayListExtra("media")
+        if (intent != null) {
+            hisID = intent.getStringExtra("hisID")
+            chatID = intent.getStringExtra("chatID")
+            images = intent.getStringArrayListExtra("media")
+            myID = intent.getStringExtra("myID")
+            myName = intent.getStringExtra("myName")
+        }
+
         MAX_PROGRESS = images!!.size
 
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O)
@@ -70,12 +70,16 @@ class SendmediaService : Service() {
                 manager.notify(600, builder.build())
             }
         }
+
         if(chatID==null)
 
         builder.setContentTitle("Sending Complete")
             .setProgress(MAX_PROGRESS, MAX_PROGRESS, false)
         manager.notify(600, builder.build())
         stopSelf()
+
+        if(MAX_PROGRESS > 1) gettokenForNotification("sent some photos")
+        else gettokenForNotification("sent one photo")
 
         return super.onStartCommand(intent, flags, startId)
     }
@@ -163,6 +167,60 @@ class SendmediaService : Service() {
                     }
                 }
             }
+    }
+
+    private fun gettokenForNotification(message: String) {
+        FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app").getReference("users")
+            .child(hisID!!).child("token").get()
+            .addOnSuccessListener {
+
+                val token = it.value.toString()
+                val to = JSONObject()
+                val data = JSONObject()
+                data.put("hisId", hisID)
+                data.put("title", myName)
+                data.put("message", message)
+                data.put("chatId", chatID)
+                to.put("to", token)
+                to.put("data", data)
+
+                sendNotification(to)
+            }
+    }
+
+    private fun sendNotification(to: JSONObject) {
+        Log.d(TAG, "token notifica: $to")
+        val request: JsonObjectRequest = object : JsonObjectRequest(
+            Method.POST,
+            AppConstants.NOTIFICATION_URL,
+            to,
+            Response.Listener { response: JSONObject ->
+                Log.d(TAG, "onResponse: $response")
+            },
+            Response.ErrorListener {
+                Log.d(TAG, "onError: $it")
+            }) {
+            override fun getHeaders(): MutableMap<String, String> {
+                val map: MutableMap<String, String> = HashMap()
+
+                map["Authorization"] = "key=" + AppConstants.SERVER_KEY
+                map["Content-type"] = "application/json"
+                return map
+            }
+
+            override fun getBodyContentType(): String {
+                return "application/json"
+            }
+        }
+
+        val requestQueue = Volley.newRequestQueue(this)
+        request.retryPolicy = DefaultRetryPolicy(
+            30000,
+            DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+            DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
+        )
+
+        requestQueue.add(request)
     }
 
 
