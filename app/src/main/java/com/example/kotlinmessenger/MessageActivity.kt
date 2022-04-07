@@ -1,14 +1,17 @@
 package com.example.kotlinmessenger
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
+import android.database.Cursor
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
-import android.os.Build
-import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
+import android.os.*
+import android.provider.OpenableColumns
+import android.system.Os.rename
 import android.util.Log
 import android.view.View
 import android.widget.Toast
@@ -31,9 +34,15 @@ import com.firebase.ui.database.FirebaseRecyclerAdapter
 import com.google.firebase.database.*
 import com.google.firebase.storage.FirebaseStorage
 import id.zelory.compressor.Compressor
+import id.zelory.compressor.constraint.default
+import id.zelory.compressor.constraint.format
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 import java.io.File
+import java.io.FileNotFoundException
+import java.io.InputStream
+import java.io.OutputStream
 
 
 class MessageActivity : AppCompatActivity() {
@@ -59,7 +68,7 @@ class MessageActivity : AppCompatActivity() {
     private var box = 0
     private var isWriting = false
     private var isOnline = false
-    private var READ_EXTERNAL_STORAGE_REQUEST_CODE=1001
+    private var READ_EXTERNAL_STORAGE_REQUEST_CODE = 1001
     private var imageUris = ArrayList<String>()
 
 
@@ -177,18 +186,6 @@ class MessageActivity : AppCompatActivity() {
 
         checkOnlineStatusAndUsername()
         getMyname()
-    }
-
-    private fun deleteChat(){
-        startActivity(Intent(this, DashBoard::class.java))
-        if (messageList.size > 0) {
-            val databaseReference =
-                FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
-                    .getReference("chatlist").child(myId!!).child(chatId!!).removeValue()
-            val databaseref =
-                FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
-                    .getReference("chat").child(chatId!!).removeValue()
-        }
     }
 
     private fun getMyname() {
@@ -354,7 +351,7 @@ class MessageActivity : AppCompatActivity() {
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (snapshot.childrenCount > messageList.size) {
                     Log.d(TAG, "New message found")
-                    if(isWriting) removeIsWritingBox()
+                    if (isWriting) removeIsWritingBox()
                     val lastMessageChildren = snapshot.children.last()
                     val senderId = lastMessageChildren.child("senderId").value.toString()
                     val reciverId = lastMessageChildren.child("reciverId").value.toString()
@@ -413,7 +410,7 @@ class MessageActivity : AppCompatActivity() {
                         Log.d(TAG, "stato interlocutore: ${activityMessageBinding.online}")
                         isOnline = false
                     }
-                    if(snapshot.child("name").value != hisUsername){
+                    if (snapshot.child("name").value != hisUsername) {
                         hisUsername = snapshot.child("name").value.toString()
                         activityMessageBinding.messageToolbar.username = hisUsername
                     }
@@ -548,36 +545,37 @@ class MessageActivity : AppCompatActivity() {
         )
 
         requestQueue.add(request)
-
     }
 
     private val getAction =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK && result.data != null) {
                 Log.d(TAG, "Photo selected: ${result.data}")
-                if(result.data!!.clipData != null){
-                    val count = result.data!!.clipData!!.itemCount-1
-                    Log.d(TAG,"Selezionata più di un immagine: ${result.data!!.clipData!!.itemCount} immagini -> ${result.data!!.clipData} ")
+                if (result.data!!.clipData != null) {
+                    val count = result.data!!.clipData!!.itemCount - 1
+                    Log.d(
+                        TAG,
+                        "Selezionata più di un immagine: ${result.data!!.clipData!!.itemCount} immagini -> ${result.data!!.clipData} "
+                    )
                     for (i in 0..count) {
                         imageUris.add(result.data!!.clipData!!.getItemAt(i).uri.toString())
                     }
-                    Log.d(TAG,"Gli uri dio bestia sono: ${imageUris}")
-                }else{
-                    Log.d(TAG,"Selezionata una sola immagine: ${result.data!!.data}")
+                } else {
+                    Log.d(TAG, "Selezionata una sola immagine: ${result.data!!.data}")
                     imageUris.add(result.data!!.data!!.toString())
-                    val file = Uri.fromFile(File(imageUris[0]))
-                    activityMessageBinding.messageToolbar.hisImage = file.toString()
                 }
 
                 val intent = Intent(this, SendmediaService::class.java)
                 intent.putExtra("hisID", hisId)
                 intent.putExtra("chatID", chatId)
-                intent.putStringArrayListExtra("media",imageUris)
+                intent.putStringArrayListExtra("media", imageUris)
 
                 if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O)
                     startForegroundService(intent)
                 else
                     startService(intent)
+
+                imageUris.clear()
             }
         }
 
@@ -589,43 +587,6 @@ class MessageActivity : AppCompatActivity() {
         getAction.launch(intent)
     }
 
-    private fun compressImage(fileName: String): String? {
-        var newPath = ""
-        val imageFile = File(fileName)
-        lifecycleScope.launch {
-            // Default compression
-            var compressedImage = Compressor.compress(this@MessageActivity, imageFile)
-            newPath = compressedImage.absolutePath.toUri().toString()
-        }
-        return newPath
-    }
-
-    /*override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-
-        super.onActivityResult(requestCode, resultCode, data)
-        Log.d(TAG,"items selected: ${data}")
-        if (resultCode == Activity.RESULT_OK ) {
-            imagesUri= data?.getData() as Nothing?
-
-            if (chatId == null)
-                Toast.makeText(this, "Please send text message first", Toast.LENGTH_SHORT).show()
-            else {
-                Toast.makeText(this, "Called", Toast.LENGTH_SHORT).show()
-
-                //val intent = Intent(this, SendmediaService::class.java)
-                /*intent.putExtra("hisID", hisId)
-                intent.putExtra("chatID", chatId)
-                intent.putStringArrayListExtra("media", returnValue)*/
-
-                if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O)
-                    startForegroundService(intent)
-                else
-                    startService(intent)
-            }
-
-        }
-    }*/
-
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -634,14 +595,14 @@ class MessageActivity : AppCompatActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when (requestCode) {
 
-            READ_EXTERNAL_STORAGE_REQUEST_CODE-> {
+            READ_EXTERNAL_STORAGE_REQUEST_CODE -> {
 
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     pickImageIntent()
                 } else {
                     Toast.makeText(
                         this@MessageActivity,
-                        "Approve permissions to open Pix ImagePicker",
+                        "Approve permissions to select images",
                         Toast.LENGTH_LONG
                     ).show()
                 }
@@ -649,7 +610,6 @@ class MessageActivity : AppCompatActivity() {
             }
         }
     }
-
 
     override fun onDestroy() {
         setNoWriting()

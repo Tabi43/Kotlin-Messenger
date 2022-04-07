@@ -5,29 +5,35 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.os.IBinder
+import android.provider.MediaStore
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
+import androidx.core.net.toFile
 import androidx.core.net.toUri
-import com.example.kotlinmessenger.MessageModel
-import com.example.kotlinmessenger.R
-import com.example.kotlinmessenger.AppUtil
-import com.example.kotlinmessenger.Constants.AppConstants
+import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.tasks.Task
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
 import id.zelory.compressor.Compressor
+import id.zelory.compressor.constraint.default
+import id.zelory.compressor.constraint.destination
+import id.zelory.compressor.constraint.format
+import id.zelory.compressor.constraint.quality
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.io.File
-import kotlin.jvm.internal.Intrinsics
+import java.io.FileNotFoundException
+import java.io.InputStream
+
 
 class SendmediaService : Service() {
-
 
     private lateinit var builder: NotificationCompat.Builder
     private var MAX_PROGRESS = 0
@@ -40,9 +46,8 @@ class SendmediaService : Service() {
 
 
     override fun onBind(intent: Intent?): IBinder? {
-             return null
+        return null
     }
-
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 
@@ -58,9 +63,7 @@ class SendmediaService : Service() {
 
         for (a in images!!.indices) {
             GlobalScope.launch {
-                //val fileName = compressImage(images!![a])
-                //uploadImage(fileName!!)
-                uploadImage(images!![a])
+                compressFinal(images!![a].toUri())
                 builder.setProgress(MAX_PROGRESS, a + 1, false)
                 manager.notify(600, builder.build())
             }
@@ -76,7 +79,6 @@ class SendmediaService : Service() {
 
 
     private fun getNotification(): NotificationCompat.Builder {
-
         builder = NotificationCompat.Builder(this, "android")
             .setContentText("Sending Media")
             .setProgress(MAX_PROGRESS, 0, false)
@@ -93,7 +95,6 @@ class SendmediaService : Service() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun createChannel() {
-
         val channel = NotificationChannel("android", "Message", NotificationManager.IMPORTANCE_HIGH)
         channel.setShowBadge(true)
         channel.lightColor = R.color.colorPrimary
@@ -104,56 +105,44 @@ class SendmediaService : Service() {
         manager.createNotificationChannel(channel)
     }
 
-    private suspend fun compressImage(fileName: String): String? {
-        /*val file =
-            File(Environment.getExternalStorageDirectory().absoluteFile, "Chat Me/Media/Sent/")*/
-        val file = File(fileName)
-        Log.d(TAG,"GABIBBO")
-        var compressedImageFile = Compressor.compress(this, file)
-        Log.d(TAG,"MADONNA _> ${compressedImageFile.toUri()}")
-        return compressedImageFile.toUri().toString()
+    private suspend fun compressFinal(intentData: Uri) {
+        Log.d(TAG, "Tryin to compress the image")
+        val actualImage: File? = FileUtil.from(this, intentData)
+        var compressedImage: File? = null
+        actualImage?.let { imageFile ->
+            GlobalScope.launch {
+                // Default compression
+                compressedImage = Compressor.compress(this@SendmediaService, imageFile)
+                Log.d(TAG, "compressed image: $compressedImage")
+                uploadImage(compressedImage!!)
+            }
+        } ?: Log.d(TAG, "Please choose an image!")
     }
 
-    private fun uploadImage(fileName: String) {
-
-        //val storageReference = FirebaseStorage.getInstance()
-        //    .getReference(chatID + "/Media/Images/" + appUtil.getUID() + "/" + System.currentTimeMillis())
-        Log.d(TAG,"uploading image")
+    private fun uploadImage(fileName: File) {
+        Log.d(TAG, "uploading image")
         val pathDB = "/$chatID/"
-        val ref = FirebaseStorage.getInstance().reference.child(pathDB+System.currentTimeMillis())
-
-        val file = File(fileName)
-
-
-        Log.d(TAG,"ref: $ref")
-
-        ref.putFile(file.toUri()).addOnFailureListener { Log.d(TAG,"error: $it") }
-
-       /* ref.putFile(uri).addOnSuccessListener { taskSnapshot ->
-            val task = taskSnapshot.storage.downloadUrl
-            task.addOnCompleteListener { uri: Task<Uri> ->
-
-
-                if (uri.isSuccessful) {
-
-                    val path = uri.result.toString()
-                    val databaseReference =
-                        FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app").getReference("chat").child(chatID!!)
-                    val messageModel =
-                        MessageModel(
+        val ref = FirebaseStorage.getInstance().reference.child(pathDB + System.currentTimeMillis())
+        Log.d(TAG, "ref: ${Uri.fromFile(fileName)}")
+        ref.putFile(Uri.fromFile(fileName)).addOnFailureListener { Log.d(TAG, "error: $it") }
+            .addOnSuccessListener { taskSnapshot ->
+                val task = taskSnapshot.storage.downloadUrl
+                task.addOnCompleteListener { uri: Task<Uri> ->
+                    if (uri.isSuccessful) {
+                        val path = uri.result.toString()
+                        val messageModel = MessageModel(
                             appUtil.getUID()!!,
                             hisID!!,
                             path,
                             System.currentTimeMillis().toString(),
                             "image"
                         )
-
-                    databaseReference.push().setValue(messageModel)
+                        FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
+                            .getReference("chat").child(chatID!!).push().setValue(messageModel)
+                    }
                 }
             }
-        }
-            .addOnFailureListener{
-                Log.d(TAG,"Error non uploaded image message -> $it")
-            }*/
     }
+
+
 }
