@@ -62,7 +62,8 @@
         <entry key="app/src/main/res/layout/f_conversations.xml" value="0.25" />
         <entry key="app/src/main/res/layout/f_login.xml" value="0.3515625" />
         <entry key="app/src/main/res/layout/fragment_prova.xml" value="0.38189682157913063" />
-        <entry key="app/src/main/res/layout/left_item_layout.xml" value="0.29907407407407405" />
+        <entry key="app/src/main/res/layout/is_writing_layout.xml" value="0.2875" />
+        <entry key="app/src/main/res/layout/left_item_layout.xml" value="0.6100100481951678" />
         <entry key="app/src/main/res/layout/message_toolbar.xml" value="0.3346602935332794" />
         <entry key="app/src/main/res/layout/right_item_layout.xml" value="0.29907407407407405" />
       </map>

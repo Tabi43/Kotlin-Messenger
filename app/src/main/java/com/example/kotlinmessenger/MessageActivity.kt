@@ -105,7 +105,7 @@ class MessageActivity : AppCompatActivity() {
         }
 
         activityMessageBinding.btnDataSend.setOnClickListener {
-            pickImageIntent()
+           if(chatId==null || chatId!=null) pickImageIntent()
         }
 
         activityMessageBinding.messageToolbar.msgBack.setOnClickListener {
@@ -334,8 +334,7 @@ class MessageActivity : AppCompatActivity() {
                     messageAdapter = MessageAdapter(messageList)
                     adapter = messageAdapter
                     activityMessageBinding.messageRecyclerView.smoothScrollToPosition(messageList.size)
-                    syncNewMessages(chatId)
-                    writingListener()
+
                 }
             }
             .addOnFailureListener {

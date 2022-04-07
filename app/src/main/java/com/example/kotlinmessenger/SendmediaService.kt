@@ -43,6 +43,8 @@ class SendmediaService : Service() {
     private val appUtil = AppUtil()
     private var images: ArrayList<String>? = null
     private val TAG = "SEND MEDIA SERVICE"
+    private val type :String? = null
+    private val message :String? = null
 
 
     override fun onBind(intent: Intent?): IBinder? {
@@ -68,6 +70,7 @@ class SendmediaService : Service() {
                 manager.notify(600, builder.build())
             }
         }
+        if(chatID==null)
 
         builder.setContentTitle("Sending Complete")
             .setProgress(MAX_PROGRESS, MAX_PROGRESS, false)
@@ -77,6 +80,24 @@ class SendmediaService : Service() {
         return super.onStartCommand(intent, flags, startId)
     }
 
+    /*private fun CreateChat(message: String) {
+        Log.d(TAG, "Chat created: $message")
+        var databaseReference =
+            FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
+                .getReference("/chatlist").child(myID)
+        chatID = databaseReference.push().key
+        val chatListMod =
+            ChatListModel(chatID!!, "Say Hi!", System.currentTimeMillis().toString(), hisId!!)
+        databaseReference.child(chatId!!).setValue(chatListMod)
+        databaseReference =
+            FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
+                .getReference("/chatlist").child(hisId!!)
+        val chatList =
+            ChatListModel(chatID!!, "Say Hi!", System.currentTimeMillis().toString(), myId!!)
+        databaseReference.child(chatId!!).setValue(chatList)
+        sperimentalReadMessages(chatId!!)
+
+    }*/
 
     private fun getNotification(): NotificationCompat.Builder {
         builder = NotificationCompat.Builder(this, "android")

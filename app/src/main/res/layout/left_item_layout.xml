@@ -45,7 +45,7 @@
                 android:layout_width="100dp"
                 android:layout_height="100dp"
                 android:scaleType="fitCenter"
-                android:visibility="@{message.type.equals(`text`)?View.GONE:View.VISIBLE}"/>
+                android:visibility="@{message.type.equals(`text`)?View.GONE:View.VISIBLE}" />
             <!--android:src="@drawable/ic_launcher_background"/>-->
 
         </LinearLayout>

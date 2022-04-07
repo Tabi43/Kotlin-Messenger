@@ -26,7 +26,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="5dp"
             android:background="@drawable/right_side_background"
-            android:padding="5dp">
+            android:padding="2dp">
 
             <TextView
                 android:id="@+id/txtMessage"
@@ -43,8 +43,8 @@
 
             <ImageView
                 imageMessage="@{message.message}"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
+                android:layout_width="150dp"
+                android:layout_height="110dp"
                 android:scaleType="fitCenter"
                 android:visibility="@{message.type.equals(`text`)?View.GONE:View.VISIBLE}" />
                  <!--android:src="@drawable/ic_launcher_background"-->
