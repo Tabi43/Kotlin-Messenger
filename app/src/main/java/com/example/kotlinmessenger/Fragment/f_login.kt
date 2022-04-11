@@ -1,5 +1,7 @@
 package com.example.kotlinmessenger.Fragment
 
+import android.app.AlertDialog
+import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -8,7 +10,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import com.example.kotlinmessenger.AppUtil
 import com.example.kotlinmessenger.Constants.AppConstants
 import com.example.kotlinmessenger.DashBoard
 import com.example.kotlinmessenger.R
@@ -21,25 +22,68 @@ import com.google.firebase.storage.FirebaseStorage
 class f_login : Fragment(R.layout.f_login) {
 
     lateinit var binding: FLoginBinding
-    private lateinit var appUtil: AppUtil
     private val TAG = "LOGIN FRAGMENT"
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
+
         binding = FLoginBinding.inflate(inflater, container, false)
         binding.loginButton.setOnClickListener {
-            performLogin()
+            isAlreadyLogged()
         }
-        appUtil = AppUtil()
+
         binding.signUpButton.setOnClickListener {
             val fragment = f_register()
             val transaction = fragmentManager?.beginTransaction()
             transaction?.replace(R.id.fragmentContainer, fragment)?.commit()
         }
+
         return binding.root
+    }
+
+    private fun isAlreadyLogged() {
+        val email = binding.mailET.text.toString()
+        val password = binding.passwordET.text.toString()
+
+        FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
+            .addOnCompleteListener {
+                val currentUSer = FirebaseAuth.getInstance().currentUser
+                if (currentUSer != null) {
+                    val uid = FirebaseAuth.getInstance().uid
+                    FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
+                        .getReference("users").child(uid!!).child("token").get()
+                        .addOnSuccessListener { savedToken ->
+                            Log.d(TAG, "Saved token: ${savedToken.value}")
+                            FirebaseMessaging.getInstance().token.addOnSuccessListener {
+                                if (!savedToken.exists()) {
+                                    Log.d(TAG, "Saved token is null")
+                                    performLogin()
+                                }else if ((savedToken.value != it)) {
+                                    Log.d(TAG, "Saved token id different!")
+                                    val builder = AlertDialog.Builder(activity)
+                                    builder.setMessage("Already logged on a different device! Are you sure to make login here?")
+                                    builder.setTitle("Warning")
+                                    builder.setCancelable(false)
+                                    builder.setPositiveButton(
+                                        "Yes",
+                                        DialogInterface.OnClickListener { dialogInterface, i -> performLogin() })
+                                    builder.setNegativeButton(
+                                        "No",
+                                        DialogInterface.OnClickListener { dialogInterface, i ->
+                                            binding.mailET.setText("")
+                                            binding.passwordET.setText("")
+                                        })
+                                    builder.create().show()
+                                } else {
+                                    startActivity(Intent(activity, DashBoard::class.java))
+                                }
+                            }
+                        }
+                }
+            }
     }
 
     private fun performLogin() {
@@ -57,18 +101,17 @@ class f_login : Fragment(R.layout.f_login) {
                 if (!it.isSuccessful) return@addOnCompleteListener
                 FirebaseMessaging.getInstance().token.addOnSuccessListener { result ->
                     if (result != null) {
-                        val token = result
-                        val databaseReference =
-                            FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
-                                .getReference("users").child(appUtil.getUID()!!).child("token")
-                                .setValue(token)
-                                .addOnSuccessListener {
-                                    Log.d(TAG, "Token successfully assigned -> $token")
-                                    startActivity(Intent(activity, DashBoard::class.java))
-                                }
-                                .addOnFailureListener {
-                                    Log.d(TAG, "Error token not assigned -> $it")
-                                }
+                        val uid = FirebaseAuth.getInstance().uid
+                        FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
+                            .getReference("users").child(uid!!).child("token")
+                            .setValue(result)
+                            .addOnSuccessListener {
+                                Log.d(TAG, "Token successfully assigned -> $result")
+                                startActivity(Intent(activity, DashBoard::class.java))
+                            }
+                            .addOnFailureListener {
+                                Log.d(TAG, "Error token not assigned -> $it")
+                            }
                     }
                 }
                 bindUrlToUSer(FirebaseAuth.getInstance().uid!!)

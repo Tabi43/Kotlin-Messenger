@@ -18,12 +18,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 
 
-//https://youtu.be/TCA9R2LsOcQ?t=319
-
 class f_contacts : Fragment(R.layout.f_contacts) {
-
-    //var collection = ArrayList<UserModel>()
-    //var dimension : Int = 0
 
     private lateinit var appPermission: AppPermission
     private var contactAdapter: ContactAdapter? = null
@@ -34,7 +29,7 @@ class f_contacts : Fragment(R.layout.f_contacts) {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FContactsBinding.inflate(inflater, container, false)
         appPermission = AppPermission()
         firebaseAuth = FirebaseAuth.getInstance()
@@ -57,7 +52,7 @@ class f_contacts : Fragment(R.layout.f_contacts) {
 
     private fun searchUser(key: String) {
         val uid = FirebaseAuth.getInstance().uid ?: ""
-        var result = ArrayList<UserModel>()
+        val result = ArrayList<UserModel>()
         val ref =
             FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
                 .getReference("/users")
@@ -87,7 +82,7 @@ class f_contacts : Fragment(R.layout.f_contacts) {
 
     private fun showAllUsers(){
         val uid = FirebaseAuth.getInstance().uid ?: ""
-        var result = ArrayList<UserModel>()
+        val result = ArrayList<UserModel>()
         val ref =
             FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
                 .getReference("/users")
@@ -96,7 +91,6 @@ class f_contacts : Fragment(R.layout.f_contacts) {
                 Toast.makeText(activity, "Failed to search users", Toast.LENGTH_SHORT).show()
             }
             .addOnSuccessListener {
-                //dimension = it.childrenCount.toInt() - 1
                 Log.d("Search", "GET: ${it}")
                 it.children.forEach {
                     val username = it.child("name").value.toString()
@@ -104,7 +98,6 @@ class f_contacts : Fragment(R.layout.f_contacts) {
                     val id = it.child("uid").value.toString()
                     val image = it.child("image").value.toString()
                     if (uid != id) {
-                        //Log.d("url ","aggiunto:${it} id:${id}" )
                         Log.d("url ", "aggiunto url foto: per id:${id}")
                         result.add(UserModel(username, status, image,id, "",""))
                         Log.d("Contatti","(S)Dimension $result")

@@ -1,5 +1,7 @@
 package com.example.kotlinmessenger
 
+import android.app.AlertDialog
+import android.content.DialogInterface
 import android.content.Intent
 import android.nfc.Tag
 import androidx.appcompat.app.AppCompatActivity
@@ -30,33 +32,55 @@ class SplashScreen : AppCompatActivity() {
         Log.d(TAG, "${firebaseAuth!!.currentUser}")
 
         Handler().postDelayed({
-            if (firebaseAuth!!.currentUser == null) {
-                startActivity(Intent(this, MainActivity::class.java))
-                finish()
-            } else {
-                bindUrlToUSer(firebaseAuth!!.uid!!)
-                startActivity(Intent(this, DashBoard::class.java))
-                finish()
-            }
+            isAlreadyLogged()
         }, 1000)
 
     }
 
-    private fun bindUrlToUSer(uid: String) {
-        FirebaseStorage.getInstance().reference.child(AppConstants.PATH + uid).downloadUrl
-            .addOnSuccessListener {
-                FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
-                    .getReference("/users").child(uid).child("image").setValue(it.toString())
-                    .addOnSuccessListener {
-                        Log.d(TAG,"Url image correctly bind to userDB")
+    private fun isAlreadyLogged(){
+        val currentUSer = FirebaseAuth.getInstance().currentUser
+        if(currentUSer != null){
+            FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
+                .getReference("users").child(currentUSer.uid).child("token").get()
+                .addOnFailureListener {
+
+                }
+                .addOnSuccessListener { savedToken ->
+                    FirebaseMessaging.getInstance().token.addOnSuccessListener{
+                        if (!savedToken.exists()) {
+                            startActivity(Intent(this, MainActivity::class.java))
+                            finish()
+                        }else if((savedToken.value != it)) {
+                            val builder = AlertDialog.Builder(this)
+                            builder.setMessage("Already logged on a different device! Do you wanna switch on this device?")
+                            builder.setTitle("Warning")
+                            builder.setCancelable(false)
+                            builder.setPositiveButton("Yes",
+                                DialogInterface.OnClickListener { dialogInterface, i ->
+                                        updateToken(it,currentUSer.uid)
+                                        startActivity(Intent(this, DashBoard::class.java))
+                                        finish()
+                                     })
+                            builder.setNegativeButton("No",
+                                DialogInterface.OnClickListener { dialogInterface, i ->
+                                    startActivity(Intent(this, MainActivity::class.java))
+                                    finish() })
+                            builder.create().show()
+                        }else{
+                            startActivity(Intent(this, DashBoard::class.java))
+                        }
                     }
-                    .addOnFailureListener {
-                        Log.d(TAG,"Error to bind url image -> $it")
-                    }
-            }
-            .addOnFailureListener {
-                Log.d(TAG,"Error to bind url image -> $it")
-            }
+                }
+        }else{
+            startActivity(Intent(this, MainActivity::class.java))
+            finish()
+        }
     }
 
+    fun updateToken(token:String,uid: String) {
+        val databaseReference = FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app").getReference("users").child(uid)
+        val map:MutableMap<String, Any> = HashMap()
+        map["token"]=token
+        databaseReference.updateChildren(map)
+    }
 }

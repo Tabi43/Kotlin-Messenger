@@ -8,6 +8,7 @@ import android.content.Intent
 import android.media.RingtoneManager
 import android.os.Build
 import android.util.Log
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.content.res.ResourcesCompat
@@ -24,18 +25,19 @@ import com.google.firebase.storage.FirebaseStorage
 class FirebaseNotificationsr:FirebaseMessagingService() {
 
     private val apputil=AppUtil()
+    private val TAG = "FB NOTIFICATION SERVICE"
 
     override fun onNewToken(token: String) {
         super.onNewToken(token)
-        Log.d("token:", "IL TOKEN GENERATO è $token")
+        Log.d(TAG, "IL TOKEN GENERATO è $token")
         updateToken(token)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)
+        Log.e(TAG,"remote message: $remoteMessage")
         if (remoteMessage.data.isNotEmpty()) {
-            Log.d("funzione:","chiamata onMessageReceived")
             val map: Map<String, String> = remoteMessage.data
 
             val title = map["title"]
@@ -43,10 +45,10 @@ class FirebaseNotificationsr:FirebaseMessagingService() {
             val hisId = map["hisId"]
             val hisImage = map["hisImage"]
             val chatId = map["chatId"]
-            Log.d("VALORI:", "sono:${hisId}")
+            Log.e(TAG,"Notify from $hisId title: $title message: $message chatId: $chatId")
             if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O)
-                createOreonotification(title!!, message!!, hisId!!, chatId!!)
-            else createnormalnotification(title!!, message!!, hisId!!, chatId!!)
+                createOreonotification(title!!, message!!, hisId!!, chatId!!,hisImage!!)
+            else createnormalnotification(title!!, message!!, hisId!!, chatId!!,hisImage!!)
         }
     }
 
@@ -57,7 +59,7 @@ class FirebaseNotificationsr:FirebaseMessagingService() {
         databaseReference.updateChildren(map)
     }
 
-    fun createnormalnotification(title:String, message:String, hisId:String, chatId:String) {
+    fun createnormalnotification(title:String, message:String, hisId:String, chatId:String, hisImage: String) {
         val uri=RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
         val builder=NotificationCompat.Builder(this, AppConstants.CHANNEL_ID)
         builder.setContentTitle(title)
@@ -70,15 +72,16 @@ class FirebaseNotificationsr:FirebaseMessagingService() {
         val intent=Intent(this,MessageActivity::class.java)
         intent.putExtra("hisId", hisId)
         intent.putExtra("chatId", chatId)
+        intent.putExtra("hisImage", hisImage)
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-        val pendingIntent=PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
+        val pendingIntent=PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE)
         builder.setContentIntent(pendingIntent)
         val manager=getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         manager.notify(Random().nextInt(85-65), builder.build())
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun createOreonotification(title:String, message:String, hisId:String, chatId:String) {
+    fun createOreonotification(title:String, message:String, hisId:String, chatId:String,hisImage: String) {
         val channel = NotificationChannel(
             AppConstants.CHANNEL_ID,
             "Message",
@@ -92,12 +95,12 @@ class FirebaseNotificationsr:FirebaseMessagingService() {
         manager.createNotificationChannel(channel)
 
         val intent = Intent(this, MessageActivity::class.java)
-        Log.d("VALORI:", "sono:${hisId}")
         intent.putExtra("hisId", hisId)
         intent.putExtra("chatId", chatId)
+        intent.putExtra("hisImage", hisImage)
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
 
-        val pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
+        val pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE)
         val notification = Notification.Builder(this, AppConstants.CHANNEL_ID)
             .setContentTitle(title)
             .setContentText(message)

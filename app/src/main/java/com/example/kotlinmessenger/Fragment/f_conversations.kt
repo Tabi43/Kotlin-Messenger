@@ -33,6 +33,9 @@ class f_conversations : Fragment(R.layout.f_conversations) {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+
+        activeChats = ArrayList<ChatModel>()
+
         binding = FConversationsBinding.inflate(inflater, container, false)
 
         firebaseAuth = FirebaseAuth.getInstance()
@@ -43,7 +46,6 @@ class f_conversations : Fragment(R.layout.f_conversations) {
 
     private fun getAllActiveChat() {
         val uid = FirebaseAuth.getInstance().uid ?: ""
-        val chats = ArrayList<ChatModel>()
 
         val ref = FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
             .getReference("/chatlist")
@@ -60,7 +62,7 @@ class f_conversations : Fragment(R.layout.f_conversations) {
                 syncNewChats()
             }
             .addOnFailureListener {
-                Toast.makeText(activity,"Query for active chats failed!",Toast.LENGTH_SHORT).show()
+                Toast.makeText(activity,"Error query for active chats failed!",Toast.LENGTH_SHORT).show()
             }
     }
 
@@ -82,7 +84,6 @@ class f_conversations : Fragment(R.layout.f_conversations) {
                         }
                     }
                 }
-
                 override fun onCancelled(error: DatabaseError) {
 
                 }

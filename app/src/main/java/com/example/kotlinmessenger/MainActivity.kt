@@ -15,7 +15,6 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-        var firebaseAuth = FirebaseAuth.getInstance()
 
         supportFragmentManager.beginTransaction()
             .replace(R.id.fragmentContainer, f_login())

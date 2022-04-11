@@ -23,8 +23,7 @@ class DashBoard : AppCompatActivity() {
 
         replaceFragment(conversationsF)
 
-        var intent = Intent(this, ProfileActivity::class.java)
-
+        val intent = Intent(this, ProfileActivity::class.java)
 
         binding.bottomNavigation.setOnItemSelectedListener {
             when(it.itemId){
@@ -35,13 +34,13 @@ class DashBoard : AppCompatActivity() {
             return@setOnItemSelectedListener true
         }
 
-
     }
 
     private fun replaceFragment(fragment: Fragment) {
         supportFragmentManager.beginTransaction()
             .replace(R.id.frameLayoutWrapper, fragment).commit()
     }
+
     override fun onPause() {
         super.onPause()
         appUtil.updateOnlineStatus("offline")

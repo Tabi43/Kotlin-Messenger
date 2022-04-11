@@ -70,6 +70,8 @@ class ProfileActivity : AppCompatActivity() {
             finish()
         }
 
+
+
         binding.imgPickImage.setOnClickListener {
             Log.d("RegisterActivity", "Try to show photo selector")
             val intent=Intent(Intent.ACTION_PICK)

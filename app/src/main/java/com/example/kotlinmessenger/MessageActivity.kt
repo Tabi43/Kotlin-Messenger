@@ -1,26 +1,16 @@
 package com.example.kotlinmessenger
 
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.content.pm.PackageManager
-import android.database.Cursor
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.net.Uri
 import android.os.*
-import android.provider.OpenableColumns
-import android.system.Os.rename
 import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.net.toUri
 import androidx.core.widget.doOnTextChanged
 import androidx.databinding.ViewDataBinding
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.DefaultRetryPolicy
@@ -32,17 +22,7 @@ import com.example.kotlinmessenger.adapter.MessageAdapter
 import com.example.kotlinmessenger.databinding.ActivityMessageBinding
 import com.firebase.ui.database.FirebaseRecyclerAdapter
 import com.google.firebase.database.*
-import com.google.firebase.storage.FirebaseStorage
-import id.zelory.compressor.Compressor
-import id.zelory.compressor.constraint.default
-import id.zelory.compressor.constraint.format
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import org.json.JSONObject
-import java.io.File
-import java.io.FileNotFoundException
-import java.io.InputStream
-import java.io.OutputStream
 
 
 class MessageActivity : AppCompatActivity() {
@@ -51,12 +31,12 @@ class MessageActivity : AppCompatActivity() {
     private var hisId: String? = null
     private var hisUsername: String? = null
     private var hisImageUrl: String? = null
+    private var myImageUrl: String? = null
     private var chatId: String? = null
     private lateinit var myId: String
     private lateinit var appUtil: AppUtil
     private var firebaseRecyclerAdapter: FirebaseRecyclerAdapter<MessageModel, ViewHolder>? = null
     private var myName: String? = null
-    private lateinit var sharedPreferences: SharedPreferences
     private val TAG = "MESSAGE ACTIVITY"
     private var messageList = ArrayList<MessageModel>()
     private var messageAdapter: MessageAdapter? = null
@@ -64,11 +44,11 @@ class MessageActivity : AppCompatActivity() {
     private var t: Long = 0
     private var deadLine: Long = 500
     private var debugTime: Long = 0
-    private var box = 0
     private var isWriting = false
     private var isOnline = false
     private var READ_EXTERNAL_STORAGE_REQUEST_CODE = 1001
     private var imageUris = ArrayList<String>()
+    private var isWritingMessage : MessageModel? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         activityMessageBinding = ActivityMessageBinding.inflate(layoutInflater)
@@ -77,13 +57,15 @@ class MessageActivity : AppCompatActivity() {
 
         appUtil = AppUtil()
         myId = appUtil.getUID()!!
-        sharedPreferences = getSharedPreferences("userData", MODE_PRIVATE)
         activityMessageBinding.activity = this
 
         hisId = intent.getStringExtra("hisId")
         hisImageUrl = intent.getStringExtra("hisImage")
         hisUsername = intent.getStringExtra("hisUsername")
-        activityMessageBinding.hisImage = hisImageUrl
+        isWritingMessage = MessageModel(hisId!!, myId, "...", System.currentTimeMillis().toString(), "IS_WRITING")
+
+        chaeckHisImage()
+
         activityMessageBinding.messageToolbar.username = hisUsername
 
         activityMessageBinding.btnSend.setOnClickListener {
@@ -98,7 +80,7 @@ class MessageActivity : AppCompatActivity() {
         }
 
         activityMessageBinding.btnDataSend.setOnClickListener {
-           if(chatId==null || chatId!=null) pickImageIntent()
+           pickImageIntent()
         }
 
         activityMessageBinding.messageToolbar.msgBack.setOnClickListener {
@@ -174,15 +156,15 @@ class MessageActivity : AppCompatActivity() {
             }
         })
 
+        Log.e(TAG,"hisID: $hisId hisImage: $hisImageUrl hisUsername: $hisUsername")
 
         if (chatId == null) CheckChat(hisId!!)
 
         checkOnlineStatusAndUsername()
-        getMyname()
+        getMynameAnImage()
     }
 
-    private fun getMyname() {
-        val databaseReference =
+    private fun getMynameAnImage() {
             FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
                 .getReference("users").child(myId).child("name")
                 .addListenerForSingleValueEvent(object : ValueEventListener {
@@ -197,7 +179,30 @@ class MessageActivity : AppCompatActivity() {
 
                     }
                 })
+            FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
+            .getReference("users").child(myId).child("image").addValueEventListener(object: ValueEventListener{
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        if (snapshot.exists()){
+                            myImageUrl = snapshot.getValue().toString()
+                            Log.d(TAG, "Mia immagine caricata: $myImageUrl")
+                        }
+                    }
 
+                    override fun onCancelled(error: DatabaseError) {
+
+                    }
+                })
+    }
+
+    private fun chaeckHisImage(){
+        if(hisImageUrl == null){
+            FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
+                .getReference("/users").child(hisId!!).child("image").get()
+                .addOnSuccessListener {
+                    hisImageUrl = it.getValue().toString()
+                    activityMessageBinding.hisImage = hisImageUrl
+                }
+        }else activityMessageBinding.hisImage = hisImageUrl
     }
 
     private fun CheckChat(hisId: String) {
@@ -237,7 +242,7 @@ class MessageActivity : AppCompatActivity() {
             FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
                 .getReference("/chatlist").child(hisId!!)
         val chatList =
-            ChatListModel(chatId!!, "Say Hi!", System.currentTimeMillis().toString(), myId!!)
+            ChatListModel(chatId!!, message, System.currentTimeMillis().toString(), myId!!)
         databaseReference.child(chatId!!).setValue(chatList)
         sperimentalReadMessages(chatId!!)
         sendMessage(message)
@@ -344,16 +349,29 @@ class MessageActivity : AppCompatActivity() {
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (snapshot.childrenCount > messageList.size) {
                     Log.d(TAG, "New message found")
-                    if (isWriting) removeIsWritingBox()
-                    val lastMessageChildren = snapshot.children.last()
-                    val senderId = lastMessageChildren.child("senderId").value.toString()
-                    val reciverId = lastMessageChildren.child("reciverId").value.toString()
-                    val message = lastMessageChildren.child("message").value.toString()
-                    val date = lastMessageChildren.child("date").value.toString()
-                    val type = lastMessageChildren.child("type").value.toString()
-                    messageList.add(MessageModel(senderId, reciverId, message, date, type))
-                    activityMessageBinding.messageRecyclerView.adapter!!.notifyDataSetChanged()
-                    activityMessageBinding.messageRecyclerView.smoothScrollToPosition(messageList.size)
+                    if (isWriting){
+                        removeIsWritingBox().run {
+                            val lastMessageChildren = snapshot.children.last()
+                            val senderId = lastMessageChildren.child("senderId").value.toString()
+                            val reciverId = lastMessageChildren.child("reciverId").value.toString()
+                            val message = lastMessageChildren.child("message").value.toString()
+                            val date = lastMessageChildren.child("date").value.toString()
+                            val type = lastMessageChildren.child("type").value.toString()
+                            messageList.add(MessageModel(senderId, reciverId, message, date, type))
+                            activityMessageBinding.messageRecyclerView.adapter!!.notifyDataSetChanged()
+                            activityMessageBinding.messageRecyclerView.smoothScrollToPosition(messageList.size)
+                        }
+                    }else{
+                        val lastMessageChildren = snapshot.children.last()
+                        val senderId = lastMessageChildren.child("senderId").value.toString()
+                        val reciverId = lastMessageChildren.child("reciverId").value.toString()
+                        val message = lastMessageChildren.child("message").value.toString()
+                        val date = lastMessageChildren.child("date").value.toString()
+                        val type = lastMessageChildren.child("type").value.toString()
+                        messageList.add(MessageModel(senderId, reciverId, message, date, type))
+                        activityMessageBinding.messageRecyclerView.adapter!!.notifyDataSetChanged()
+                        activityMessageBinding.messageRecyclerView.smoothScrollToPosition(messageList.size)
+                    }
                 } else {
                     Log.d(
                         TAG,
@@ -365,6 +383,7 @@ class MessageActivity : AppCompatActivity() {
             override fun onCancelled(error: DatabaseError) {
 
             }
+
         })
     }
 
@@ -425,22 +444,15 @@ class MessageActivity : AppCompatActivity() {
             override fun onDataChange(snapshot: DataSnapshot) {
                 Log.d(TAG, "Him typing: ${snapshot.child("typing").value}")
                 if (snapshot.child("typing").value == "true" && !isWriting) {
-                    messageList.add(
-                        MessageModel(
-                            hisId!!,
-                            myId,
-                            "...",
-                            System.currentTimeMillis().toString(),
-                            "IS_WRITING"
-                        )
-                    )
-                    box = messageList.size - 1
+                    messageList.add(isWritingMessage!!)
+                    //box = messageList.size - 1
                     isWriting = true
                     activityMessageBinding.messageRecyclerView.adapter!!.notifyDataSetChanged()
                     activityMessageBinding.messageRecyclerView.smoothScrollToPosition(messageList.size)
                 }
                 if (snapshot.child("typing").value == "false" && isWriting) {
-                    messageList.removeAt(box)
+                    //messageList.removeAt(box)
+                        messageList.remove(isWritingMessage)
                     isWriting = false
                     activityMessageBinding.messageRecyclerView.adapter!!.notifyDataSetChanged()
                     activityMessageBinding.messageRecyclerView.smoothScrollToPosition(messageList.size)
@@ -456,7 +468,8 @@ class MessageActivity : AppCompatActivity() {
 
     private fun removeIsWritingBox() {
         if (isWriting) {
-            messageList.removeAt(box)
+            //messageList.removeAt(box)
+                messageList.remove(isWritingMessage)
             isWriting = false
             activityMessageBinding.messageRecyclerView.adapter!!.notifyDataSetChanged()
             activityMessageBinding.messageRecyclerView.smoothScrollToPosition(messageList.size)
@@ -503,6 +516,7 @@ class MessageActivity : AppCompatActivity() {
                 val data = JSONObject()
                 data.put("hisId", myId)
                 data.put("title", myName)
+                data.put("hisImage", myImageUrl)
                 data.put("message", message)
                 data.put("chatId", chatId)
                 to.put("to", token)
@@ -570,9 +584,9 @@ class MessageActivity : AppCompatActivity() {
                 intent.putExtra("hisID", hisId)
                 intent.putExtra("chatID", chatId)
                 intent.putExtra("myName",myName)
-                intent.putExtra("myID",myId)
+                intent.putExtra("hisImage",myImageUrl)
                 intent.putStringArrayListExtra("media", imageUris)
-
+                /*hisId e myId sono stati confusi di ruolo ed è un casino se metti in "hisID" <- myId Crasha senza senso!!!!!*/
                 if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O)
                     startForegroundService(intent)
                 else

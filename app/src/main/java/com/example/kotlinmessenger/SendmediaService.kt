@@ -19,6 +19,7 @@ import com.android.volley.toolbox.Volley
 import com.bumptech.glide.util.Util
 import com.example.kotlinmessenger.Constants.AppConstants
 import com.google.android.gms.tasks.Task
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
 import id.zelory.compressor.Compressor
@@ -37,6 +38,7 @@ class SendmediaService : Service() {
     private var chatID: String? = null
     private var hisID: String? = null
     private var myID: String? = null
+    private var hisImage: String? = null
     private var myName: String? = null
     private val appUtil = AppUtil()
     private var images: ArrayList<String>? = null
@@ -52,8 +54,9 @@ class SendmediaService : Service() {
             hisID = intent.getStringExtra("hisID")
             chatID = intent.getStringExtra("chatID")
             images = intent.getStringArrayListExtra("media")
-            myID = intent.getStringExtra("myID")
+            //myID = intent.getStringExtra("myID")
             myName = intent.getStringExtra("myName")
+            hisImage = intent.getStringExtra("hisImage")
         }
 
         MAX_PROGRESS = images!!.size
@@ -173,14 +176,15 @@ class SendmediaService : Service() {
         FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app").getReference("users")
             .child(hisID!!).child("token").get()
             .addOnSuccessListener {
-
+                val myID = FirebaseAuth.getInstance().uid
                 val token = it.value.toString()
                 val to = JSONObject()
                 val data = JSONObject()
-                data.put("hisId", hisID)
+                data.put("hisId", myID)
                 data.put("title", myName)
                 data.put("message", message)
                 data.put("chatId", chatID)
+                data.put("hisImage",hisImage)
                 to.put("to", token)
                 to.put("data", data)
 
