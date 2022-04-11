@@ -68,6 +68,7 @@ class SplashScreen : AppCompatActivity() {
                             builder.create().show()
                         }else{
                             startActivity(Intent(this, DashBoard::class.java))
+                            finish()
                         }
                     }
                 }

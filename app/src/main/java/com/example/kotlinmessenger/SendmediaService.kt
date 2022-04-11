@@ -28,8 +28,6 @@ import kotlinx.coroutines.launch
 import org.json.JSONObject
 import java.io.File
 
-//Library for compress image: https://github.com/zetbaitsu/Compressor
-
 class SendmediaService : Service() {
 
     private lateinit var builder: NotificationCompat.Builder
@@ -86,25 +84,6 @@ class SendmediaService : Service() {
 
         return super.onStartCommand(intent, flags, startId)
     }
-
-    /*private fun CreateChat(message: String) {
-        Log.d(TAG, "Chat created: $message")
-        var databaseReference =
-            FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
-                .getReference("/chatlist").child(myID)
-        chatID = databaseReference.push().key
-        val chatListMod =
-            ChatListModel(chatID!!, "Say Hi!", System.currentTimeMillis().toString(), hisId!!)
-        databaseReference.child(chatId!!).setValue(chatListMod)
-        databaseReference =
-            FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
-                .getReference("/chatlist").child(hisId!!)
-        val chatList =
-            ChatListModel(chatID!!, "Say Hi!", System.currentTimeMillis().toString(), myId!!)
-        databaseReference.child(chatId!!).setValue(chatList)
-        sperimentalReadMessages(chatId!!)
-
-    }*/
 
     private fun getNotification(): NotificationCompat.Builder {
         builder = NotificationCompat.Builder(this, "android")

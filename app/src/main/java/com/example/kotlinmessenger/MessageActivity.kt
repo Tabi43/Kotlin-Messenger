@@ -48,7 +48,7 @@ class MessageActivity : AppCompatActivity() {
     private var isOnline = false
     private var READ_EXTERNAL_STORAGE_REQUEST_CODE = 1001
     private var imageUris = ArrayList<String>()
-    private var isWritingMessage : MessageModel? = null
+    private var isWritingMessage: MessageModel? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         activityMessageBinding = ActivityMessageBinding.inflate(layoutInflater)
@@ -62,9 +62,10 @@ class MessageActivity : AppCompatActivity() {
         hisId = intent.getStringExtra("hisId")
         hisImageUrl = intent.getStringExtra("hisImage")
         hisUsername = intent.getStringExtra("hisUsername")
-        isWritingMessage = MessageModel(hisId!!, myId, "...", System.currentTimeMillis().toString(), "IS_WRITING")
+        isWritingMessage =
+            MessageModel(hisId!!, myId, "...", System.currentTimeMillis().toString(), "IS_WRITING")
 
-        chaeckHisImage()
+        checkHisImage()
 
         activityMessageBinding.messageToolbar.username = hisUsername
 
@@ -74,13 +75,13 @@ class MessageActivity : AppCompatActivity() {
                 Toast.makeText(this, "Enter Message", Toast.LENGTH_SHORT).show()
             } else {
                 setNoWriting()
-                sendMessage(message)
+                CheckChatToSend(hisId!!,message)
                 gettokenForNotification(message)
             }
         }
 
         activityMessageBinding.btnDataSend.setOnClickListener {
-           pickImageIntent()
+            pickImageIntent()
         }
 
         activityMessageBinding.messageToolbar.msgBack.setOnClickListener {
@@ -156,7 +157,7 @@ class MessageActivity : AppCompatActivity() {
             }
         })
 
-        Log.e(TAG,"hisID: $hisId hisImage: $hisImageUrl hisUsername: $hisUsername")
+        Log.e(TAG, "hisID: $hisId hisImage: $hisImageUrl hisUsername: $hisUsername")
 
         if (chatId == null) CheckChat(hisId!!)
 
@@ -165,44 +166,45 @@ class MessageActivity : AppCompatActivity() {
     }
 
     private fun getMynameAnImage() {
-            FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
-                .getReference("users").child(myId).child("name")
-                .addListenerForSingleValueEvent(object : ValueEventListener {
-                    override fun onDataChange(snapshot: DataSnapshot) {
-                        if (snapshot.exists()) {
-                            myName = snapshot.getValue().toString()
-                            Log.d(TAG, "nome caricato: $myName")
-                        }
+        FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
+            .getReference("users").child(myId).child("name")
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    if (snapshot.exists()) {
+                        myName = snapshot.getValue().toString()
+                        Log.d(TAG, "nome caricato: $myName")
                     }
+                }
 
-                    override fun onCancelled(error: DatabaseError) {
+                override fun onCancelled(error: DatabaseError) {
 
+                }
+            })
+        FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
+            .getReference("users").child(myId).child("image")
+            .addValueEventListener(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    if (snapshot.exists()) {
+                        myImageUrl = snapshot.getValue().toString()
+                        Log.d(TAG, "Mia immagine caricata: $myImageUrl")
                     }
-                })
-            FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
-            .getReference("users").child(myId).child("image").addValueEventListener(object: ValueEventListener{
-                    override fun onDataChange(snapshot: DataSnapshot) {
-                        if (snapshot.exists()){
-                            myImageUrl = snapshot.getValue().toString()
-                            Log.d(TAG, "Mia immagine caricata: $myImageUrl")
-                        }
-                    }
+                }
 
-                    override fun onCancelled(error: DatabaseError) {
+                override fun onCancelled(error: DatabaseError) {
 
-                    }
-                })
+                }
+            })
     }
 
-    private fun chaeckHisImage(){
-        if(hisImageUrl == null){
+    private fun checkHisImage() {
+        if (hisImageUrl == null) {
             FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
                 .getReference("/users").child(hisId!!).child("image").get()
                 .addOnSuccessListener {
                     hisImageUrl = it.getValue().toString()
                     activityMessageBinding.hisImage = hisImageUrl
                 }
-        }else activityMessageBinding.hisImage = hisImageUrl
+        } else activityMessageBinding.hisImage = hisImageUrl
     }
 
     private fun CheckChat(hisId: String) {
@@ -211,22 +213,31 @@ class MessageActivity : AppCompatActivity() {
             FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
                 .getReference("/chatlist").child(myId)
         databaseReference.get().addOnSuccessListener {
-            it.children.forEach {
-                if (it.child("member").value == hisId) {
-                    Log.d(TAG, "Chat ID rilevato: ${it.key}")
-                    chatId = it.key
-                    sperimentalReadMessages(chatId!!)
-                }
+            chatId = searchInsideDataSnapshot(hisId, it)
+            if(chatId != null) sperimentalReadMessages(chatId!!)
+        }
+    }
+
+    private fun CheckChatToSend(hisId: String,message: String) {
+        Log.d(TAG, "Check chat id: $hisId")
+        val databaseReference =
+            FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
+                .getReference("/chatlist").child(myId)
+        databaseReference.get().addOnSuccessListener {
+            chatId = searchInsideDataSnapshot(hisId, it)
+            sendMessage(message)
+        }
+    }
+
+    private fun searchInsideDataSnapshot(hisId: String,snapshot: DataSnapshot) :String? {
+        snapshot.children.forEach {
+            if (it.child("member").value == hisId) {
+                Log.d(TAG, "Chat ID rilevato: ${it.key}")
+                chatId = it.key
+                return chatId.toString()
             }
         }
-        FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
-            .getReference("/chatlist").child(hisId).get()
-            .addOnFailureListener {
-                //Va ricreata una nuova chat
-            }
-            .addOnSuccessListener {
-
-            }
+        return null
     }
 
     private fun CreateChat(message: String) {
@@ -349,7 +360,7 @@ class MessageActivity : AppCompatActivity() {
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (snapshot.childrenCount > messageList.size) {
                     Log.d(TAG, "New message found")
-                    if (isWriting){
+                    if (isWriting) {
                         removeIsWritingBox().run {
                             val lastMessageChildren = snapshot.children.last()
                             val senderId = lastMessageChildren.child("senderId").value.toString()
@@ -359,9 +370,11 @@ class MessageActivity : AppCompatActivity() {
                             val type = lastMessageChildren.child("type").value.toString()
                             messageList.add(MessageModel(senderId, reciverId, message, date, type))
                             activityMessageBinding.messageRecyclerView.adapter!!.notifyDataSetChanged()
-                            activityMessageBinding.messageRecyclerView.smoothScrollToPosition(messageList.size)
+                            activityMessageBinding.messageRecyclerView.smoothScrollToPosition(
+                                messageList.size
+                            )
                         }
-                    }else{
+                    } else {
                         val lastMessageChildren = snapshot.children.last()
                         val senderId = lastMessageChildren.child("senderId").value.toString()
                         val reciverId = lastMessageChildren.child("reciverId").value.toString()
@@ -370,7 +383,9 @@ class MessageActivity : AppCompatActivity() {
                         val type = lastMessageChildren.child("type").value.toString()
                         messageList.add(MessageModel(senderId, reciverId, message, date, type))
                         activityMessageBinding.messageRecyclerView.adapter!!.notifyDataSetChanged()
-                        activityMessageBinding.messageRecyclerView.smoothScrollToPosition(messageList.size)
+                        activityMessageBinding.messageRecyclerView.smoothScrollToPosition(
+                            messageList.size
+                        )
                     }
                 } else {
                     Log.d(
@@ -452,7 +467,7 @@ class MessageActivity : AppCompatActivity() {
                 }
                 if (snapshot.child("typing").value == "false" && isWriting) {
                     //messageList.removeAt(box)
-                        messageList.remove(isWritingMessage)
+                    messageList.remove(isWritingMessage)
                     isWriting = false
                     activityMessageBinding.messageRecyclerView.adapter!!.notifyDataSetChanged()
                     activityMessageBinding.messageRecyclerView.smoothScrollToPosition(messageList.size)
@@ -469,7 +484,7 @@ class MessageActivity : AppCompatActivity() {
     private fun removeIsWritingBox() {
         if (isWriting) {
             //messageList.removeAt(box)
-                messageList.remove(isWritingMessage)
+            messageList.remove(isWritingMessage)
             isWriting = false
             activityMessageBinding.messageRecyclerView.adapter!!.notifyDataSetChanged()
             activityMessageBinding.messageRecyclerView.smoothScrollToPosition(messageList.size)
@@ -477,13 +492,13 @@ class MessageActivity : AppCompatActivity() {
     }
 
     private fun setWriting() {
-            FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
-                .getReference("users").child(myId).child("typing").setValue("true")
+        FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
+            .getReference("users").child(myId).child("typing").setValue("true")
     }
 
     private fun setNoWriting() {
-            FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
-                .getReference("users").child(myId).child("typing").setValue("false")
+        FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
+            .getReference("users").child(myId).child("typing").setValue("false")
     }
 
     private fun gettokenForNotification(message: String) {
@@ -508,7 +523,8 @@ class MessageActivity : AppCompatActivity() {
                     override fun onCancelled(error: DatabaseError) {
                     }
                 })*/ //INDOVINA? Non mi piaceva...
-            FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app").getReference("users")
+        FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
+            .getReference("users")
             .child(hisId!!).child("token").get()
             .addOnSuccessListener {
                 val token = it.value.toString()
@@ -580,11 +596,11 @@ class MessageActivity : AppCompatActivity() {
                 }
 
                 val intent = Intent(this, SendmediaService::class.java)
-                Toast.makeText(this,"il nome: $myName",Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "il nome: $myName", Toast.LENGTH_SHORT).show()
                 intent.putExtra("hisID", hisId)
                 intent.putExtra("chatID", chatId)
-                intent.putExtra("myName",myName)
-                intent.putExtra("hisImage",myImageUrl)
+                intent.putExtra("myName", myName)
+                intent.putExtra("hisImage", myImageUrl)
                 intent.putStringArrayListExtra("media", imageUris)
                 /*hisId e myId sono stati confusi di ruolo ed è un casino se metti in "hisID" <- myId Crasha senza senso!!!!!*/
                 if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O)
