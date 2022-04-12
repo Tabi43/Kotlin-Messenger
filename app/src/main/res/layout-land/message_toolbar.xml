@@ -49,10 +49,10 @@
                 <de.hdodenhof.circleimageview.CircleImageView
                     android:id="@+id/msgImage"
                     imageUrl="@{hisImage}"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:layout_marginTop="2.5dp"
-                    android:layout_marginBottom="2.5dp"
+                    android:layout_width="43dp"
+                    android:layout_height="43dp"
+                    android:layout_marginTop="2.0dp"
+                    android:layout_marginBottom="3.0dp"
                     android:src="@drawable/ic_launcher_background"/>
 
                 <ImageView

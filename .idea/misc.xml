@@ -52,9 +52,16 @@
         <entry key="app/src/main/res/drawable/left_side_background.xml" value="0.1835" />
         <entry key="app/src/main/res/drawable/message_edittext_background.xml" value="0.187" />
         <entry key="app/src/main/res/drawable/right_side_background.xml" value="0.1835" />
-        <entry key="app/src/main/res/layout-land/f_login.xml" value="0.45180722891566266" />
+        <entry key="app/src/main/res/layout-land/activity_message.xml" value="0.165" />
+        <entry key="app/src/main/res/layout-land/activity_profile.xml" value="0.165" />
+        <entry key="app/src/main/res/layout-land/chat_item_layout.xml" value="0.2774774774774775" />
+        <entry key="app/src/main/res/layout-land/contact_item_layout.xml" value="0.2774774774774775" />
+        <entry key="app/src/main/res/layout-land/f_contacts.xml" value="0.2774774774774775" />
+        <entry key="app/src/main/res/layout-land/f_conversations.xml" value="0.2774774774774775" />
+        <entry key="app/src/main/res/layout-land/f_login.xml" value="0.4117647058823529" />
         <entry key="app/src/main/res/layout-land/f_login_landscape.xml" value="1.4357142857142857" />
         <entry key="app/src/main/res/layout-land/f_register.xml" value="0.5192708333333333" />
+        <entry key="app/src/main/res/layout-land/message_toolbar.xml" value="0.45" />
         <entry key="app/src/main/res/layout/activity_dash_board.xml" value="0.12129629629629629" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.213768115942029" />
         <entry key="app/src/main/res/layout/activity_message.xml" value="0.25" />

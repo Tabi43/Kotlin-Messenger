@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -9,13 +10,13 @@
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
-        android:layout_height="300dp"
+        android:layout_height="150dp"
         android:background="@color/colorPrimary">
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/imgUser"
-            android:layout_width="150dp"
-            android:layout_height="150dp"
+            android:layout_width="145dp"
+            android:layout_height="130dp"
             android:layout_gravity="center"
             android:src="@drawable/ic_launcher_background"
             app:civ_border_color="@color/colorAccent"
@@ -23,10 +24,9 @@
 
         <ImageView
             android:id="@+id/imgPickImage"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_marginTop="170dp"
-            android:layout_marginRight="120dp"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_marginTop="105dp"
             android:src="@drawable/ic_camera"
             app:layout_anchor="@id/imgUser"
             app:layout_anchorGravity="end|center"
@@ -54,7 +54,6 @@
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
     <LinearLayout
-        android:layout_marginTop="10dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="25dp"
@@ -64,13 +63,13 @@
             android:id="@+id/usernameET"
             android:layout_width="match_parent"
             android:layout_height="43dp"
-            android:layout_marginTop="30dp"
+            android:layout_marginTop="20dp"
             android:background="#5D8BF4"
+            android:hint="Username"
             android:inputType="text|textCapSentences"
             android:padding="10dp"
-            android:hint="Username"
-            android:textColorHint="@color/white"
             android:textColor="@color/white"
+            android:textColorHint="@color/white"
             android:textSize="15dp"
             android:textStyle="bold" />
 
@@ -78,15 +77,15 @@
             android:id="@+id/userStatusET"
             android:layout_width="match_parent"
             android:layout_height="43dp"
-            android:layout_marginTop="30dp"
+            android:layout_marginTop="10dp"
             android:background="#5D8BF4"
+            android:hint="Hey There! I'm using this app"
             android:inputType="text|textCapSentences"
             android:padding="10dp"
-            android:hint="Hey There! I'm using this app"
-            android:textColorHint="@color/white"
             android:textColor="@color/white"
+            android:textColorHint="@color/white"
             android:textSize="15dp"
-            android:textStyle="bold"/>
+            android:textStyle="bold" />
 
     </LinearLayout>
 
@@ -95,13 +94,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="20dp"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="10dp"
         android:background="@drawable/button_background"
         android:backgroundTint="@color/colorPrimary"
         android:text="Done"
         android:textColor="@color/white"
         android:textSize="20dp"
         android:textStyle="bold" />
-
 
 </LinearLayout>

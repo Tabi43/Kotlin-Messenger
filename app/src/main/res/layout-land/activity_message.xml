@@ -29,6 +29,7 @@
             bind:hisImage="@{hisImage}"
             bind:online="@{online}" />
 
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/messageRecyclerView"
             android:layout_width="match_parent"
@@ -36,6 +37,7 @@
             android:layout_above="@+id/msgData"
             android:layout_below="@+id/messageToolbar"
             android:layout_marginBottom="0dp" />
+
 
         <LinearLayout
             android:id="@+id/msgData"
@@ -74,7 +76,8 @@
                     android:inputType="textMultiLine"
                     android:padding="8dp"
                     android:scrollbars="vertical"
-                    android:text="" />
+                    android:text=""
+                    android:imeOptions="flagNoFullscreen"/>
             </LinearLayout>
 
 
@@ -89,6 +92,7 @@
 
 
         </LinearLayout>
+
 
     </RelativeLayout>
 </layout>
