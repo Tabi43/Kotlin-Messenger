@@ -1,10 +1,12 @@
 package com.example.kotlinmessenger.Fragment
 
 
+import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -40,6 +42,10 @@ class f_conversations : Fragment(R.layout.f_conversations) {
 
         firebaseAuth = FirebaseAuth.getInstance()
         getAllActiveChat()
+
+        getActivity()?.getWindow()?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
+
+        activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR
 
         return binding.root
     }

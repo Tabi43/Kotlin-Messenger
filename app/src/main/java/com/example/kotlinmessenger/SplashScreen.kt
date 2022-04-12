@@ -3,6 +3,7 @@ package com.example.kotlinmessenger
 import android.app.AlertDialog
 import android.content.DialogInterface
 import android.content.Intent
+import android.content.res.Configuration
 import android.nfc.Tag
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -36,6 +37,7 @@ class SplashScreen : AppCompatActivity() {
         }, 1000)
 
     }
+
 
     private fun isAlreadyLogged(){
         val currentUSer = FirebaseAuth.getInstance().currentUser

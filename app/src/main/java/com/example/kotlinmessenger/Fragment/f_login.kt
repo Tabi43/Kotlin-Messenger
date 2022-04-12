@@ -3,11 +3,15 @@ package com.example.kotlinmessenger.Fragment
 import android.app.AlertDialog
 import android.content.DialogInterface
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
+import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputConnection
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.kotlinmessenger.Constants.AppConstants
@@ -18,6 +22,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.storage.FirebaseStorage
+
 
 class f_login : Fragment(R.layout.f_login) {
 
@@ -40,9 +45,13 @@ class f_login : Fragment(R.layout.f_login) {
             val transaction = fragmentManager?.beginTransaction()
             transaction?.replace(R.id.fragmentContainer, fragment)?.commit()
         }
+        getActivity()?.getWindow()?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
 
+        activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR
         return binding.root
+
     }
+
 
     private fun isAlreadyLogged() {
         val email = binding.mailET.text.toString()

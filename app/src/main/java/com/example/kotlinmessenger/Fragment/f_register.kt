@@ -1,12 +1,14 @@
 package com.example.kotlinmessenger.Fragment
 
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.Toast
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
@@ -49,6 +51,9 @@ class f_register : Fragment(R.layout.f_register) {
             performRegistration()
         }
 
+        getActivity()?.getWindow()?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
+
+        activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR
         return binding.root
     }
 

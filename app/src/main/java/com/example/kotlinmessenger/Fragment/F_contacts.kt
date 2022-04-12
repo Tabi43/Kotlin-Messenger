@@ -1,10 +1,12 @@
 package com.example.kotlinmessenger.Fragment
 
+import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.Toast
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
@@ -47,6 +49,10 @@ class f_contacts : Fragment(R.layout.f_contacts) {
             }
         })
         showAllUsers()
+
+        getActivity()?.getWindow()?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
+
+        activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR
         return binding.root
     }
 

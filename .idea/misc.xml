@@ -52,6 +52,9 @@
         <entry key="app/src/main/res/drawable/left_side_background.xml" value="0.1835" />
         <entry key="app/src/main/res/drawable/message_edittext_background.xml" value="0.187" />
         <entry key="app/src/main/res/drawable/right_side_background.xml" value="0.1835" />
+        <entry key="app/src/main/res/layout-land/f_login.xml" value="0.45180722891566266" />
+        <entry key="app/src/main/res/layout-land/f_login_landscape.xml" value="1.4357142857142857" />
+        <entry key="app/src/main/res/layout-land/f_register.xml" value="0.5192708333333333" />
         <entry key="app/src/main/res/layout/activity_dash_board.xml" value="0.12129629629629629" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.213768115942029" />
         <entry key="app/src/main/res/layout/activity_message.xml" value="0.25" />
@@ -62,6 +65,7 @@
         <entry key="app/src/main/res/layout/f_contacts.xml" value="0.1" />
         <entry key="app/src/main/res/layout/f_conversations.xml" value="0.25" />
         <entry key="app/src/main/res/layout/f_login.xml" value="0.3515625" />
+        <entry key="app/src/main/res/layout/f_register.xml" value="0.328125" />
         <entry key="app/src/main/res/layout/fragment_prova.xml" value="0.38189682157913063" />
         <entry key="app/src/main/res/layout/is_writing_layout.xml" value="0.2875" />
         <entry key="app/src/main/res/layout/left_item_layout.xml" value="0.6100100481951678" />
@@ -70,7 +74,7 @@
       </map>
     </option>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_16" project-jdk-name="Android Studio default JDK" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_X" project-jdk-name="Android Studio default JDK" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />
   </component>
   <component name="ProjectType">
