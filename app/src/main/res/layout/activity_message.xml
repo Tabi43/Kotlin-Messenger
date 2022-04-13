@@ -74,7 +74,8 @@
                     android:inputType="textMultiLine"
                     android:padding="8dp"
                     android:scrollbars="vertical"
-                    android:text="" />
+                    android:text=""
+                    tools:ignore="TouchTargetSizeCheck" />
             </LinearLayout>
 
 

@@ -43,7 +43,7 @@
         <EditText
             android:id="@+id/usernameET"
             android:layout_width="match_parent"
-            android:layout_height="43dp"
+            android:layout_height="48dp"
             android:layout_marginTop="30dp"
             android:background="#5D8BF4"
             android:inputType="text|textCapSentences"
@@ -56,7 +56,7 @@
         <EditText
             android:id="@+id/edtUserStatusET"
             android:layout_width="match_parent"
-            android:layout_height="43dp"
+            android:layout_height="48dp"
             android:layout_marginTop="30dp"
             android:background="#5D8BF4"
             android:inputType="text|textCapSentences"
@@ -64,7 +64,7 @@
             android:text="Hey There! I,m using this app"
             android:textColor="@color/white"
             android:textSize="15dp"
-            android:textStyle="bold"/>
+            android:textStyle="bold" />
     </LinearLayout>
 
     <Button
@@ -75,7 +75,7 @@
         android:layout_marginTop="30dp"
         android:background="@drawable/button_background"
         android:backgroundTint="@color/colorPrimary"
-        android:text="Done"
+        android:text="Do"
         android:textColor="@color/white"
         android:textSize="20dp"
         android:textStyle="bold" />

@@ -51,9 +51,6 @@ class f_register : Fragment(R.layout.f_register) {
             performRegistration()
         }
 
-        getActivity()?.getWindow()?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
-
-        activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR
         return binding.root
     }
 

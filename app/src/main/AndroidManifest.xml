@@ -15,9 +15,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.KotlinMessenger">
-        <activity
-            android:name=".DebugActivity"
-            android:exported="false" />
+
 
         <service
             android:name=".FirebaseNotificationsr"
@@ -41,24 +39,30 @@
         <activity
             android:name=".ProfileActivity"
             android:exported="false"
+            android:windowSoftInputMode="adjustResize"
             android:configChanges="orientation|screenSize"
             android:screenOrientation="sensor"
             android:isScrollContainer="false"/>
         <activity
             android:name=".DashBoard"
             android:exported="false"
+            android:windowSoftInputMode="adjustResize"
             android:configChanges="orientation|screenSize"
             android:screenOrientation="sensor"
             android:isScrollContainer="false"/>
         <activity
             android:name=".MainActivity"
-            android:exported="false" />
-        <activity
-            android:name=".SplashScreen"
-            android:exported="true"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize"
             android:configChanges="orientation|screenSize"
             android:screenOrientation="sensor"
-            android:isScrollContainer="false">
+            android:isScrollContainer="false"/>
+        <activity
+            android:name=".SplashScreen"
+            android:windowSoftInputMode="adjustResize"
+            android:exported="true"
+            android:configChanges="orientation|screenSize"
+            android:screenOrientation="sensor">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

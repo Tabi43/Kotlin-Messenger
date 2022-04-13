@@ -45,9 +45,7 @@ class f_login : Fragment(R.layout.f_login) {
             val transaction = fragmentManager?.beginTransaction()
             transaction?.replace(R.id.fragmentContainer, fragment)?.commit()
         }
-        getActivity()?.getWindow()?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
 
-        activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR
         return binding.root
 
     }

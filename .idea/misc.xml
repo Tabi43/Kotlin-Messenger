@@ -56,15 +56,18 @@
         <entry key="app/src/main/res/drawable/left_side_background.xml" value="0.1835" />
         <entry key="app/src/main/res/drawable/message_edittext_background.xml" value="0.187" />
         <entry key="app/src/main/res/drawable/right_side_background.xml" value="0.1835" />
+        <entry key="app/src/main/res/layout-land/activity_dash_board.xml" value="0.28802083333333334" />
+        <entry key="app/src/main/res/layout-land/activity_main.xml" value="0.5109375" />
         <entry key="app/src/main/res/layout-land/activity_message.xml" value="0.165" />
-        <entry key="app/src/main/res/layout-land/activity_profile.xml" value="0.165" />
+        <entry key="app/src/main/res/layout-land/activity_profile.xml" value="0.29894165039062504" />
         <entry key="app/src/main/res/layout-land/chat_item_layout.xml" value="0.2774774774774775" />
         <entry key="app/src/main/res/layout-land/contact_item_layout.xml" value="0.2774774774774775" />
-        <entry key="app/src/main/res/layout-land/f_contacts.xml" value="0.2774774774774775" />
+        <entry key="app/src/main/res/layout-land/f_contacts.xml" value="0.3948526605829462" />
         <entry key="app/src/main/res/layout-land/f_conversations.xml" value="0.2774774774774775" />
         <entry key="app/src/main/res/layout-land/f_login.xml" value="0.4117647058823529" />
         <entry key="app/src/main/res/layout-land/f_login_landscape.xml" value="1.4357142857142857" />
         <entry key="app/src/main/res/layout-land/f_register.xml" value="0.5192708333333333" />
+        <entry key="app/src/main/res/layout-land/f_userdata.xml" value="0.27350158691406257" />
         <entry key="app/src/main/res/layout-land/message_toolbar.xml" value="0.45" />
         <entry key="app/src/main/res/layout/activity_dash_board.xml" value="0.12129629629629629" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.213768115942029" />
@@ -77,11 +80,14 @@
         <entry key="app/src/main/res/layout/f_conversations.xml" value="0.25" />
         <entry key="app/src/main/res/layout/f_login.xml" value="0.3515625" />
         <entry key="app/src/main/res/layout/f_register.xml" value="0.328125" />
+        <entry key="app/src/main/res/layout/f_settings.xml" value="0.3416666666666667" />
+        <entry key="app/src/main/res/layout/f_userdata.xml" value="0.3416666666666667" />
         <entry key="app/src/main/res/layout/fragment_prova.xml" value="0.38189682157913063" />
         <entry key="app/src/main/res/layout/is_writing_layout.xml" value="0.2875" />
         <entry key="app/src/main/res/layout/left_item_layout.xml" value="0.6100100481951678" />
         <entry key="app/src/main/res/layout/message_toolbar.xml" value="0.3346602935332794" />
         <entry key="app/src/main/res/layout/right_item_layout.xml" value="0.29907407407407405" />
+        <entry key="app/src/main/res/menu/nav_menu.xml" value="0.3416666666666667" />
       </map>
     </option>
   </component>

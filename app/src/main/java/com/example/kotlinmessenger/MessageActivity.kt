@@ -371,14 +371,9 @@ class MessageActivity : AppCompatActivity() {
                     val type = lastMessageChildren.child("type").value.toString()
                     messageList.add(MessageModel(senderId, reciverId, message, date, type))
                     activityMessageBinding.messageRecyclerView.adapter!!.notifyDataSetChanged()
-                    activityMessageBinding.messageRecyclerView.smoothScrollToPosition(
-                        messageList.size
-                    )
+                    activityMessageBinding.messageRecyclerView.smoothScrollToPosition(messageList.size)
                 } else {
-                    Log.d(
-                        TAG,
-                        "No new message found children: ${snapshot.childrenCount} array: ${messageList.size}"
-                    )
+                    Log.d(TAG,"No new message found children: ${snapshot.childrenCount} array: ${messageList.size}")
                     activityMessageBinding.messageRecyclerView.adapter!!.notifyDataSetChanged()
                     activityMessageBinding.messageRecyclerView.smoothScrollToPosition(messageList.size)
                 }

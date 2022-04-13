@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -43,7 +44,8 @@
             android:textColor="@color/white"
             android:textColorHint="@color/white"
             android:textSize="15dp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            tools:ignore="TouchTargetSizeCheck" />
 
         <EditText
             android:id="@+id/mailET"
@@ -56,7 +58,8 @@
             android:textColor="@color/white"
             android:textColorHint="@color/white"
             android:textSize="15dp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            tools:ignore="TouchTargetSizeCheck" />
 
 
         <EditText
@@ -71,7 +74,8 @@
             android:textColor="@color/white"
             android:textColorHint="@color/white"
             android:textSize="15dp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            tools:ignore="TouchTargetSizeCheck" />
 
         <EditText
             android:id="@+id/confirmPasswordET"
@@ -85,7 +89,8 @@
             android:textColor="@color/white"
             android:textColorHint="@color/white"
             android:textSize="15dp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            tools:ignore="TouchTargetSizeCheck" />
 
         <Button
             android:id="@+id/confirmButton"
