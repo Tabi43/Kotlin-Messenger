@@ -43,9 +43,10 @@
 
             <ImageView
                 imageMessage="@{message.message}"
-                android:layout_width="150dp"
-                android:layout_height="110dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:scaleType="fitCenter"
+                android:adjustViewBounds="true"
                 android:visibility="@{message.type.equals(`text`)?View.GONE:View.VISIBLE}" />
                  <!--android:src="@drawable/ic_launcher_background"-->
 

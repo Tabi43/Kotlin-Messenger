@@ -24,7 +24,6 @@ import com.firebase.ui.database.FirebaseRecyclerAdapter
 import com.google.firebase.database.*
 import org.json.JSONObject
 
-
 class MessageActivity : AppCompatActivity() {
 
     private lateinit var activityMessageBinding: ActivityMessageBinding
@@ -62,6 +61,7 @@ class MessageActivity : AppCompatActivity() {
         hisId = intent.getStringExtra("hisId")
         hisImageUrl = intent.getStringExtra("hisImage")
         hisUsername = intent.getStringExtra("hisUsername")
+        chatId = computeChatId()
         isWritingMessage =
             MessageModel(hisId!!, myId, "...", System.currentTimeMillis().toString(), "IS_WRITING")
 
@@ -75,7 +75,8 @@ class MessageActivity : AppCompatActivity() {
                 Toast.makeText(this, "Enter Message", Toast.LENGTH_SHORT).show()
             } else {
                 setNoWriting()
-                CheckChatToSend(hisId!!,message)
+                //CheckChatToSend(hisId!!,message)
+                sendMessage(message)
                 gettokenForNotification(message)
             }
         }
@@ -157,12 +158,14 @@ class MessageActivity : AppCompatActivity() {
             }
         })
 
-        Log.e(TAG, "hisID: $hisId hisImage: $hisImageUrl hisUsername: $hisUsername")
+        Log.d(TAG, "hisID: $hisId hisImage: $hisImageUrl hisUsername: $hisUsername")
 
-        if (chatId == null) CheckChat(hisId!!)
+        //if (chatId == null) CheckChat(hisId!!)
 
+        sperimentalReadMessages(chatId!!)
         checkOnlineStatusAndUsername()
         getMynameAnImage()
+        Log.e(TAG, "Chat id computed: ${computeChatId()}")
     }
 
     private fun getMynameAnImage() {
@@ -207,7 +210,7 @@ class MessageActivity : AppCompatActivity() {
         } else activityMessageBinding.hisImage = hisImageUrl
     }
 
-    private fun CheckChat(hisId: String) {
+    /*private fun CheckChat(hisId: String) {
         Log.d(TAG, "Check chat id: $hisId")
         val databaseReference =
             FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
@@ -216,20 +219,20 @@ class MessageActivity : AppCompatActivity() {
             chatId = searchInsideDataSnapshot(hisId, it)
             if(chatId != null) sperimentalReadMessages(chatId!!)
         }
-    }
+    }*/
 
-    private fun CheckChatToSend(hisId: String,message: String) {
-        Log.d(TAG, "Check chat id: $hisId")
-        val databaseReference =
-            FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
-                .getReference("/chatlist").child(myId)
-        databaseReference.get().addOnSuccessListener {
-            chatId = searchInsideDataSnapshot(hisId, it)
-            sendMessage(message)
-        }
-    }
+    /* private fun CheckChatToSend(hisId: String,message: String) {
+         Log.d(TAG, "Check chat id: $hisId")
+         val databaseReference =
+             FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
+                 .getReference("/chatlist").child(myId)
+         databaseReference.get().addOnSuccessListener {
+             chatId = searchInsideDataSnapshot(hisId, it)
+             sendMessage(message)
+         }
+     }*/
 
-    private fun searchInsideDataSnapshot(hisId: String,snapshot: DataSnapshot) :String? {
+    private fun searchInsideDataSnapshot(hisId: String, snapshot: DataSnapshot): String? {
         snapshot.children.forEach {
             if (it.child("member").value == hisId) {
                 Log.d(TAG, "Chat ID rilevato: ${it.key}")
@@ -245,7 +248,7 @@ class MessageActivity : AppCompatActivity() {
         var databaseReference =
             FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
                 .getReference("/chatlist").child(myId)
-        chatId = databaseReference.push().key
+        //chatId = databaseReference.push().key [OLD]
         val chatListMod =
             ChatListModel(chatId!!, message, System.currentTimeMillis().toString(), hisId!!)
         databaseReference.child(chatId!!).setValue(chatListMod)
@@ -255,7 +258,7 @@ class MessageActivity : AppCompatActivity() {
         val chatList =
             ChatListModel(chatId!!, message, System.currentTimeMillis().toString(), myId!!)
         databaseReference.child(chatId!!).setValue(chatList)
-        sperimentalReadMessages(chatId!!)
+        //sperimentalReadMessages(chatId!!)
         sendMessage(message)
     }
 
@@ -358,40 +361,26 @@ class MessageActivity : AppCompatActivity() {
                 .getReference("chat").child(chatId)
         query.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
+                removeIsWritingBox()
                 if (snapshot.childrenCount > messageList.size) {
-                    Log.d(TAG, "New message found")
-                    if (isWriting) {
-                        removeIsWritingBox().run {
-                            val lastMessageChildren = snapshot.children.last()
-                            val senderId = lastMessageChildren.child("senderId").value.toString()
-                            val reciverId = lastMessageChildren.child("reciverId").value.toString()
-                            val message = lastMessageChildren.child("message").value.toString()
-                            val date = lastMessageChildren.child("date").value.toString()
-                            val type = lastMessageChildren.child("type").value.toString()
-                            messageList.add(MessageModel(senderId, reciverId, message, date, type))
-                            activityMessageBinding.messageRecyclerView.adapter!!.notifyDataSetChanged()
-                            activityMessageBinding.messageRecyclerView.smoothScrollToPosition(
-                                messageList.size
-                            )
-                        }
-                    } else {
-                        val lastMessageChildren = snapshot.children.last()
-                        val senderId = lastMessageChildren.child("senderId").value.toString()
-                        val reciverId = lastMessageChildren.child("reciverId").value.toString()
-                        val message = lastMessageChildren.child("message").value.toString()
-                        val date = lastMessageChildren.child("date").value.toString()
-                        val type = lastMessageChildren.child("type").value.toString()
-                        messageList.add(MessageModel(senderId, reciverId, message, date, type))
-                        activityMessageBinding.messageRecyclerView.adapter!!.notifyDataSetChanged()
-                        activityMessageBinding.messageRecyclerView.smoothScrollToPosition(
-                            messageList.size
-                        )
-                    }
+                    val lastMessageChildren = snapshot.children.last()
+                    val senderId = lastMessageChildren.child("senderId").value.toString()
+                    val reciverId = lastMessageChildren.child("reciverId").value.toString()
+                    val message = lastMessageChildren.child("message").value.toString()
+                    val date = lastMessageChildren.child("date").value.toString()
+                    val type = lastMessageChildren.child("type").value.toString()
+                    messageList.add(MessageModel(senderId, reciverId, message, date, type))
+                    activityMessageBinding.messageRecyclerView.adapter!!.notifyDataSetChanged()
+                    activityMessageBinding.messageRecyclerView.smoothScrollToPosition(
+                        messageList.size
+                    )
                 } else {
                     Log.d(
                         TAG,
                         "No new message found children: ${snapshot.childrenCount} array: ${messageList.size}"
                     )
+                    activityMessageBinding.messageRecyclerView.adapter!!.notifyDataSetChanged()
+                    activityMessageBinding.messageRecyclerView.smoothScrollToPosition(messageList.size)
                 }
             }
 
@@ -460,13 +449,11 @@ class MessageActivity : AppCompatActivity() {
                 Log.d(TAG, "Him typing: ${snapshot.child("typing").value}")
                 if (snapshot.child("typing").value == "true" && !isWriting) {
                     messageList.add(isWritingMessage!!)
-                    //box = messageList.size - 1
                     isWriting = true
                     activityMessageBinding.messageRecyclerView.adapter!!.notifyDataSetChanged()
                     activityMessageBinding.messageRecyclerView.smoothScrollToPosition(messageList.size)
                 }
                 if (snapshot.child("typing").value == "false" && isWriting) {
-                    //messageList.removeAt(box)
                     messageList.remove(isWritingMessage)
                     isWriting = false
                     activityMessageBinding.messageRecyclerView.adapter!!.notifyDataSetChanged()
@@ -483,7 +470,6 @@ class MessageActivity : AppCompatActivity() {
 
     private fun removeIsWritingBox() {
         if (isWriting) {
-            //messageList.removeAt(box)
             messageList.remove(isWritingMessage)
             isWriting = false
             activityMessageBinding.messageRecyclerView.adapter!!.notifyDataSetChanged()
@@ -502,27 +488,6 @@ class MessageActivity : AppCompatActivity() {
     }
 
     private fun gettokenForNotification(message: String) {
-        /*val databaseReference =
-            FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
-                .getReference("users").child(hisId!!).child("token")
-                .addListenerForSingleValueEvent(object : ValueEventListener {
-                    override fun onDataChange(snapshot: DataSnapshot) {
-                        if (snapshot.exists()) {
-                            val token = snapshot.getValue().toString()
-                            val to = JSONObject()
-                            val data = JSONObject()
-                            data.put("hisId", myId)
-                            data.put("title", myName)
-                            data.put("message", message)
-                            data.put("chatId", chatId)
-                            to.put("to", token)
-                            to.put("data", data)
-                            sendNotification(to)
-                        }
-                    }
-                    override fun onCancelled(error: DatabaseError) {
-                    }
-                })*/ //INDOVINA? Non mi piaceva...
         FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
             .getReference("users")
             .child(hisId!!).child("token").get()
@@ -596,13 +561,11 @@ class MessageActivity : AppCompatActivity() {
                 }
 
                 val intent = Intent(this, SendmediaService::class.java)
-                Toast.makeText(this, "il nome: $myName", Toast.LENGTH_SHORT).show()
                 intent.putExtra("hisID", hisId)
                 intent.putExtra("chatID", chatId)
                 intent.putExtra("myName", myName)
                 intent.putExtra("hisImage", myImageUrl)
                 intent.putStringArrayListExtra("media", imageUris)
-                /*hisId e myId sono stati confusi di ruolo ed è un casino se metti in "hisID" <- myId Crasha senza senso!!!!!*/
                 if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O)
                     startForegroundService(intent)
                 else
@@ -642,6 +605,15 @@ class MessageActivity : AppCompatActivity() {
                 return
             }
         }
+    }
+
+    private fun computeChatId(): String {
+        var newId = ""
+        for (i in myId.indices) {
+            if (hisId!![i].code >= myId[i].code) newId += hisId!![i]
+            else newId += myId!![i]
+        }
+        return newId
     }
 
     override fun onDestroy() {
