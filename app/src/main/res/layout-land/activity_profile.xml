@@ -7,7 +7,6 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".ProfileActivity">
-
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="135dp"
@@ -57,17 +56,13 @@
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
-    <ScrollView
-        android:id="@+id/scrollView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
 
     <LinearLayout
+
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="25dp"
-        android:orientation="vertical"
-        android:gravity="center">
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical">
 
         <EditText
             android:id="@+id/usernameET"
@@ -113,6 +108,6 @@
             android:textStyle="bold" />
 
     </LinearLayout>
-    </ScrollView>
+
 
 </LinearLayout>

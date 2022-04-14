@@ -17,8 +17,8 @@ class MessageModel constructor(
         @JvmStatic
         @BindingAdapter("imageMessage")
         fun loadImage(imageView: ImageView, image: String?) {
-            imageView.maxHeight = 900
-            imageView.maxWidth = 700
+            imageView.maxHeight = 500
+            imageView.maxWidth = 300
             if (image != null) {
                 Glide.with(imageView.context).load(image).into(imageView)
             }
