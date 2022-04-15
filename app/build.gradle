@@ -87,6 +87,10 @@ dependencies {
 
     implementation 'id.zelory:compressor:3.0.1'
 
+    implementation 'com.google.mlkit:language-id:17.0.3'
+    implementation 'com.google.android.gms:play-services-mlkit-language-id:17.0.0-beta1'
+    implementation 'com.google.mlkit:translate:17.0.0'
+
 }
 apply plugin: 'com.google.gms.google-services'
 

@@ -60,12 +60,12 @@
 
                     <TextView
                         android:id="@+id/txtChatStatus"
-                        android:layout_width="wrap_content"
+                        android:layout_width="190dp"
                         android:layout_height="wrap_content"
+                        android:layout_marginStart="5dp"
                         android:layout_marginTop="4dp"
                         android:text="@{chatModel.lastMessage,default=Nothing}"
                         android:textColor="@color/textColor"
-                        android:layout_marginStart="5dp"
                         android:textSize="13dp"
                         android:textStyle="bold" />
 
@@ -73,12 +73,12 @@
                         android:id="@+id/txtChatDate"
                         android:layout_width="100dp"
                         android:layout_height="wrap_content"
-                        android:textAlignment="textEnd"
                         android:layout_alignParentEnd="true"
                         android:layout_marginTop="5dp"
                         android:layout_marginEnd="5dp"
                         android:layout_marginRight="40dp"
-                        android:text="@{chatModel.name, default=Nothing}"
+                        android:text="@{chatModel.date, default=Nothing}"
+                        android:textAlignment="textEnd"
                         android:textColor="@color/textColor"
                         android:textSize="13dp"
                         android:textStyle="bold" />

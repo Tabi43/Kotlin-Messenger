@@ -19,12 +19,12 @@
         android:layout_height="wrap_content"
         android:padding="5dp">
 
-
         <LinearLayout
             android:id="@+id/leftLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="5dp"
+            android:layout_centerVertical="true"
             android:background="@drawable/left_side_background"
             android:padding="5dp">
 
@@ -50,6 +50,20 @@
             <!--android:src="@drawable/ic_launcher_background"/>-->
 
         </LinearLayout>
+
+        <ImageView
+            android:id="@+id/translateButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_toEndOf="@id/leftLayout"
+            android:layout_alignBottom="@id/leftLayout"
+            android:layout_toRightOf="@id/leftLayout"
+            android:background="@drawable/circle_backgrounf"
+            android:backgroundTint="@color/edittextColor"
+            android:padding="3dp"
+            android:src="@drawable/ic_translate"
+            android:visibility="@{message.type.equals(`text`)?View.VISIBLE:View.GONE}" />
 
     </RelativeLayout>
 </layout>

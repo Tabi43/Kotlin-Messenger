@@ -55,6 +55,12 @@ class f_login : Fragment(R.layout.f_login) {
         val email = binding.mailET.text.toString()
         val password = binding.passwordET.text.toString()
 
+        if (email.isEmpty() || password.isEmpty()) {
+            Toast.makeText(activity, "Email or Password fields are required", Toast.LENGTH_LONG)
+                .show()
+            return
+        }
+
         FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
             .addOnCompleteListener {
                 val currentUSer = FirebaseAuth.getInstance().currentUser

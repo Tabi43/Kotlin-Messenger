@@ -3,7 +3,6 @@ package com.example.kotlinmessenger
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.content.res.Configuration
 import android.os.*
 import android.util.Log
 import android.view.View
@@ -23,6 +22,7 @@ import com.example.kotlinmessenger.adapter.MessageAdapter
 import com.example.kotlinmessenger.databinding.ActivityMessageBinding
 import com.firebase.ui.database.FirebaseRecyclerAdapter
 import com.google.firebase.database.*
+import com.google.mlkit.nl.translate.TranslateLanguage
 import org.json.JSONObject
 
 class MessageActivity : AppCompatActivity() {
@@ -161,12 +161,16 @@ class MessageActivity : AppCompatActivity() {
 
         Log.d(TAG, "hisID: $hisId hisImage: $hisImageUrl hisUsername: $hisUsername")
 
-        //if (chatId == null) CheckChat(hisId!!)
-
         sperimentalReadMessages(chatId!!)
         checkOnlineStatusAndUsername()
         getMynameAnImage()
         Log.e(TAG, "Chat id computed: ${computeChatId()}")
+
+        //Test
+        val TManager = LanguageManager(TranslateLanguage.ENGLISH)
+       // TManager.identifyLanguage("The pen is on the table") {}
+        TManager.translate("The pen is on the table") {}
+
     }
 
     private fun getMynameAnImage() {
@@ -209,39 +213,6 @@ class MessageActivity : AppCompatActivity() {
                     activityMessageBinding.hisImage = hisImageUrl
                 }
         } else activityMessageBinding.hisImage = hisImageUrl
-    }
-
-    /*private fun CheckChat(hisId: String) {
-        Log.d(TAG, "Check chat id: $hisId")
-        val databaseReference =
-            FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
-                .getReference("/chatlist").child(myId)
-        databaseReference.get().addOnSuccessListener {
-            chatId = searchInsideDataSnapshot(hisId, it)
-            if(chatId != null) sperimentalReadMessages(chatId!!)
-        }
-    }*/
-
-    /* private fun CheckChatToSend(hisId: String,message: String) {
-         Log.d(TAG, "Check chat id: $hisId")
-         val databaseReference =
-             FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
-                 .getReference("/chatlist").child(myId)
-         databaseReference.get().addOnSuccessListener {
-             chatId = searchInsideDataSnapshot(hisId, it)
-             sendMessage(message)
-         }
-     }*/
-
-    private fun searchInsideDataSnapshot(hisId: String, snapshot: DataSnapshot): String? {
-        snapshot.children.forEach {
-            if (it.child("member").value == hisId) {
-                Log.d(TAG, "Chat ID rilevato: ${it.key}")
-                chatId = it.key
-                return chatId.toString()
-            }
-        }
-        return null
     }
 
     private fun CreateChat(message: String) {
