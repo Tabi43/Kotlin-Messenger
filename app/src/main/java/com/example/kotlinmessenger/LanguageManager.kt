@@ -6,9 +6,9 @@ import com.google.mlkit.common.model.RemoteModelManager
 import com.google.mlkit.nl.languageid.LanguageIdentification
 import com.google.mlkit.nl.translate.*
 
-class LanguageManager(sourceLanguage: String) {
+class LanguageManager(sourceLanguage: String, targetLanguage: String) {
 
-    var foreignLanguage: String = ""
+    var foreignLanguage: String? = null
     var nativeLanguage: String? = null
     var modelAvailable: Boolean = false
     var translator: Translator? = null
@@ -16,6 +16,7 @@ class LanguageManager(sourceLanguage: String) {
 
     init {
         setSourceLanguage(sourceLanguage)
+        setTarghetLanguage(targetLanguage)
         createTranslator()
     }
 
@@ -43,20 +44,17 @@ class LanguageManager(sourceLanguage: String) {
         foreignLanguage = language
     }
 
+    fun setTarghetLanguage(language: String){
+        nativeLanguage = language
+    }
+
     fun createTranslator() {
-        Log.e(TAG, "String: $foreignLanguage")
         val options = TranslatorOptions.Builder()
-            .setSourceLanguage(foreignLanguage)
-            .setTargetLanguage(TranslateLanguage.ITALIAN)
+            .setSourceLanguage(foreignLanguage!!)
+            .setTargetLanguage(nativeLanguage!!)
             .build()
         translator = Translation.getClient(options)
-        RemoteModelManager.getInstance().getDownloadedModels(TranslateRemoteModel::class.java)
-            .addOnSuccessListener {
-                it.forEach {
-                    if (it.language == foreignLanguage) modelAvailable = true
-                    else checkConditions()
-                }
-            }
+        checkConditions()
     }
 
     fun checkConditions() {
@@ -66,15 +64,29 @@ class LanguageManager(sourceLanguage: String) {
             .addOnSuccessListener {
                 Log.i(TAG, "Model correctly downloaded")
                 modelAvailable = true
+                Log.d(TAG, "Translator: $modelAvailable")
             }
             .addOnFailureListener {
                 Log.e(TAG, "Error : model not correctly downloaded -> $it")
                 modelAvailable = false
+                Log.d(TAG, "Translator: $modelAvailable")
+            }
+    }
+
+    fun onReady(callback: () -> Unit){
+        val modelManager = RemoteModelManager.getInstance()
+        modelManager.getDownloadedModels(TranslateRemoteModel::class.java)
+            .addOnSuccessListener {
+                it.forEach {
+                    if(it.language == foreignLanguage) {
+                        modelAvailable = true
+                        callback()
+                    }
+                }
             }
     }
 
     fun translate(message: String, callback: (String?) -> Unit) {
-        Log.e(TAG, "dio $modelAvailable")
         if (!modelAvailable) {
             checkConditions()
             callback(null)

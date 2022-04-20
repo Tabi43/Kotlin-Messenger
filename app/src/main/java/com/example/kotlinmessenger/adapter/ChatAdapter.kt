@@ -94,14 +94,18 @@ class ChatAdapter(private val chatList: ArrayList<ChatModel>,private val noChatT
                 Log.d(TAG,"error: $error")
             }
         })
-
-        holder.chatItemLayoutBinding.container.setOnClickListener{
-            val intent = Intent(it.context, MessageActivity::class.java)
-            intent.putExtra("hisId", chatModel.hisID)
-            intent.putExtra("hisImage", chatModel.image)
-            intent.putExtra("hisUsername",chatModel.name)
-            it.context.startActivity(intent)
-        }
+        FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
+            .getReference("users").child(chatModel.hisID!!).child("language").get()
+            .addOnSuccessListener { hisLanguage ->
+                holder.chatItemLayoutBinding.container.setOnClickListener{
+                    val intent = Intent(it.context, MessageActivity::class.java)
+                    intent.putExtra("hisId", chatModel.hisID)
+                    intent.putExtra("hisImage", chatModel.image)
+                    intent.putExtra("hisUsername",chatModel.name)
+                    intent.putExtra("hisLanguage",hisLanguage.value.toString())
+                    it.context.startActivity(intent)
+                }
+            }
 
         holder.chatItemLayoutBinding.deleteChat.setOnClickListener {
             chatList.removeAt(position)

@@ -8,6 +8,7 @@ import android.widget.ImageView
 import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.RecyclerView
 import com.example.kotlinmessenger.BR
+import com.example.kotlinmessenger.LanguageManager
 import com.example.kotlinmessenger.MessageModel
 import com.example.kotlinmessenger.R
 import com.example.kotlinmessenger.databinding.IsWritingLayoutBinding
@@ -15,16 +16,17 @@ import com.example.kotlinmessenger.databinding.LeftItemLayoutBinding
 import com.example.kotlinmessenger.databinding.RightItemLayoutBinding
 import com.google.firebase.auth.FirebaseAuth
 
-class MessageAdapter(private val messageList: ArrayList<MessageModel>) :
+class MessageAdapter(
+    private val messageList: ArrayList<MessageModel>,
+    private val translator: LanguageManager
+) :
     RecyclerView.Adapter<MessageAdapter.ViewHolder>() {
 
     private val TAG = "MESSAGE ADAPTER"
+    private var original = true
 
     class ViewHolder(var viewDataBinding: ViewDataBinding) :
         RecyclerView.ViewHolder(viewDataBinding.root) {}
-
-    class LeftViewHolder(var leftItemLayoutBinding: LeftItemLayoutBinding):
-        RecyclerView.ViewHolder(leftItemLayoutBinding.root) {}
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         var viewDataBinding: ViewDataBinding? = null
@@ -52,7 +54,8 @@ class MessageAdapter(private val messageList: ArrayList<MessageModel>) :
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val messageModel = messageList[position]
         val myId = FirebaseAuth.getInstance().uid ?: ""
-        val viewType = if (messageModel.senderId == myId) 0
+        val viewType = if(messageModel.type == "IS_WRITING") 2
+        else if (messageModel.senderId == myId) 0
         else 1
         if (viewType == 0) {
             holder.viewDataBinding.setVariable(BR.message, messageModel)
@@ -60,8 +63,7 @@ class MessageAdapter(private val messageList: ArrayList<MessageModel>) :
         if (viewType == 1) {
             holder.viewDataBinding.setVariable(BR.message, messageModel)
             holder.itemView.findViewById<ImageView>(R.id.translateButton).setOnClickListener {
-                Log.i(TAG,"hey")
-                test(messageModel,holder)
+                flipTranslation(messageModel, holder)
             }
         }
     }
@@ -78,8 +80,17 @@ class MessageAdapter(private val messageList: ArrayList<MessageModel>) :
         else return 1
     }
 
-    fun test(model: MessageModel, holder: ViewHolder){
-        model.message = "BELANDI FUNZIONA !!!!"
-        holder.viewDataBinding.setVariable(BR.message,model)
+    fun flipTranslation(model: MessageModel, holder: ViewHolder) {
+        if (original) {
+            val modelOriginal = MessageModel(model.senderId,model.receiverId,model.translatedMessage,model.date,model.type)
+            holder.viewDataBinding.setVariable(BR.message, modelOriginal)
+            original = false
+        } else {
+            val modelTranlated = MessageModel(model.senderId,model.receiverId,model.message,model.date,model.type)
+            holder.viewDataBinding.setVariable(BR.message, modelTranlated)
+            original = true
+        }
     }
+
 }
+

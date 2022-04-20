@@ -1,6 +1,5 @@
 package com.example.kotlinmessenger.Fragment
 
-
 import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -19,7 +18,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
-
 
 class f_conversations : Fragment(R.layout.f_conversations) {
 

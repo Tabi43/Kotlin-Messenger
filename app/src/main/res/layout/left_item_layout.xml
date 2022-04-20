@@ -12,6 +12,7 @@
         <variable
             name="message"
             type="com.example.kotlinmessenger.MessageModel" />
+
     </data>
 
     <RelativeLayout

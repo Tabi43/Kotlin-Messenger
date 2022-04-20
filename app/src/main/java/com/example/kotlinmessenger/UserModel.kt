@@ -11,9 +11,9 @@ data class UserModel(
     val uid: String = "",
     val online: String = "offline",
     val typing: String = "false"
-
-
     ) {
+
+    var language: String = ""
 
     companion object {
 

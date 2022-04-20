@@ -1,6 +1,7 @@
 package com.example.kotlinmessenger
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.*
@@ -50,10 +51,18 @@ class MessageActivity : AppCompatActivity() {
     private var imageUris = ArrayList<String>()
     private var isWritingMessage: MessageModel? = null
 
+    //Language parameter
+    private var translator: LanguageManager? = null
+    private var hisLanguage = ""
+    private var myLanguage = ""
+
     override fun onCreate(savedInstanceState: Bundle?) {
         activityMessageBinding = ActivityMessageBinding.inflate(layoutInflater)
         super.onCreate(savedInstanceState)
         setContentView(activityMessageBinding.root)
+
+        var sharedPreferences = getSharedPreferences("preference", Context.MODE_PRIVATE)
+        myLanguage = sharedPreferences.getString("myLanguage","")!!
 
         appUtil = AppUtil()
         myId = appUtil.getUID()!!
@@ -62,12 +71,14 @@ class MessageActivity : AppCompatActivity() {
         hisId = intent.getStringExtra("hisId")
         hisImageUrl = intent.getStringExtra("hisImage")
         hisUsername = intent.getStringExtra("hisUsername")
+        hisLanguage = intent.getStringExtra("hisLanguage")!!
         chatId = computeChatId()
-        isWritingMessage =
-            MessageModel(hisId!!, myId, "...", System.currentTimeMillis().toString(), "IS_WRITING")
+
+        isWritingMessage = MessageModel(hisId!!, myId, "...", System.currentTimeMillis().toString(), "IS_WRITING")
 
         checkHisImage()
 
+        translator = LanguageManager(myLanguage,hisLanguage)
         activityMessageBinding.messageToolbar.username = hisUsername
 
         activityMessageBinding.btnSend.setOnClickListener {
@@ -76,7 +87,6 @@ class MessageActivity : AppCompatActivity() {
                 Toast.makeText(this, "Enter Message", Toast.LENGTH_SHORT).show()
             } else {
                 setNoWriting()
-                //CheckChatToSend(hisId!!,message)
                 sendMessage(message)
                 gettokenForNotification(message)
             }
@@ -161,16 +171,15 @@ class MessageActivity : AppCompatActivity() {
 
         Log.d(TAG, "hisID: $hisId hisImage: $hisImageUrl hisUsername: $hisUsername")
 
-        sperimentalReadMessages(chatId!!)
+        translator!!.onReady {
+            Log.d(TAG,"Translator (onReady call) -> ${translator!!.modelAvailable}")
+            sperimentalReadMessages(chatId!!)
+        }
+
         checkOnlineStatusAndUsername()
         getMynameAnImage()
+
         Log.e(TAG, "Chat id computed: ${computeChatId()}")
-
-        //Test
-        val TManager = LanguageManager(TranslateLanguage.ENGLISH)
-       // TManager.identifyLanguage("The pen is on the table") {}
-        TManager.translate("The pen is on the table") {}
-
     }
 
     private fun getMynameAnImage() {
@@ -215,6 +224,34 @@ class MessageActivity : AppCompatActivity() {
         } else activityMessageBinding.hisImage = hisImageUrl
     }
 
+    private fun checkHisLanguage(callback: (String) -> Unit){
+        if(hisLanguage == ""){
+            FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
+                .getReference("/users").child(hisId!!).child("language").get()
+                .addOnSuccessListener {
+                    hisLanguage = it.getValue().toString()
+                    callback(hisLanguage)
+                }
+                .addOnFailureListener {
+                    Log.e(TAG,"His language error query -> $it")
+                }
+        }
+    }
+
+    private fun checkMyLanguage(callback: () -> Unit){
+        if(myLanguage == ""){
+            FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
+                .getReference("/users").child(myId).child("language").get()
+                .addOnSuccessListener {
+                    myLanguage = it.getValue().toString()
+                    callback()
+                }
+                .addOnFailureListener {
+                    Log.e(TAG,"My language error query -> $it")
+                }
+        }
+    }
+
     private fun CreateChat(message: String) {
         Log.d(TAG, "Chat created: $message")
         var databaseReference =
@@ -242,7 +279,7 @@ class MessageActivity : AppCompatActivity() {
             CreateChat(message)
         } else {
             Log.d(TAG, "SEND OK")
-            var databaseReference =
+            val databaseChatReference =
                 FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
                     .getReference("/chat").child(chatId!!)
             val messageModel = MessageModel(
@@ -252,15 +289,20 @@ class MessageActivity : AppCompatActivity() {
                 type = "text",
                 date = System.currentTimeMillis().toString()
             )
-            databaseReference.push().setValue(messageModel)
+            translator!!.translate(message){
+                messageModel.translatedMessage = it!!
+                databaseChatReference.push().setValue(messageModel)
+            }
+            //30chars
             val Map: MutableMap<String, Any> = HashMap()
             FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
                 .getReference("chatlist").child(hisId!!).child(chatId!!).child("chatid").get()
                 .addOnSuccessListener {
                     if (it.exists()) {
-                        Map["lastMessage"] = message
+                        if(message.length > 29) Map["lastMessage"] = message.substring(0,25)+"..."
+                        else Map["lastMessage"] = message
                         Map["date"] = System.currentTimeMillis()
-                        databaseReference =
+                        var databaseReference =
                             FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
                                 .getReference("/chatlist").child(myId).child(chatId!!)
                         databaseReference.updateChildren(Map)
@@ -269,11 +311,12 @@ class MessageActivity : AppCompatActivity() {
                                 .getReference("/chatlist").child(hisId!!).child(chatId!!)
                         databaseReference.updateChildren(Map)
                     } else {
-                        Map["lastMessage"] = message
+                        if(message.length > 29) Map["lastMessage"] = message.substring(0,25)+"..."
+                        else Map["lastMessage"] = message
                         Map["date"] = System.currentTimeMillis()
                         Map["chatId"] = chatId!!
                         Map["member"] = hisId!!
-                        databaseReference =
+                        var databaseReference =
                             FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
                                 .getReference("/chatlist").child(myId).child(chatId!!)
                         databaseReference.updateChildren(Map)
@@ -285,9 +328,10 @@ class MessageActivity : AppCompatActivity() {
                     }
                 }
                 .addOnFailureListener {
-                    Map["lastMessage"] = message
+                    if(message.length > 29) Map["lastMessage"] = message.substring(0,25)+"..."
+                    else Map["lastMessage"] = message
                     Map["date"] = System.currentTimeMillis()
-                    databaseReference =
+                    var databaseReference =
                         FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
                             .getReference("/chatlist").child(myId).child(chatId!!)
                     databaseReference.updateChildren(Map)
@@ -310,12 +354,16 @@ class MessageActivity : AppCompatActivity() {
                     val message = it.child("message").value.toString()
                     val date = it.child("date").value.toString()
                     val type = it.child("type").value.toString()
-                    messageList.add(MessageModel(senderId, reciverId, message, date, type))
+                    val tranlastedMessage = it.child("translatedMessage").value.toString()
+                    var model = MessageModel(senderId, reciverId, message, date, type)
+                    model.translatedMessage = tranlastedMessage
+                    messageList.add(model)
                 }
                 activityMessageBinding.messageRecyclerView.apply {
                     layoutManager = LinearLayoutManager(context)
                     setHasFixedSize(true)
-                    messageAdapter = MessageAdapter(messageList)
+                    Log.d(TAG,"Translator: ${translator!!.modelAvailable}")
+                    messageAdapter = MessageAdapter(messageList,translator!!)
                     adapter = messageAdapter
                     activityMessageBinding.messageRecyclerView.smoothScrollToPosition(messageList.size)
                 }
@@ -341,7 +389,10 @@ class MessageActivity : AppCompatActivity() {
                     val message = lastMessageChildren.child("message").value.toString()
                     val date = lastMessageChildren.child("date").value.toString()
                     val type = lastMessageChildren.child("type").value.toString()
-                    messageList.add(MessageModel(senderId, reciverId, message, date, type))
+                    val tranlastedMessage = lastMessageChildren.child("translatedMessage").value.toString()
+                    var model = MessageModel(senderId, reciverId, message, date, type)
+                    model.translatedMessage = tranlastedMessage
+                    messageList.add(model)
                     activityMessageBinding.messageRecyclerView.adapter!!.notifyDataSetChanged()
                     activityMessageBinding.messageRecyclerView.smoothScrollToPosition(messageList.size)
                 } else {

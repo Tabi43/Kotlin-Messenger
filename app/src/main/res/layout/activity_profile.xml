@@ -102,7 +102,7 @@
         android:layout_marginTop="15dp"
         android:background="@drawable/button_background"
         android:backgroundTint="@color/colorPrimary"
-        android:text="Done"
+        android:text="Save"
         android:textColor="@color/white"
         android:textSize="20dp"
         android:textStyle="bold" />

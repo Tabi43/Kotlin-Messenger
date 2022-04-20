@@ -12,6 +12,7 @@ import com.example.kotlinmessenger.MessageActivity
 import com.example.kotlinmessenger.Constants.AppConstants
 import com.example.kotlinmessenger.UserModel
 import com.example.kotlinmessenger.databinding.ContactItemLayoutBinding
+import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
 import kotlin.collections.ArrayList
 
@@ -42,13 +43,18 @@ class ContactAdapter(private var appContacts: ArrayList<UserModel>) :
                 }
         }else holder.contactItemLayoutBinding.userModel = userModel
 
-        holder.itemView.setOnClickListener {
-            val intent = Intent(it.context, MessageActivity::class.java)
-            intent.putExtra("hisId", userModel.uid)
-            intent.putExtra("hisImage", userModel.image)
-            intent.putExtra("hisUsername",userModel.name)
-            it.context.startActivity(intent)
-        }
+        FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
+            .getReference("users").child(userModel.uid).child("language").get()
+            .addOnSuccessListener { hisLanguage ->
+                holder.itemView.setOnClickListener {
+                    val intent = Intent(it.context, MessageActivity::class.java)
+                    intent.putExtra("hisId", userModel.uid)
+                    intent.putExtra("hisImage", userModel.image)
+                    intent.putExtra("hisUsername",userModel.name)
+                    intent.putExtra("hisLanguage",hisLanguage.value.toString())
+                    it.context.startActivity(intent)
+                }
+            }
     }
 
     override fun getItemCount(): Int {
@@ -61,34 +67,6 @@ class ContactAdapter(private var appContacts: ArrayList<UserModel>) :
 
     override fun getFilter(): Filter? {
         return null
-    /* return object : Filter() {
-            override fun performFiltering(constraint: CharSequence?): FilterResults {
-                val searchContent = constraint.toString()
-                if (searchContent.isEmpty())
-                    allContact = appContacts
-                else {
-
-                    val filterContact = ArrayList<UserModel>()
-                    for (userModel in appContacts) {
-
-                        if (userModel.name.toLowerCase(Locale.ROOT).trim()
-                                .contains(searchContent.toLowerCase(Locale.ROOT).trim())
-                        )
-                            filterContact.add(userModel)
-                    }
-                    allContact = filterContact
-                }
-
-                val filterResults = FilterResults()
-                filterResults.values = allContact
-                return filterResults
-            }
-
-            override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
-                allContact = results?.values as ArrayList<UserModel>
-                notifyDataSetChanged()
-            }
-        }*/
     }
 
 }

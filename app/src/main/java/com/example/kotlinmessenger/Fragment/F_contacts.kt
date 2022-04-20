@@ -73,6 +73,7 @@ class f_contacts : Fragment(R.layout.f_contacts) {
                     val status = it.child("status").value.toString()
                     val id = it.child("uid").value.toString()
                     val image = it.child("image").value.toString()
+                    val language = it.child("language").value.toString()
                     if (username.contains(key,true) && uid != id) {
                         //Log.d("url ","aggiunto:${it} id:${id}" )
                         Log.d("url ", "aggiunto url foto: per id:${id}")

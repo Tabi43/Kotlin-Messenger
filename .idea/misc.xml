@@ -25,7 +25,7 @@
         <entry key="..\:/Users/Tabit/AndroidStudioProjects/Kotlin-Messenger/app/src/main/res/layout/activity_message.xml" value="0.5" />
         <entry key="..\:/Users/Tabit/AndroidStudioProjects/Kotlin-Messenger/app/src/main/res/layout/activity_profile.xml" value="0.5744791666666667" />
         <entry key="..\:/Users/Tabit/AndroidStudioProjects/Kotlin-Messenger/app/src/main/res/layout/activity_splash_screen.xml" value="0.5744791666666667" />
-        <entry key="..\:/Users/Tabit/AndroidStudioProjects/Kotlin-Messenger/app/src/main/res/layout/chat_item_layout.xml" value="0.1" />
+        <entry key="..\:/Users/Tabit/AndroidStudioProjects/Kotlin-Messenger/app/src/main/res/layout/chat_item_layout.xml" value="0.5" />
         <entry key="..\:/Users/Tabit/AndroidStudioProjects/Kotlin-Messenger/app/src/main/res/layout/chat_item_layout2.xml" value="0.5708333333333333" />
         <entry key="..\:/Users/Tabit/AndroidStudioProjects/Kotlin-Messenger/app/src/main/res/layout/contact_element_v2.xml" value="0.5744791666666667" />
         <entry key="..\:/Users/Tabit/AndroidStudioProjects/Kotlin-Messenger/app/src/main/res/layout/contact_item_layout.xml" value="0.5" />
@@ -33,7 +33,7 @@
         <entry key="..\:/Users/Tabit/AndroidStudioProjects/Kotlin-Messenger/app/src/main/res/layout/f_conversations.xml" value="0.1" />
         <entry key="..\:/Users/Tabit/AndroidStudioProjects/Kotlin-Messenger/app/src/main/res/layout/f_login.xml" value="0.5" />
         <entry key="..\:/Users/Tabit/AndroidStudioProjects/Kotlin-Messenger/app/src/main/res/layout/f_register.xml" value="0.5656410256410257" />
-        <entry key="..\:/Users/Tabit/AndroidStudioProjects/Kotlin-Messenger/app/src/main/res/layout/f_settings.xml" value="0.39537037037037037" />
+        <entry key="..\:/Users/Tabit/AndroidStudioProjects/Kotlin-Messenger/app/src/main/res/layout/f_settings.xml" value="0.5" />
         <entry key="..\:/Users/Tabit/AndroidStudioProjects/Kotlin-Messenger/app/src/main/res/layout/is_writing_layout.xml" value="0.5744791666666667" />
         <entry key="..\:/Users/Tabit/AndroidStudioProjects/Kotlin-Messenger/app/src/main/res/layout/left_item_layout.xml" value="0.5" />
         <entry key="..\:/Users/Tabit/AndroidStudioProjects/Kotlin-Messenger/app/src/main/res/layout/message_toolbar.xml" value="0.5" />
