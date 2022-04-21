@@ -363,7 +363,7 @@ class MessageActivity : AppCompatActivity() {
                     layoutManager = LinearLayoutManager(context)
                     setHasFixedSize(true)
                     Log.d(TAG,"Translator: ${translator!!.modelAvailable}")
-                    messageAdapter = MessageAdapter(messageList,translator!!)
+                    messageAdapter = MessageAdapter(messageList,translator!!,context)
                     adapter = messageAdapter
                     activityMessageBinding.messageRecyclerView.smoothScrollToPosition(messageList.size)
                 }

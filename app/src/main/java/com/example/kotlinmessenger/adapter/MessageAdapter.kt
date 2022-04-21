@@ -1,6 +1,7 @@
 package com.example.kotlinmessenger.adapter
 
 
+import android.content.Context
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -18,12 +19,15 @@ import com.google.firebase.auth.FirebaseAuth
 
 class MessageAdapter(
     private val messageList: ArrayList<MessageModel>,
-    private val translator: LanguageManager
+    private val translator: LanguageManager,
+    private val activity: Context
 ) :
     RecyclerView.Adapter<MessageAdapter.ViewHolder>() {
 
     private val TAG = "MESSAGE ADAPTER"
     private var original = true
+    var sharedPreferences = activity.getSharedPreferences("preference", Context.MODE_PRIVATE)
+    val autoTranslation = sharedPreferences.getBoolean("autoTranslation",false)
 
     class ViewHolder(var viewDataBinding: ViewDataBinding) :
         RecyclerView.ViewHolder(viewDataBinding.root) {}
@@ -62,6 +66,11 @@ class MessageAdapter(
         }
         if (viewType == 1) {
             holder.viewDataBinding.setVariable(BR.message, messageModel)
+            if(autoTranslation) {
+                val modelOriginal = MessageModel(messageModel.senderId,messageModel.receiverId,messageModel.translatedMessage,messageModel.date,messageModel.type)
+                holder.viewDataBinding.setVariable(BR.message, modelOriginal)
+                original = false
+            }
             holder.itemView.findViewById<ImageView>(R.id.translateButton).setOnClickListener {
                 flipTranslation(messageModel, holder)
             }

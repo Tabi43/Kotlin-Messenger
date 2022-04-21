@@ -1,36 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+        <variable
+            name="userImage"
+            type="String" />
+    </data>
+
+<LinearLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
     <RelativeLayout
+        android:id="@+id/userBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="5dp">
 
         <TextView
-            android:id="@+id/profileTV"
+            android:id="@+id/settingsTV"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Profile" />
+            android:text="Settings"
+            android:textColor="@color/cardview_dark_background"
+            android:textSize="20dp"
+            android:layout_centerHorizontal="true"
+            android:textStyle="bold" />
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/imgUser"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_below="@id/profileTV"
+            imageUrl="@{userImage}"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_below="@id/settingsTV"
             android:src="@drawable/ic_launcher_background" />
 
         <TextView
             android:id="@+id/usernameTV"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/profileTV"
+            android:layout_below="@id/settingsTV"
             android:layout_marginLeft="5dp"
-            android:layout_marginTop="5dp"
+            android:layout_marginTop="9dp"
             android:layout_toRightOf="@id/imgUser"
-            android:text="Username" />
+            android:text="Username"
+            android:textColor="@color/colorPrimary"
+            android:textSize="20dp"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/statusTV"
@@ -39,7 +56,22 @@
             android:layout_below="@id/usernameTV"
             android:layout_marginLeft="5dp"
             android:layout_toRightOf="@id/imgUser"
-            android:text="Status" />
+            android:text="Status"
+            android:textColor="@color/textColor"
+            android:textSize="15dp"
+            android:textStyle="bold"/>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginTop="37dp"
+            android:layout_marginRight="10dp"
+            android:scaleX="1.2"
+            android:scaleY="1.2"
+            android:src="@drawable/ic_baseline_edit_24" />
 
     </RelativeLayout>
 
@@ -52,7 +84,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
-            android:text="Preference" />
+            android:text="Preference"
+            android:textColor="@color/cardview_dark_background"
+            android:textSize="18dp"
+            android:textStyle="bold"/>
 
         <TextView
             android:id="@+id/traductionTV"
@@ -61,7 +96,10 @@
             android:layout_below="@id/preferenceTV"
             android:layout_centerHorizontal="false"
             android:layout_marginLeft="5dp"
-            android:text="Translation" />
+            android:text="Translation"
+            android:textColor="@color/cardview_dark_background"
+            android:textSize="15dp"
+            android:textStyle="bold"/>
 
         <RelativeLayout
             android:id="@+id/autoTranslationBox"
@@ -75,7 +113,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:text="Auto translation" />
+                android:text="Auto translation"
+                android:textColor="@color/cardview_dark_background"
+                android:textSize="14dp"
+                android:textStyle="bold"/>
 
             <CheckBox
                 android:id="@+id/autoTranslationCheck"
@@ -92,7 +133,10 @@
                 android:layout_centerVertical="true"
                 android:layout_toRightOf="@id/autoTranslationCheck"
                 android:text="Your language: "
-                android:layout_marginLeft="10dp"/>
+                android:layout_marginLeft="10dp"
+                android:textColor="@color/cardview_dark_background"
+                android:textSize="14dp"
+                android:textStyle="bold"/>
 
             <Spinner
                 android:id="@+id/languageSpinner"
@@ -100,7 +144,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
-                android:layout_toRightOf="@id/languageTV" />
+                android:layout_toRightOf="@id/languageTV"/>
 
         </RelativeLayout>
 
@@ -109,3 +153,4 @@
 
 
 </LinearLayout>
+</layout>
