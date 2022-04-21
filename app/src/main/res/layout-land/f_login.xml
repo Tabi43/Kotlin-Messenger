@@ -16,17 +16,6 @@
             android:orientation="horizontal"
             android:gravity="end">
 
-            <Button
-                android:id="@+id/signUpButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Sign Up"
-                android:layout_marginRight="5dp"
-                android:layout_marginTop="5dp"
-                android:textSize="15dp"
-                android:backgroundTint="#EFFFFD"
-                android:textColor="@color/black"
-                android:textAllCaps="false"/>
 
         </LinearLayout>
 
@@ -53,7 +42,7 @@
                 android:layout_width="250dp"
                 android:layout_height="wrap_content"
                 android:background="#5D8BF4"
-                android:hint="Mail"
+                android:hint="@string/mail"
                 android:imeOptions="flagNoFullscreen"
                 android:inputType="text"
                 android:minHeight="40dp"
@@ -70,7 +59,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
                 android:background="#5D8BF4"
-                android:hint="Password"
+                android:hint="@string/password"
                 android:imeOptions="flagNoFullscreen"
                 android:inputType="textPassword"
                 android:minHeight="40dp"
@@ -87,9 +76,17 @@
                 android:layout_marginHorizontal="30dp"
                 android:layout_marginTop="20dp"
                 android:backgroundTint="#EFFFFD"
-                android:text="Login"
+                android:text="@string/login"
                 android:textColor="@color/black"
                 android:id="@+id/loginButton"/>
+            <TextView
+                android:id="@+id/signUpButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/sign_up"
+                android:layout_marginTop="5dp"
+                android:textColor="@color/white"
+                android:textSize="16sp"/>
 
         </LinearLayout>
         </ScrollView>

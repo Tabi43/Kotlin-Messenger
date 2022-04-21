@@ -4,7 +4,9 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.ActivityInfo
+import android.content.res.Configuration
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -28,6 +30,7 @@ class f_settings : Fragment(R.layout.f_settings) {
     lateinit var binding: FSettingsBinding
     val language = languageCompanion()
     var userSnapshot: DataSnapshot? = null
+    private var TAG="f_settings"
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -40,7 +43,6 @@ class f_settings : Fragment(R.layout.f_settings) {
         val sharedPreferences = activity!!.getSharedPreferences("preference", Context.MODE_PRIVATE)
         val autoTranslation = sharedPreferences.getBoolean("autoTranslation", false)
         val edit = sharedPreferences.edit()
-
         getActivity()?.getWindow()
             ?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
 
@@ -51,6 +53,7 @@ class f_settings : Fragment(R.layout.f_settings) {
             androidx.appcompat.R.layout.support_simple_spinner_dropdown_item,
             language.supported_languages
         )
+
         ad.setDropDownViewResource(androidx.appcompat.R.layout.support_simple_spinner_dropdown_item)
         binding.languageSpinner.adapter = ad
 

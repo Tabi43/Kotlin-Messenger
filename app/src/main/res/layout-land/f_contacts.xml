@@ -30,7 +30,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="150dp"
                     app:iconifiedByDefault="false"
-                    app:queryHint="Search Friend" />
+                    app:queryHint="@string/search_friend" />
 
             </LinearLayout>
 

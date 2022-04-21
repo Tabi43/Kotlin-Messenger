@@ -70,7 +70,7 @@
                     android:layout_marginStart="3dp"
                     android:layout_marginEnd="3dp"
                     android:background="@drawable/message_edittext_background"
-                    android:hint="Write message..."
+                    android:hint="@string/write_message"
                     android:inputType="textMultiLine"
                     android:padding="8dp"
                     android:scrollbars="vertical"

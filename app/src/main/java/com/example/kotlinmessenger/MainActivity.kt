@@ -15,10 +15,11 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+        if (savedInstanceState == null) {
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.fragmentContainer, f_login())
+                .commit()
+        }
 
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.fragmentContainer, f_login())
-            .commit()
     }
-
 }
