@@ -128,7 +128,6 @@ class f_login : Fragment(R.layout.f_login) {
                     }
                 }
                 bindUrlToUSer(FirebaseAuth.getInstance().uid!!)
-                Toast.makeText(activity, "Loggato con successo $email", Toast.LENGTH_SHORT).show()
                 startActivity(Intent(activity, DashBoard::class.java))
             }
             .addOnFailureListener {

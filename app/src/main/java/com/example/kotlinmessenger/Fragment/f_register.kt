@@ -39,7 +39,7 @@ class f_register : Fragment(R.layout.f_register) {
         binding = FRegisterBinding.inflate(inflater, container, false)
 
         binding.confirmButton.setOnClickListener {
-            //TODO: Funzione per il register fragment
+
         }
         appUtil = AppUtil()
         binding.loginreturnButton.setOnClickListener {
@@ -82,10 +82,9 @@ class f_register : Fragment(R.layout.f_register) {
                 saveUserToFirebaseDatabase()
             }
             .addOnFailureListener {
-                Toast.makeText(activity, "Failed to create user: ${it.message}", Toast.LENGTH_LONG)
+                Toast.makeText(activity, "Failed to register -> ${it.message}", Toast.LENGTH_LONG)
                     .show()
                 //info visibili su logcat
-                Log.d("Main Activity", "sei un coglione")
             }
     }//fine performRegistration
 
@@ -121,7 +120,7 @@ class f_register : Fragment(R.layout.f_register) {
                 }
             }
             .addOnFailureListener {
-                Toast.makeText(activity, "impossibile salvare nel db", Toast.LENGTH_LONG).show()
+                Toast.makeText(activity, "Is impossible to update your data", Toast.LENGTH_LONG).show()
                 Log.d(TAG, "Utente NON salvato nel db")
             }
     }
@@ -145,7 +144,7 @@ class f_register : Fragment(R.layout.f_register) {
                     }
             }
             .addOnFailureListener {
-                Toast.makeText(activity, "Image loading failed", Toast.LENGTH_SHORT).show()
+                Toast.makeText(activity, "Default avatar image loading failed", Toast.LENGTH_SHORT).show()
             }
     }
 
