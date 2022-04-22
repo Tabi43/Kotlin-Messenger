@@ -9,20 +9,19 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
-import com.example.kotlinmessenger.AppUtil
+import com.example.kotlinmessenger.*
 import com.example.kotlinmessenger.Constants.AppConstants
-import com.example.kotlinmessenger.DashBoard
-import com.example.kotlinmessenger.R
 import com.example.kotlinmessenger.databinding.FRegisterBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
 import java.io.File
-import com.example.kotlinmessenger.UserModel
 import com.google.firebase.messaging.FirebaseMessaging
+import java.util.*
 
 
 class f_register : Fragment(R.layout.f_register) {
@@ -37,11 +36,12 @@ class f_register : Fragment(R.layout.f_register) {
         savedInstanceState: Bundle?
     ): View {
         binding = FRegisterBinding.inflate(inflater, container, false)
+        val language = languageCompanion()
 
         binding.confirmButton.setOnClickListener {
 
         }
-        appUtil = AppUtil()
+        appUtil = AppUtil(requireActivity())
         binding.loginreturnButton.setOnClickListener {
             val fragment = f_login()
             val transaction = fragmentManager?.beginTransaction()
@@ -50,6 +50,20 @@ class f_register : Fragment(R.layout.f_register) {
         binding.confirmButton.setOnClickListener {
             performRegistration()
         }
+
+        val ad: ArrayAdapter<*> = ArrayAdapter<String?>(
+            requireActivity(),
+            R.layout.spinner_item,
+            language.supported_languages
+        )
+
+        ad.setDropDownViewResource(androidx.appcompat.R.layout.support_simple_spinner_dropdown_item)
+        binding.languageSpinner!!.adapter = ad
+
+        val systemLanguage = Locale.getDefault().getLanguage()
+        binding.languageSpinner!!.setSelection(
+            language.getPosition(systemLanguage)
+        )
 
         return binding.root
     }
@@ -60,12 +74,12 @@ class f_register : Fragment(R.layout.f_register) {
         var confirm_password = binding.confirmPasswordET.text.toString()
 
         if (email.isEmpty() || password.isEmpty()) {
-            Toast.makeText(activity, "Please fill out the fields", Toast.LENGTH_LONG).show()
+            Toast.makeText(activity, getString(R.string.text_toast1), Toast.LENGTH_LONG).show()
             return
         }
         Log.d("Main Activity", "$password :check $confirm_password")
         if (password != confirm_password) {
-            Toast.makeText(activity, "Check your password", Toast.LENGTH_LONG).show()
+            Toast.makeText(activity, getString(R.string.text_toast2), Toast.LENGTH_LONG).show()
             return
         }
 
@@ -82,8 +96,6 @@ class f_register : Fragment(R.layout.f_register) {
                 saveUserToFirebaseDatabase()
             }
             .addOnFailureListener {
-                Toast.makeText(activity, "Failed to register -> ${it.message}", Toast.LENGTH_LONG)
-                    .show()
                 //info visibili su logcat
             }
     }//fine performRegistration
@@ -120,7 +132,7 @@ class f_register : Fragment(R.layout.f_register) {
                 }
             }
             .addOnFailureListener {
-                Toast.makeText(activity, "Is impossible to update your data", Toast.LENGTH_LONG).show()
+                Toast.makeText(activity, getString(R.string.text_toast3), Toast.LENGTH_LONG).show()
                 Log.d(TAG, "Utente NON salvato nel db")
             }
     }
@@ -135,16 +147,11 @@ class f_register : Fragment(R.layout.f_register) {
                 val url = localFile.toUri()
                 storageReference!!.child(AppConstants.PATH + uid).putFile(url!!)
                     .addOnSuccessListener {
-                        Toast.makeText(
-                            activity,
-                            "Default avatar loaded and saved",
-                            Toast.LENGTH_SHORT
-                        ).show()
                         bindUrlToUSer(uid)
                     }
             }
             .addOnFailureListener {
-                Toast.makeText(activity, "Default avatar image loading failed", Toast.LENGTH_SHORT).show()
+
             }
     }
 

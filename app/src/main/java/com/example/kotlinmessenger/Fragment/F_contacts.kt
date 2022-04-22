@@ -64,7 +64,7 @@ class f_contacts : Fragment(R.layout.f_contacts) {
                 .getReference("/users")
         ref.get()
             .addOnFailureListener() {
-                Toast.makeText(activity, "Failed to search users", Toast.LENGTH_SHORT).show()
+                Toast.makeText(activity, getString(R.string.search_user_error), Toast.LENGTH_SHORT).show()
             }
             .addOnSuccessListener {
                 Log.d("Search", "GET: ${it}")
@@ -95,7 +95,7 @@ class f_contacts : Fragment(R.layout.f_contacts) {
                 .getReference("/users")
         ref.get()
             .addOnFailureListener() {
-                Toast.makeText(activity, "Failed to search users", Toast.LENGTH_SHORT).show()
+                Toast.makeText(activity, getString(R.string.search_user_error), Toast.LENGTH_SHORT).show()
             }
             .addOnSuccessListener {
                 Log.d("Search", "GET: ${it}")

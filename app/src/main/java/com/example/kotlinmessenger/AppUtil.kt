@@ -1,10 +1,12 @@
 package com.example.kotlinmessenger
 
+import android.content.Context
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import android.util.Log
+import kotlin.coroutines.coroutineContext
 
-class AppUtil {
+class AppUtil(val context: Context) {
 
     companion object {
 
@@ -36,25 +38,25 @@ class AppUtil {
 
         return when {
             diff < MINUTE_MILLIS -> {
-                "just now"
+                " "+context.getString(R.string.just_now)
             }
             diff < 2 * MINUTE_MILLIS -> {
-                "a minute ago"
+                " "+context.getString(R.string.a_minute_ago)
             }
             diff < 50 * MINUTE_MILLIS -> {
-                (diff / MINUTE_MILLIS).toString() + " minutes ago"
+                (diff / MINUTE_MILLIS).toString() + " "+context.getString(R.string.minutes_ago)
             }
             diff < 90 * MINUTE_MILLIS -> {
-                "an hour ago"
+                " "+context.getString(R.string.an_hour_ago)
             }
             diff < 24 * HOUR_MILLIS -> {
-                (diff / HOUR_MILLIS).toString() + " hours ago"
+                (diff / HOUR_MILLIS).toString() + " "+context.getString(R.string.hours_ago)
             }
             diff < 48 * HOUR_MILLIS -> {
-                "yesterday"
+                " "+context.getString(R.string.yesterday)
             }
             else -> {
-                (diff / DAY_MILLIS).toString() + " days ago"
+                (diff / DAY_MILLIS).toString() + " "+context.getString(R.string.days_ago)
             }
         }
     }

@@ -1,5 +1,6 @@
 package com.example.kotlinmessenger.adapter
 
+import android.content.Context
 import android.content.Intent
 import android.util.Log
 import android.view.LayoutInflater
@@ -22,7 +23,7 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.storage.FirebaseStorage
 
 
-class ChatAdapter(private val chatList: ArrayList<ChatModel>,private val noChatTV: TextView) :
+class ChatAdapter(private val chatList: ArrayList<ChatModel>,private val noChatTV: TextView, private val context: Context) :
         RecyclerView.Adapter<ChatAdapter.ViewHolder>() {
 
     private val TAG = "CHAT ADAPTER"
@@ -36,7 +37,7 @@ class ChatAdapter(private val chatList: ArrayList<ChatModel>,private val noChatT
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val util = AppUtil()
+        val util = AppUtil(context)
         val uid = FirebaseAuth.getInstance().uid ?: ""
         val chatModel = chatList[position]
         val rawDate = chatModel.date

@@ -56,7 +56,7 @@ class f_login : Fragment(R.layout.f_login) {
         val password = binding.passwordET.text.toString()
 
         if (email.isEmpty() || password.isEmpty()) {
-            Toast.makeText(activity, "Email or Password fields are required", Toast.LENGTH_LONG)
+            Toast.makeText(activity, getString(R.string.login_error), Toast.LENGTH_LONG)
                 .show()
             return
         }
@@ -104,7 +104,7 @@ class f_login : Fragment(R.layout.f_login) {
         val password = binding.passwordET.text.toString()
 
         if (email.isEmpty() || password.isEmpty()) {
-            Toast.makeText(activity, "Email or Password fields are required", Toast.LENGTH_LONG)
+            Toast.makeText(activity, getString(R.string.login_error), Toast.LENGTH_LONG)
                 .show()
             return
         }

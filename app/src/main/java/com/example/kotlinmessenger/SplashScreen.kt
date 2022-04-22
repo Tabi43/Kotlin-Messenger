@@ -29,7 +29,7 @@ class SplashScreen : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash_screen)
         firebaseAuth = FirebaseAuth.getInstance()
-        appUtil = AppUtil()
+        appUtil = AppUtil(this)
         Log.d(TAG, "${firebaseAuth!!.currentUser}")
 
         Handler().postDelayed({

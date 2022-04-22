@@ -38,7 +38,6 @@ class SendmediaService : Service() {
     private var myID: String? = null
     private var hisImage: String? = null
     private var myName: String? = null
-    private val appUtil = AppUtil()
     private var images: ArrayList<String>? = null
     private val TAG = "SEND MEDIA SERVICE"
 
@@ -138,7 +137,7 @@ class SendmediaService : Service() {
                     if (uri.isSuccessful) {
                         val path = uri.result.toString()
                         val messageModel = MessageModel(
-                            appUtil.getUID()!!,
+                            FirebaseAuth.getInstance().uid!!,
                             hisID!!,
                             path,
                             System.currentTimeMillis().toString(),

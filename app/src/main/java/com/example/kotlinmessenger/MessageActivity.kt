@@ -64,7 +64,7 @@ class MessageActivity : AppCompatActivity() {
         var sharedPreferences = getSharedPreferences("preference", Context.MODE_PRIVATE)
         myLanguage = sharedPreferences.getString("myLanguage","")!!
 
-        appUtil = AppUtil()
+        appUtil = AppUtil(this)
         myId = appUtil.getUID()!!
         activityMessageBinding.activity = this
 
@@ -84,7 +84,7 @@ class MessageActivity : AppCompatActivity() {
         activityMessageBinding.btnSend.setOnClickListener {
             val message: String = activityMessageBinding.msgText.text.toString()
             if (message.isEmpty()) {
-                Toast.makeText(this, "Enter Message", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.enter_message), Toast.LENGTH_SHORT).show()
             } else {
                 setNoWriting()
                 sendMessage(message)
@@ -518,6 +518,8 @@ class MessageActivity : AppCompatActivity() {
                 data.put("hisImage", myImageUrl)
                 data.put("message", message)
                 data.put("chatId", chatId)
+                data.put("myLanguage",myLanguage)
+                data.put("hisLanguage",hisLanguage)
                 to.put("to", token)
                 to.put("data", data)
 
@@ -616,7 +618,7 @@ class MessageActivity : AppCompatActivity() {
                 } else {
                     Toast.makeText(
                         this@MessageActivity,
-                        "Approve permissions to select images",
+                        getString(R.string.text_toast0),
                         Toast.LENGTH_LONG
                     ).show()
                 }

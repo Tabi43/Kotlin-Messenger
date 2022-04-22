@@ -19,12 +19,12 @@ import com.google.firebase.messaging.RemoteMessage
 import java.util.*
 import kotlin.collections.HashMap
 import com.example.kotlinmessenger.UserModel
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.FirebaseStorage
 
 
 class FirebaseNotificationsr:FirebaseMessagingService() {
 
-    private val apputil=AppUtil()
     private val TAG = "FB NOTIFICATION SERVICE"
 
     override fun onNewToken(token: String) {
@@ -45,21 +45,24 @@ class FirebaseNotificationsr:FirebaseMessagingService() {
             val hisId = map["hisId"]
             val hisImage = map["hisImage"]
             val chatId = map["chatId"]
+            val myLanguage = map["hisLanguage"]
+            val hisLanguage = map["myLanguage"]
             Log.e(TAG,"Notify from $hisId title: $title message: $message chatId: $chatId")
             if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O)
-                createOreonotification(title!!, message!!, hisId!!, chatId!!,hisImage!!)
-            else createnormalnotification(title!!, message!!, hisId!!, chatId!!,hisImage!!)
+                createOreonotification(title!!, message!!, hisId!!, chatId!!,hisImage!!,myLanguage!!,hisLanguage!!)
+            else createnormalnotification(title!!, message!!, hisId!!, chatId!!,hisImage!!,myLanguage!!,hisLanguage!!)
         }
     }
 
     fun updateToken(token:String) {
-        val databaseReference = FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app").getReference("users").child(apputil.getUID()!!)
+        val databaseReference = FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app").getReference("users").child(
+            FirebaseAuth.getInstance().uid!!)
         val map:MutableMap<String, Any> = HashMap()
         map["token"]=token
         databaseReference.updateChildren(map)
     }
 
-    fun createnormalnotification(title:String, message:String, hisId:String, chatId:String, hisImage: String) {
+    fun createnormalnotification(title:String, message:String, hisId:String, chatId:String, hisImage: String, myLanguage: String,hisLanguage: String) {
         val uri=RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
         val builder=NotificationCompat.Builder(this, AppConstants.CHANNEL_ID)
         builder.setContentTitle(title)
@@ -73,6 +76,8 @@ class FirebaseNotificationsr:FirebaseMessagingService() {
         intent.putExtra("hisId", hisId)
         intent.putExtra("chatId", chatId)
         intent.putExtra("hisImage", hisImage)
+        intent.putExtra("myLanguage",myLanguage)
+        intent.putExtra("hisLanguage",hisLanguage)
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
         val pendingIntent=PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE)
         builder.setContentIntent(pendingIntent)
@@ -81,7 +86,7 @@ class FirebaseNotificationsr:FirebaseMessagingService() {
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun createOreonotification(title:String, message:String, hisId:String, chatId:String,hisImage: String) {
+    fun createOreonotification(title:String, message:String, hisId:String, chatId:String,hisImage: String,myLanguage: String,hisLanguage: String) {
         val channel = NotificationChannel(
             AppConstants.CHANNEL_ID,
             "Message",
@@ -98,6 +103,7 @@ class FirebaseNotificationsr:FirebaseMessagingService() {
         intent.putExtra("hisId", hisId)
         intent.putExtra("chatId", chatId)
         intent.putExtra("hisImage", hisImage)
+
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
 
         val pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE)

@@ -11,8 +11,8 @@
     <string name="status">Status</string>
     <string name="basic_status">Hey There!</string>
     <string name="search_friend">Search Friend</string>
-    <string name="mail">Mail</string>
-    <string name="password">Password</string>
+    <string name="mail" translatable="false">Mail</string>
+    <string name="password" translatable="false">Password</string>
     <string name="login">Login</string>
     <string name="login_error">Email or Password fields are required</string>
     <string name="confirm_password">Confirm Password</string>
@@ -27,5 +27,12 @@
     <string name="save">Save</string>
     <string name="sign_up">Sign Up</string>
     <string name="confirm">Confirm</string>
-
+    <string name="search_user_error">Failed to search user</string>
+    <string name="just_now">just now</string>
+    <string name="a_minute_ago">a minute ago</string>
+    <string name="minutes_ago">minutes ago</string>
+    <string name="an_hour_ago">an hour ago</string>
+    <string name="hours_ago">hours ago</string>
+    <string name="yesterday">yesterday</string>
+    <string name="days_ago">days ago</string>
 </resources>

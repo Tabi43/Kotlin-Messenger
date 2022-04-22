@@ -103,7 +103,7 @@ class f_conversations : Fragment(R.layout.f_conversations) {
         binding.recyclerViewChat.apply {
             layoutManager = LinearLayoutManager(context)
             setHasFixedSize(true)
-            chatAdapter = ChatAdapter(collection,binding.noChatTV)
+            chatAdapter = ChatAdapter(collection,binding.noChatTV,requireActivity())
             adapter = chatAdapter
         }
 

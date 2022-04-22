@@ -14,7 +14,7 @@ import com.example.kotlinmessenger.databinding.ActivityDashBoardBinding
 class DashBoard : AppCompatActivity() {
 
     lateinit var binding: ActivityDashBoardBinding
-    private var appUtil=AppUtil()
+    private var appUtil=AppUtil(this)
     private var TAG="DashboardActivity"
 
     override fun onCreate(savedInstanceState: Bundle?) {
