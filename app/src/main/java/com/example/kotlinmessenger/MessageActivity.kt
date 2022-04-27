@@ -3,8 +3,10 @@ package com.example.kotlinmessenger
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.os.*
+import android.provider.Settings
 import android.util.Log
 import android.view.View
 import android.widget.Toast
@@ -53,16 +55,18 @@ class MessageActivity : AppCompatActivity() {
 
     //Language parameter
     private var translator: LanguageManager? = null
-    private var hisLanguage = ""
-    private var myLanguage = ""
+    private var hisLanguage : String = ""
+    private var myLanguage : String = ""
+
+    var sharedPreferences : SharedPreferences? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         activityMessageBinding = ActivityMessageBinding.inflate(layoutInflater)
         super.onCreate(savedInstanceState)
         setContentView(activityMessageBinding.root)
 
-        var sharedPreferences = getSharedPreferences("preference", Context.MODE_PRIVATE)
-        myLanguage = sharedPreferences.getString("myLanguage","")!!
+        sharedPreferences = getSharedPreferences("preference", Context.MODE_PRIVATE)
+        myLanguage = sharedPreferences!!.getString("myLanguage","")!!
 
         appUtil = AppUtil(this)
         myId = appUtil.getUID()!!
@@ -77,6 +81,7 @@ class MessageActivity : AppCompatActivity() {
         isWritingMessage = MessageModel(hisId!!, myId, "...", System.currentTimeMillis().toString(), "IS_WRITING")
 
         checkHisImage()
+        setConv()
 
         translator = LanguageManager(myLanguage,hisLanguage)
         activityMessageBinding.messageToolbar.username = hisUsername
@@ -222,6 +227,16 @@ class MessageActivity : AppCompatActivity() {
                     activityMessageBinding.hisImage = hisImageUrl
                 }
         } else activityMessageBinding.hisImage = hisImageUrl
+    }
+
+    private fun setConv(){
+        sharedPreferences!!.edit().putString("conv",hisId)
+            .apply()
+    }
+
+    private fun clearConv(){
+        sharedPreferences!!.edit().putString("conv","")
+            .apply()
     }
 
     private fun checkHisLanguage(callback: (String) -> Unit){
@@ -416,12 +431,14 @@ class MessageActivity : AppCompatActivity() {
         if (firebaseRecyclerAdapter != null) {
             firebaseRecyclerAdapter!!.stopListening()
         }
+        clearConv()
         appUtil.updateOnlineStatus("offline")
         super.onPause()
     }
 
     override fun onResume() {
         appUtil.updateOnlineStatus("online")
+        setConv()
         super.onResume()
     }
 
@@ -639,6 +656,7 @@ class MessageActivity : AppCompatActivity() {
     override fun onDestroy() {
         setNoWriting()
         appUtil.updateOnlineStatus("offline")
+        clearConv()
         super.onDestroy()
     }
 }

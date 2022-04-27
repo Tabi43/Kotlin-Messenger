@@ -40,7 +40,7 @@ class ChatAdapter(private val chatList: ArrayList<ChatModel>,private val noChatT
         val util = AppUtil(context)
         val uid = FirebaseAuth.getInstance().uid ?: ""
         val chatModel = chatList[position]
-        val rawDate = chatModel.date
+        var rawDate = chatModel.date
         var last_message = chatModel.lastMessage
         chatModel.date = util.getTimeAgo(rawDate!!.toLong())
         val databaseReference = FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
@@ -65,7 +65,7 @@ class ChatAdapter(private val chatList: ArrayList<ChatModel>,private val noChatT
                                         Log.d(TAG, "Failed to load url image -> $it")
                                     }
                             }
-                            if(snapshot.child("typing").getValue() == "true"){
+                            if(snapshot.child("typing").value.toString().equals("true")){
                                 chatModel.lastMessage = "is typing..."
                             }else{
                                 chatModel.lastMessage = last_message
@@ -84,10 +84,10 @@ class ChatAdapter(private val chatList: ArrayList<ChatModel>,private val noChatT
                 if(!snapshot.exists()) ref.removeEventListener(this)
                 else {
                     chatModel.lastMessage = snapshot.child("lastMessage").value.toString()
-                    //chatModel.date = util.getTimeAgo(snapshot.child("date").value.toString().toLong())
-                    var raw = snapshot.child("date").value.toString()
-                    Log.d("CHAT ADAPTER", "Load data user or changed $raw")
-                    chatModel.date = util.getTimeAgo(raw.toLong())
+                    last_message = chatModel.lastMessage
+                    rawDate = snapshot.child("date").value.toString()
+                    Log.d("CHAT ADAPTER", "Load data user or changed $rawDate")
+                    chatModel.date = util.getTimeAgo(rawDate!!.toLong())
                     holder.chatItemLayoutBinding.chatModel = chatModel
                 }
             }

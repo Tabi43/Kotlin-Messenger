@@ -5,11 +5,22 @@
     android:layout_height="match_parent"
     tools:context=".Fragment.f_conversations">
 
+    <TextView
+        android:id="@+id/myChatTV"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"
+        android:text="@string/mychat"
+        android:textColor="@color/colorPrimary"
+        android:textSize="20dp"
+        android:textStyle="bold" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewChat"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:listitem="@layout/chat_item_layout" />
+        tools:listitem="@layout/chat_item_layout"
+        android:layout_below="@id/myChatTV"/>
 
     <TextView
         android:id="@+id/noChatTV"
@@ -23,8 +34,8 @@
         android:layout_marginEnd="100dp"
         android:layout_marginBottom="-44dp"
         android:text="No chat found"
-        android:textSize="20dp"
         android:textAlignment="center"
+        android:textSize="20dp"
         android:textStyle="bold"
         android:visibility="invisible" />
 

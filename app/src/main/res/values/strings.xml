@@ -23,7 +23,7 @@
     <string name="translation">Translation</string>
     <string name="auto_translation">Auto Translation</string>
     <string name="your_language">Your Language</string>
-    <string name="is_wrinting">Is Wrinting</string>
+    <string name="is_wrinting">Is wrinting...</string>
     <string name="save">Save</string>
     <string name="sign_up">Sign Up</string>
     <string name="confirm">Confirm</string>
@@ -35,4 +35,5 @@
     <string name="hours_ago">hours ago</string>
     <string name="yesterday">yesterday</string>
     <string name="days_ago">days ago</string>
+    <string name="mychat">My Chat</string>
 </resources>

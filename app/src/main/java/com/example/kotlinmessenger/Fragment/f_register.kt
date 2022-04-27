@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.core.net.toUri
@@ -29,6 +30,7 @@ class f_register : Fragment(R.layout.f_register) {
     lateinit var binding: FRegisterBinding
     private lateinit var appUtil: AppUtil
     private val TAG = "REGISTRATION FRAGMENT"
+    private var lan = ""
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -38,9 +40,6 @@ class f_register : Fragment(R.layout.f_register) {
         binding = FRegisterBinding.inflate(inflater, container, false)
         val language = languageCompanion()
 
-        binding.confirmButton.setOnClickListener {
-
-        }
         appUtil = AppUtil(requireActivity())
         binding.loginreturnButton.setOnClickListener {
             val fragment = f_login()
@@ -58,20 +57,31 @@ class f_register : Fragment(R.layout.f_register) {
         )
 
         ad.setDropDownViewResource(androidx.appcompat.R.layout.support_simple_spinner_dropdown_item)
-        binding.languageSpinner!!.adapter = ad
+        binding.languageSpinner.adapter = ad
 
         val systemLanguage = Locale.getDefault().getLanguage()
-        binding.languageSpinner!!.setSelection(
+        binding.languageSpinner.setSelection(
             language.getPosition(systemLanguage)
         )
+        lan = language.getBCP47CodeFromIntCode(language.getPosition(systemLanguage))
+        binding.languageSpinner.onItemSelectedListener =
+            object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
+                    lan = language.getBCP47CodeFromIntCode(p2)
+                }
+
+                override fun onNothingSelected(p0: AdapterView<*>?) {
+
+                }
+            }
 
         return binding.root
     }
 
     private fun performRegistration() {
-        var email = binding.mailET.text.toString()
-        var password = binding.passwordET.text.toString()
-        var confirm_password = binding.confirmPasswordET.text.toString()
+        val email = binding.mailET.text.toString()
+        val password = binding.passwordET.text.toString()
+        val confirm_password = binding.confirmPasswordET.text.toString()
 
         if (email.isEmpty() || password.isEmpty()) {
             Toast.makeText(activity, getString(R.string.text_toast1), Toast.LENGTH_LONG).show()
@@ -109,6 +119,7 @@ class f_register : Fragment(R.layout.f_register) {
         Log.d("Register Activity", "Reference : $userRef")
         //val user = User(uid, binding.username.text.toString(), "Hello")
         val user = UserModel(binding.username.text.toString(), "Hello", "", uid, "offline", "false")
+        user.language = lan
         userRef.child(uid).setValue(user)
             .addOnSuccessListener {
                 Toast.makeText(activity, "Successfully registration", Toast.LENGTH_LONG).show()

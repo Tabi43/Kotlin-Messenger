@@ -19,16 +19,6 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="5dp">
 
-            <!-- <TextView
-                 android:id="@+id/settingsTV"
-                 android:layout_width="wrap_content"
-                 android:layout_height="wrap_content"
-                 android:layout_centerHorizontal="true"
-                 android:text="Settings"
-                 android:textColor="@color/cardview_dark_background"
-                 android:textSize="20dp"
-                 android:textStyle="bold" />
-     -->
             <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/imgUser"
                 imageUrl="@{userImage}"
