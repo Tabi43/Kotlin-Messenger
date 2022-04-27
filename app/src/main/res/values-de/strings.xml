@@ -35,4 +35,5 @@
     <string name="yesterday">gestern</string>
     <string name="days_ago">vor tagen</string>
     <string name="mychat">Meine Chats</string>
+    <string name="no_user">keine Benutzer gefunden</string>
 </resources>

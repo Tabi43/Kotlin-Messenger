@@ -50,7 +50,6 @@ class f_login : Fragment(R.layout.f_login) {
 
     }
 
-
     private fun isAlreadyLogged() {
         val email = binding.mailET.text.toString()
         val password = binding.passwordET.text.toString()
@@ -63,38 +62,43 @@ class f_login : Fragment(R.layout.f_login) {
 
         FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
             .addOnCompleteListener {
-                val currentUSer = FirebaseAuth.getInstance().currentUser
-                if (currentUSer != null) {
-                    val uid = FirebaseAuth.getInstance().uid
-                    FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
-                        .getReference("users").child(uid!!).child("token").get()
-                        .addOnSuccessListener { savedToken ->
-                            Log.d(TAG, "Saved token: ${savedToken.value}")
-                            FirebaseMessaging.getInstance().token.addOnSuccessListener {
-                                if (!savedToken.exists()) {
-                                    Log.d(TAG, "Saved token is null")
-                                    performLogin()
-                                }else if ((savedToken.value != it)) {
-                                    Log.d(TAG, "Saved token id different!")
-                                    val builder = AlertDialog.Builder(activity)
-                                    builder.setMessage("Already logged on a different device! Are you sure to make login here?")
-                                    builder.setTitle("Warning")
-                                    builder.setCancelable(false)
-                                    builder.setPositiveButton(
-                                        "Yes",
-                                        DialogInterface.OnClickListener { dialogInterface, i -> performLogin() })
-                                    builder.setNegativeButton(
-                                        "No",
-                                        DialogInterface.OnClickListener { dialogInterface, i ->
-                                            binding.mailET.setText("")
-                                            binding.passwordET.setText("")
-                                        })
-                                    builder.create().show()
-                                } else {
-                                    startActivity(Intent(activity, DashBoard::class.java))
+                if (!it.isSuccessful) {
+                    Toast.makeText(activity, getString(R.string.no_user), Toast.LENGTH_LONG)
+                        .show()
+                } else {
+                    val currentUSer = FirebaseAuth.getInstance().currentUser
+                    if (currentUSer != null) {
+                        val uid = FirebaseAuth.getInstance().uid
+                        FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
+                            .getReference("users").child(uid!!).child("token").get()
+                            .addOnSuccessListener { savedToken ->
+                                Log.d(TAG, "Saved token: ${savedToken.value}")
+                                FirebaseMessaging.getInstance().token.addOnSuccessListener {
+                                    if (!savedToken.exists()) {
+                                        Log.d(TAG, "Saved token is null")
+                                        performLogin()
+                                    } else if ((savedToken.value != it)) {
+                                        Log.d(TAG, "Saved token id different!")
+                                        val builder = AlertDialog.Builder(activity)
+                                        builder.setMessage("Already logged on a different device! Are you sure to make login here?")
+                                        builder.setTitle("Warning")
+                                        builder.setCancelable(false)
+                                        builder.setPositiveButton(
+                                            "Yes",
+                                            DialogInterface.OnClickListener { dialogInterface, i -> performLogin() })
+                                        builder.setNegativeButton(
+                                            "No",
+                                            DialogInterface.OnClickListener { dialogInterface, i ->
+                                                binding.mailET.setText("")
+                                                binding.passwordET.setText("")
+                                            })
+                                        builder.create().show()
+                                    } else {
+                                        startActivity(Intent(activity, DashBoard::class.java))
+                                    }
                                 }
                             }
-                        }
+                    }
                 }
             }
     }
@@ -111,7 +115,6 @@ class f_login : Fragment(R.layout.f_login) {
         Log.d(TAG, "Login with email $email and password $password")
         FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
             .addOnCompleteListener {
-                if (!it.isSuccessful) return@addOnCompleteListener
                 FirebaseMessaging.getInstance().token.addOnSuccessListener { result ->
                     if (result != null) {
                         val uid = FirebaseAuth.getInstance().uid
@@ -131,7 +134,7 @@ class f_login : Fragment(R.layout.f_login) {
                 startActivity(Intent(activity, DashBoard::class.java))
             }
             .addOnFailureListener {
-                Toast.makeText(this.activity, "Failed to Login: ${it.message}", Toast.LENGTH_LONG)
+                Toast.makeText(activity, "Failed to Login: ${it.message}", Toast.LENGTH_LONG)
                     .show()
             }
     }

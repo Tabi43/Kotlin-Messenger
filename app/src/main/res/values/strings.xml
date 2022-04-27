@@ -36,4 +36,5 @@
     <string name="yesterday">yesterday</string>
     <string name="days_ago">days ago</string>
     <string name="mychat">My Chat</string>
+    <string name="no_user">No user found</string>
 </resources>

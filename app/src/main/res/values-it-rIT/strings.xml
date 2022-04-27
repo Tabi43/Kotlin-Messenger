@@ -35,4 +35,5 @@
     <string name="an_hour_ago">un\'ora fa</string>
     <string name="days_ago">giorni fa</string>
     <string name="mychat">Le mie chat</string>
+    <string name="no_user">Nessun utente trovato</string>
 </resources>
