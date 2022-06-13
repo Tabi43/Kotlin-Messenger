@@ -4,12 +4,14 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.kotlinmessenger.ProfileActivity
 import com.example.kotlinmessenger.R
@@ -53,14 +55,32 @@ class f_settings : Fragment(R.layout.f_settings) {
 
         if (autoTranslation) binding.autoTranslationCheck.isChecked = true
 
-        binding.languageSpinner.setSelection(
-            language.getPosition(
-                sharedPreferences.getString(
-                    "myLanguage",
-                    ""
-                )!!
+        val lan = sharedPreferences.getString(
+            "myLanguage",
+            ""
+        )!!
+        Toast.makeText(activity,"Language sp: $lan ",Toast.LENGTH_SHORT).show()
+        if(lan == ""){
+            FirebaseDatabase.getInstance("https://kotlin-messenger-288bc-default-rtdb.europe-west1.firebasedatabase.app")
+                .getReference("/users").child(myId!!).child("language").get()
+                .addOnSuccessListener {
+                    binding.languageSpinner.setSelection(
+                        language.getPosition(it.value.toString()
+                        )
+                    )
+                }
+                .addOnFailureListener {
+                    Log.e(TAG,"My language error query -> $it")
+                }
+        }else{
+            binding.languageSpinner.setSelection(
+                language.getPosition(
+                    lan
+                )
             )
-        )
+        }
+
+
 
         binding.languageSpinner.onItemSelectedListener =
             object : AdapterView.OnItemSelectedListener {
